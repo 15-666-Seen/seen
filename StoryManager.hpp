@@ -1,20 +1,21 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include <cassert>
 #include <string>
 #include <vector>
-#include <cassert>
+
 
 struct StoryManager {
 
-	StoryManager();
+  StoryManager();
 
-	const int total_phase = 4;
-	int current_phase = -1;
+  const int total_phase = 4;
+  int current_phase = -1;
 
-	/* called per frame to test if we need to go to the next stage */
-	virtual void advanceStory() override; 
+  /* called per frame to test if we need to go to the next stage */
+  virtual void advanceStory();
 
-	/* set up phase[current_phase] */
-	virtual void setUpPhase() override;
+  /* set up phase[current_phase] */
+  virtual void setUpPhase();
 };

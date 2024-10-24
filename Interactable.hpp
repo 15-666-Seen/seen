@@ -8,6 +8,9 @@
 
 #include "Scene.hpp"
 
+const float ITEM_INTERACT_DISTANCE = 1.0f;
+const float FURNITURE_INTERACT_DISTANCE = 1.0f;
+
 /* interactable object that can be picked up */
 enum ItemType { BEDROOM_KEY };
 
@@ -22,10 +25,15 @@ struct Furniture {
   FurnitureType type;
   Scene::Transform *transform;
 
-  bool visible;
-  bool canInteract;
+  // if the furniture is allowed to be interact in this phase
+  bool phase_allow_interact;
+
+  bool can_interact = false;
 
   virtual bool interact();
+
+  // see if this furniture is close enough to be interacted with
+  virtual bool interactable(Scene::Transform *player_transform);
 };
 
 /* A single item */
@@ -37,9 +45,14 @@ struct Item {
   Scene::Transform *transform;
 
   bool visible;
-  bool canInteract;
+  bool phase_allow_interact;
+
+  bool can_interact = false;
 
   virtual bool interact();
+
+  // see if this item is good to be interacted with
+  virtual bool interactable(Scene::Transform *player_transform);
 };
 
 /* Player inventory */
@@ -49,7 +62,7 @@ struct Inventory {
 
   std::unordered_set<ItemType> items; // all items
   int size = 5;                       // can initially hold 5 items
-  int current_item = 0; // the item the player currently hold s. 0 = nothing
+  int holding_item = 0; // the item the player currently hold s. 0 = nothing
 
   virtual bool hasItem(ItemType item_type);
   virtual bool addItem(ItemType item_type);
