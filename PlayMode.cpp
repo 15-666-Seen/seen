@@ -8,11 +8,8 @@
 #include "data_path.hpp"
 #include "gl_errors.hpp"
 
-
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/quaternion.hpp>
-
-#include <random>
 
 GLuint phonebank_meshes_for_lit_color_texture_program = 0;
 Load<MeshBuffer> phonebank_meshes(LoadTagDefault, []() -> MeshBuffer const * {
