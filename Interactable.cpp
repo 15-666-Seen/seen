@@ -4,38 +4,21 @@
 #include <string>
 #include <vector>
 
-
 /* INVENTORY */
-Inventory::Inventory() {
+Inventory::Inventory() {}
 
-}
+bool Inventory::hasItem() { return false; }
 
-bool Inventory::hasItem() {
-	return false;
-}
+bool Inventory::addItem() { return false; }
 
-bool Inventory::addItem() {
-	return false;
-}
-
-bool Inventory::removeItem() {
-	return false;
-}
+bool Inventory::removeItem() { return false; }
 
 /* ITEM */
-Item::Item() {
+Item::Item() {}
 
-}
-
-bool Item::interact() {
-	return false;
-}
+bool Item::interact() { return false; }
 
 /* FURNITURE */
-Furniture::Furniture() {
+Furniture::Furniture() {}
 
-}
-
-bool Furniture::interact() {
-	return false;
-}
+bool Furniture::interact() { return false; }

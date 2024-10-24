@@ -3,72 +3,62 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include <string>
 #include <vector>
 
+#include "Scene.hpp"
 
 /* interactable object that can be picked up */
-enum ItemType {
-	BEDROOM_KEY
-};
+enum ItemType { BEDROOM_KEY };
 
 /* Type of interactable object that cannot be picked up */
-enum FurnitureType {
-	BED,
-	CLOSET,
-	BEDROOM_DOOR,
-	FRONT_DOOR
-};
+enum FurnitureType { BED, CLOSET, BEDROOM_DOOR, FRONT_DOOR };
 
-/* Manages the inventory, all items, all furniture*/
-struct InteractableManager {
+/* A single furniture */
+struct Furniture {
 
-	Inventory inventory = Inventory();
-	std::vector<Item*> items; // better name? This collides with inventory->items
-	std::vector<Furniture*> furnitures;
+  Furniture();
 
-};
+  FurnitureType type;
+  Scene::Transform *transform;
 
-/* Player inventory */
-struct Inventory {
+  bool visible;
+  bool canInteract;
 
-	Inventory();
-
-	std::vector<ItemType> items; // all items
-	int size = 5; // can initially hold 5 items 
-	int current_item = 0; // the item the player currently holds. 0 = nothing 
-
-	virtual bool hasItem() override;
-	virtual bool addItem() override;
-	virtual bool removeItem() override;
-
+  virtual bool interact();
 };
 
 /* A single item */
 struct Item {
 
-	Item();
+  Item();
 
-	ItemType type;
-	Scene::Transform* transform;
+  ItemType type;
+  Scene::Transform *transform;
 
-	bool visible;
-	bool canInteract;
+  bool visible;
+  bool canInteract;
 
-	virtual bool interact() override;
-
+  virtual bool interact();
 };
 
-/* A single furniture */
-struct Furniture {
+/* Player inventory */
+struct Inventory {
 
-	Furniture();
+  Inventory();
 
-	FurnitureType type;
-	Scene::Transform* transform;
+  std::vector<ItemType> items; // all items
+  int size = 5;                // can initially hold 5 items
+  int current_item = 0; // the item the player currently holds. 0 = nothing
 
-	bool visible;
-	bool canInteract;
+  virtual bool hasItem();
+  virtual bool addItem();
+  virtual bool removeItem();
+};
 
-	virtual bool interact() override;
+/* Manages the inventory, all items, all furniture*/
+struct InteractableManager {
+
+  Inventory inventory = Inventory();
+  std::vector<Item *> items; // better name? This collides with inventory->items
+  std::vector<Furniture *> furnitures;
 };
