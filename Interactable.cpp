@@ -7,11 +7,26 @@
 /* INVENTORY */
 Inventory::Inventory() {}
 
-bool Inventory::hasItem() { return false; }
+bool Inventory::hasItem(ItemType item_type) {
+  return items.find(item_type) != items.end();
+}
 
-bool Inventory::addItem() { return false; }
+bool Inventory::addItem(ItemType item_type) {
+  if (items.find(item_type) != items.end()) {
+    assert(false && "Item already in inventory");
+    return false;
+  }
+  items.insert(item_type);
+  return true;
+}
 
-bool Inventory::removeItem() { return false; }
+bool Inventory::removeItem(ItemType item_type) {
+  if (items.find(item_type) == items.end()) {
+    return false;
+  }
+  items.erase(item_type);
+  return true;
+}
 
 /* ITEM */
 Item::Item() {}
