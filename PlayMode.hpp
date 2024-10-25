@@ -8,7 +8,8 @@
 #include <deque>
 #include <vector>
 
-struct PlayMode : Mode {
+struct PlayMode : Mode
+{
   PlayMode();
   virtual ~PlayMode();
 
@@ -21,7 +22,8 @@ struct PlayMode : Mode {
   //----- game state -----
 
   // input tracking:
-  struct Button {
+  struct Button
+  {
     uint8_t downs = 0;
     uint8_t pressed = 0;
   } left, right, down, up;
@@ -30,7 +32,8 @@ struct PlayMode : Mode {
   Scene scene;
 
   // player info:
-  struct Player {
+  struct Player
+  {
     WalkPoint at;
     // transform is at player's feet and will be yawed by mouse left/right
     // motion:
