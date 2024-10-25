@@ -6,6 +6,7 @@
 #include <unordered_set>
 #include <vector>
 #include <map>
+#include <map>
 
 #include "Scene.hpp"
 
@@ -27,6 +28,11 @@ enum FurnitureType
 	FRONT_DOOR,
 	DESK
 };
+std::map<Color, string> FurnitureTypeToString = {{BED, "Bed"},
+												 {CLOSET, "Closet"},
+												 {BEDROOM_DOOR, "Bedroom Door"},
+												 {FRONT_DOOR, "Front Door"},
+												 {DESK, "Desk"}};
 std::map<Color, string> FurnitureTypeToString = {{BED, "Bed"},
 												 {CLOSET, "Closet"},
 												 {BEDROOM_DOOR, "Bedroom Door"},

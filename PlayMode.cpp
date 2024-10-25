@@ -343,6 +343,5 @@ void PlayMode::draw(glm::uvec2 const &drawable_size)
         glm::u8vec4(0xff, 0xff, 0xff, 0x00));
   }
   // TODO: Replace with GameplayUI.DrawUI();
-
   GL_ERRORS();
 }
