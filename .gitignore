@@ -18,3 +18,5 @@ scenes/show-scene*
 *.blend[0-9]
 .vs/*
 maek-cache.json
+
+.clangd

@@ -3,8 +3,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include <string>
+#include <unordered_set>
 #include <vector>
+
+#include "Scene.hpp"
+
+const float ITEM_INTERACT_DISTANCE = 1.0f;
+const float FURNITURE_INTERACT_DISTANCE = 1.0f;
 
 /* interactable object that can be picked up */
 enum ItemType
@@ -18,32 +23,27 @@ enum FurnitureType
 	BED,
 	CLOSET,
 	BEDROOM_DOOR,
-	FRONT_DOOR,
-	DESK
+	FRONT_DOOR
 };
 
-/* Manages the inventory, all items, all furniture*/
-struct InteractableManager
+/* A single furniture */
+struct Furniture
 {
 
-	Inventory inventory = Inventory();
-	std::vector<Item *> items; // better name? This collides with inventory->items
-	std::vector<Furniture *> furnitures;
-};
+	Furniture();
 
-/* Player inventory */
-struct Inventory
-{
+	FurnitureType type;
+	Scene::Transform *transform;
 
-	Inventory();
+	// if the furniture is allowed to be interact in this phase
+	bool phase_allow_interact;
 
-	std::vector<ItemType> items; // all items
-	int size = 5;				 // can initially hold 5 items
-	int current_item = 0;		 // the item the player currently holds. 0 = nothing
+	bool can_interact = false;
 
-	virtual bool hasItem() override;
-	virtual bool addItem() override;
-	virtual bool removeItem() override;
+	virtual bool interact();
+
+	// see if this furniture is close enough to be interacted with
+	virtual bool interactable(Scene::Transform *player_transform);
 };
 
 /* A single item */
@@ -56,24 +56,38 @@ struct Item
 	Scene::Transform *transform;
 
 	bool visible;
-	bool canInteract;
-	bool interactStatus = falses; // is the player currently interacting with it?
+	bool phase_allow_interact;
 
-	virtual bool interact() override;
+	bool interactStatus = false; // is the player currently interacting with it?
+	bool can_interact = false;
+
+	virtual bool interact();
+
+	// see if this item is good to be interacted with
+	virtual bool interactable(Scene::Transform *player_transform);
 };
 
-/* A single furniture */
-struct Furniture
+/* Player inventory */
+struct Inventory
 {
 
-	Furniture();
+	Inventory();
 
-	FurnitureType type;
-	Scene::Transform *transform;
+	std::unordered_set<ItemType> items; // all items
+	int size = 5;						// can initially hold 5 items
+	int holding_item = 0;				// the item the player currently hold s. 0 = nothing
 
-	bool visible;
-	bool canInteract;
-	bool interactStatus = false; // is the player currently interacting with it?
+	virtual bool hasItem(ItemType item_type);
+	virtual bool addItem(ItemType item_type);
+	virtual bool removeItem(ItemType item_type);
+};
 
-	virtual bool interact() override;
+/* Manages the inventory, all items, all furniture*/
+struct InteractableManager
+{
+
+	Inventory inventory = Inventory();
+
+	std::vector<Item *> items; // better name? This collides with inventory->items
+	std::vector<Furniture *> furnitures;
 };
