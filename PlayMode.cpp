@@ -248,6 +248,10 @@ void PlayMode::update(float elapsed) {
   right.downs = 0;
   up.downs = 0;
   down.downs = 0;
+
+  // TODO: interactable items and furniture UPDATES
+
+  // TODO: UI updates
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
