@@ -1,4 +1,5 @@
 #include "UI.hpp"
+#include "DrawLines.hpp"
 
 GameplayUI::GameplayUI()
 {
