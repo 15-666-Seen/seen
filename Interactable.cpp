@@ -1,6 +1,8 @@
 #include "Interactable.hpp"
+#include "Load.hpp"
 #include <glm/glm.hpp>
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -66,4 +68,41 @@ bool Furniture::interactable(Scene::Transform *player_transform) {
 
   can_interact = distance < FURNITURE_INTERACT_DISTANCE;
   return can_interact;
+}
+
+/* INTERACTABLE MANAGER */
+void InteractableManager::load(Load<Scene> scene) {
+  for (const auto &[mesh_name, furniture_type] : MeshNameToFurnitureType) {
+    auto it = scene->mesh_name_to_transform.find(mesh_name);
+    if (it == scene->mesh_name_to_transform.end()) {
+      std::cout << "Furniture mesh not found: " << mesh_name << std::endl;
+      continue; // TODO: this should not be continue, should exit
+    }
+
+    // create new furniture
+    Furniture *furniture = new Furniture();
+    furniture->type = furniture_type;
+    furniture->transform = it->second;
+    // TODO: allowable need check
+    furniture->phase_allow_interact = true;
+    furniture->can_interact = true;
+  }
+
+  for (const auto &[mesh_name, item_type] : MeshNameToItemType) {
+    auto it = scene->mesh_name_to_transform.find(mesh_name);
+    if (it == scene->mesh_name_to_transform.end()) {
+      std::cout << "Item mesh not found: " << mesh_name << std::endl;
+      continue; // TODO: this should not be continue, should exit
+    }
+
+    // create new item
+    Item *item = new Item();
+    item->type = item_type;
+    item->transform = it->second;
+
+    // TODO: allowable need check
+    item->visible = true;
+    item->can_interact = true;
+    item->phase_allow_interact = true;
+  }
 }
