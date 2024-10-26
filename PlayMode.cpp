@@ -11,17 +11,18 @@
 #include <glm/gtx/quaternion.hpp>
 
 GLuint phonebank_meshes_for_lit_color_texture_program = 0;
-Load<MeshBuffer> phonebank_meshes(LoadTagDefault, []() -> MeshBuffer const * {
+Load<MeshBuffer> phonebank_meshes(LoadTagDefault, []() -> MeshBuffer const *
+                                  {
   MeshBuffer const *ret = new MeshBuffer(data_path("simple.pnct"));
   phonebank_meshes_for_lit_color_texture_program =
       ret->make_vao_for_program(lit_color_texture_program->program);
-  return ret;
-});
+  return ret; });
 
-Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
-  return new Scene(
-      data_path("simple.scene"), [&](Scene &scene, Scene::Transform *transform,
-                                     std::string const &mesh_name) {
+Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const *
+                            { return new Scene(
+                                  data_path("simple.scene"), [&](Scene &scene, Scene::Transform *transform,
+                                                                 std::string const &mesh_name)
+                                  {
         Mesh const &mesh = phonebank_meshes->lookup(mesh_name);
 
         scene.drawables.emplace_back(transform);
@@ -32,19 +33,18 @@ Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
         drawable.pipeline.vao = phonebank_meshes_for_lit_color_texture_program;
         drawable.pipeline.type = mesh.type;
         drawable.pipeline.start = mesh.start;
-        drawable.pipeline.count = mesh.count;
-      });
-});
+        drawable.pipeline.count = mesh.count; }); });
 
 WalkMesh const *walkmesh = nullptr;
 Load<WalkMeshes>
-phonebank_walkmeshes(LoadTagDefault, []() -> WalkMeshes const * {
+phonebank_walkmeshes(LoadTagDefault, []() -> WalkMeshes const *
+                     {
   WalkMeshes *ret = new WalkMeshes(data_path("simple.w"));
   walkmesh = &ret->lookup("FloorPlane");
-  return ret;
-});
+  return ret; });
 
-PlayMode::PlayMode() : scene(*phonebank_scene) {
+PlayMode::PlayMode() : scene(*phonebank_scene)
+{
   // create a player transform:
   scene.transforms.emplace_back();
   player.transform = &scene.transforms.back();
@@ -76,50 +76,80 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
 PlayMode::~PlayMode() {}
 
 bool PlayMode::handle_event(SDL_Event const &evt,
-                            glm::uvec2 const &window_size) {
+                            glm::uvec2 const &window_size)
+{
 
-  if (evt.type == SDL_KEYDOWN) {
-    if (evt.key.keysym.sym == SDLK_ESCAPE) {
+  if (evt.type == SDL_KEYDOWN)
+  {
+    if (evt.key.keysym.sym == SDLK_ESCAPE)
+    {
       SDL_SetRelativeMouseMode(SDL_FALSE);
       return true;
-    } else if (evt.key.keysym.sym == SDLK_a) {
+    }
+    else if (evt.key.keysym.sym == SDLK_a)
+    {
       left.downs += 1;
       left.pressed = true;
       return true;
-    } else if (evt.key.keysym.sym == SDLK_d) {
+    }
+    else if (evt.key.keysym.sym == SDLK_d)
+    {
       right.downs += 1;
       right.pressed = true;
       return true;
-    } else if (evt.key.keysym.sym == SDLK_w) {
+    }
+    else if (evt.key.keysym.sym == SDLK_w)
+    {
       up.downs += 1;
       up.pressed = true;
       return true;
-    } else if (evt.key.keysym.sym == SDLK_s) {
+    }
+    else if (evt.key.keysym.sym == SDLK_s)
+    {
       down.downs += 1;
       down.pressed = true;
       return true;
     }
-  } else if (evt.type == SDL_KEYUP) {
-    if (evt.key.keysym.sym == SDLK_a) {
+  }
+  else if (evt.type == SDL_KEYUP)
+  {
+    if (evt.key.keysym.sym == SDLK_a)
+    {
       left.pressed = false;
       return true;
-    } else if (evt.key.keysym.sym == SDLK_d) {
+    }
+    else if (evt.key.keysym.sym == SDLK_d)
+    {
       right.pressed = false;
       return true;
-    } else if (evt.key.keysym.sym == SDLK_w) {
+    }
+    else if (evt.key.keysym.sym == SDLK_w)
+    {
       up.pressed = false;
       return true;
-    } else if (evt.key.keysym.sym == SDLK_s) {
+    }
+    else if (evt.key.keysym.sym == SDLK_s)
+    {
       down.pressed = false;
       return true;
     }
-  } else if (evt.type == SDL_MOUSEBUTTONDOWN) {
-    if (SDL_GetRelativeMouseMode() == SDL_FALSE) {
+  }
+  else if (evt.type == SDL_MOUSEBUTTONDOWN)
+  {
+    int x, y;
+    SDL_GetMouseState(&x, &y);
+    gameplayUI->InteractOnClick(x, y);
+
+    if (SDL_GetRelativeMouseMode() == SDL_FALSE)
+    {
       SDL_SetRelativeMouseMode(SDL_TRUE);
       return true;
     }
-  } else if (evt.type == SDL_MOUSEMOTION) {
-    if (SDL_GetRelativeMouseMode() == SDL_TRUE) {
+  }
+  else if (evt.type == SDL_MOUSEMOTION)
+  {
+    if (SDL_GetRelativeMouseMode() == SDL_TRUE)
+    {
       glm::vec2 motion = glm::vec2(evt.motion.xrel / float(window_size.y),
                                    -evt.motion.yrel / float(window_size.y));
       glm::vec3 upDir = walkmesh->to_world_smooth_normal(player.at);
@@ -143,7 +173,8 @@ bool PlayMode::handle_event(SDL_Event const &evt,
   return false;
 }
 
-void PlayMode::update(float elapsed) {
+void PlayMode::update(float elapsed)
+{
   // player walking:
   {
     // combine inputs into a move:
@@ -169,14 +200,16 @@ void PlayMode::update(float elapsed) {
     // using a for() instead of a while() here so that if walkpoint gets stuck
     // in
     // some awkward case, code will not infinite loop:
-    for (uint32_t iter = 0; iter < 10; ++iter) {
+    for (uint32_t iter = 0; iter < 10; ++iter)
+    {
       if (remain == glm::vec3(0.0f))
         break;
       WalkPoint end;
       float time;
       walkmesh->walk_in_triangle(player.at, remain, &end, &time);
       player.at = end;
-      if (time == 1.0f) {
+      if (time == 1.0f)
+      {
         // finished within triangle:
         remain = glm::vec3(0.0f);
         break;
@@ -185,12 +218,15 @@ void PlayMode::update(float elapsed) {
       remain *= (1.0f - time);
       // try to step over edge:
       glm::quat rotation;
-      if (walkmesh->cross_edge(player.at, &end, &rotation)) {
+      if (walkmesh->cross_edge(player.at, &end, &rotation))
+      {
         // stepped to a new triangle:
         player.at = end;
         // rotate step to follow surface:
         remain = rotation * remain;
-      } else {
+      }
+      else
+      {
         // ran into a wall, bounce / slide along it:
         glm::vec3 const &a = walkmesh->vertices[player.at.indices.x];
         glm::vec3 const &b = walkmesh->vertices[player.at.indices.y];
@@ -201,17 +237,21 @@ void PlayMode::update(float elapsed) {
 
         // check how much 'remain' is pointing out of the triangle:
         float d = glm::dot(remain, in);
-        if (d < 0.0f) {
+        if (d < 0.0f)
+        {
           // bounce off of the wall:
           remain += (-1.25f * d) * in;
-        } else {
+        }
+        else
+        {
           // if it's just pointing along the edge, bend slightly away from wall:
           remain += 0.01f * d * in;
         }
       }
     }
 
-    if (remain != glm::vec3(0.0f)) {
+    if (remain != glm::vec3(0.0f))
+    {
       std::cout << "NOTE: code used full iteration budget for walking."
                 << std::endl;
     }
@@ -248,7 +288,8 @@ void PlayMode::update(float elapsed) {
   down.downs = 0;
 }
 
-void PlayMode::draw(glm::uvec2 const &drawable_size) {
+void PlayMode::draw(glm::uvec2 const &drawable_size)
+{
   // update camera aspect ratio for drawable:
   player.camera->aspect = float(drawable_size.x) / float(drawable_size.y);
 
