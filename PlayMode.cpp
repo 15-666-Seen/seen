@@ -13,19 +13,20 @@
 GLuint phonebank_meshes_for_lit_color_texture_program = 0;
 Load<MeshBuffer> phonebank_meshes(LoadTagDefault, []() -> MeshBuffer const *
                                   {
-  MeshBuffer const *ret = new MeshBuffer(data_path("simple.pnct"));
+  MeshBuffer const *ret = new MeshBuffer(data_path("bedroom.pnct"));
   phonebank_meshes_for_lit_color_texture_program =
       ret->make_vao_for_program(lit_color_texture_program->program);
   return ret; });
 
 Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const *
                             { return new Scene(
-                                  data_path("simple.scene"), [&](Scene &scene, Scene::Transform *transform,
-                                                                 std::string const &mesh_name)
+                                  data_path("bedroom.scene"), [&](Scene &scene, Scene::Transform *transform,
+                                                                  std::string const &mesh_name)
                                   {
         Mesh const &mesh = phonebank_meshes->lookup(mesh_name);
 
         scene.drawables.emplace_back(transform);
+        scene.mesh_name_to_transform[mesh_name] = transform;
         Scene::Drawable &drawable = scene.drawables.back();
 
         drawable.pipeline = lit_color_texture_program_pipeline;
@@ -39,8 +40,8 @@ WalkMesh const *walkmesh = nullptr;
 Load<WalkMeshes>
 phonebank_walkmeshes(LoadTagDefault, []() -> WalkMeshes const *
                      {
-  WalkMeshes *ret = new WalkMeshes(data_path("simple.w"));
-  walkmesh = &ret->lookup("FloorPlane");
+  WalkMeshes *ret = new WalkMeshes(data_path("bedroom.w"));
+  walkmesh = &ret->lookup("WalkMesh");
   return ret; });
 
 PlayMode::PlayMode() : scene(*phonebank_scene)
@@ -58,7 +59,7 @@ PlayMode::PlayMode() : scene(*phonebank_scene)
   player.camera->transform->parent = player.transform;
 
   // player's eyes are 1.8 units above the ground:
-  player.camera->transform->position = glm::vec3(0.0f, 0.0f, 1.8f);
+  player.camera->transform->position = glm::vec3(0.0f, 0.0f, 1.0f);
 
   // rotate camera facing direction (-z) to player facing direction (+y):
   player.camera->transform->rotation =
@@ -67,7 +68,8 @@ PlayMode::PlayMode() : scene(*phonebank_scene)
   // start player walking at nearest walk point:
   player.at = walkmesh->nearest_walk_point(player.transform->position);
 
-  // items & furniture loading
+  // TODO: items & furniture loading
+  interactableManager.load(phonebank_scene);
 
   // UI
   gameplayUI = new GameplayUI();

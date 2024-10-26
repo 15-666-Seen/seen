@@ -1,5 +1,3 @@
-
-
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
@@ -7,22 +5,24 @@
 #include <unordered_set>
 #include <vector>
 
+#include "Load.hpp"
 #include "Scene.hpp"
 
 const float ITEM_INTERACT_DISTANCE = 1.0f;
 const float FURNITURE_INTERACT_DISTANCE = 1.0f;
 
 /* interactable object that can be picked up */
+// =========================  mesh name must match =========================
 enum ItemType { BEDROOM_KEY };
+static std::map<std::string, ItemType> MeshNameToItemType = {
+    {"BedroomKey", BEDROOM_KEY}};
 
 /* Type of interactable object that cannot be picked up */
 enum FurnitureType { BED, CLOSET, BEDROOM_DOOR, FRONT_DOOR, DESK };
 static std::map<FurnitureType, std::string> FurnitureTypeToString = {
-    {BED, "Bed"},
-    {CLOSET, "Closet"},
-    {BEDROOM_DOOR, "Bedroom Door"},
-    {FRONT_DOOR, "Front Door"},
-    {DESK, "Desk"}};
+    {BED, "Bed"}, {BEDROOM_DOOR, "Bedroom Door"}};
+static std::map<std::string, FurnitureType> MeshNameToFurnitureType = {
+    {"Bed", BED}, {"BedroomDoor", BEDROOM_DOOR}};
 
 /* A single furniture */
 struct Furniture {
@@ -34,7 +34,7 @@ struct Furniture {
 
   // if the furniture is allowed to be interact in this phase
   bool phase_allow_interact;
-
+  bool interactStatus = false; // is the player currently interacting with it?
   bool can_interact = false;
 
   virtual bool interact();
@@ -53,8 +53,6 @@ struct Item {
 
   bool visible;
   bool phase_allow_interact;
-
-  bool interactStatus = false; // is the player currently interacting with it?
   bool can_interact = false;
 
   virtual bool interact();
@@ -84,4 +82,6 @@ struct InteractableManager {
 
   std::vector<Item *> items; // better name? This collides with inventory->items
   std::vector<Furniture *> furnitures;
+
+  void load(Load<Scene> meshes);
 };
