@@ -7,10 +7,9 @@ GameplayUI::GameplayUI() {
   dialogueText.emplace_back("Last Testing Dialogue");
 }
 
-void GameplayUI::setInteractionText(Furniture *f) {
-  if (f != nullptr) {
-    interactionText =
-        "Press [F] to interact with the " + FurnitureTypeToString[f->type];
+void GameplayUI::setInteractionText(InteractableInterface *interactable_it) {
+  if (interactable_it != nullptr) {
+    interactionText = "Press [F] to " + interactable_it->interact_text();
   } else {
     interactionText = "";
   }
@@ -40,12 +39,6 @@ void GameplayUI::DrawUI(glm::uvec2 const &drawable_size) {
                   glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
                   glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
                   glm::u8vec4(0x00, 0x00, 0x00, 0x00));
-
-  if (dialogueText.size() > 0)
-    lines.draw_text(dialogueText[0].c_str(),
-                    glm::vec3(-aspect + 0.5f * H, -0.3 + 0.1f * H, 0.0),
-                    glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
-                    glm::u8vec4(0x00, 0x00, 0x00, 0x00));
 
   if (dialogueText.size() > 0) {
     lines.draw_box(glm::mat4(0.9f * aspect, 0.0f, 0.0f, 0.0f, 0.0f, 0.3f, 0.0f,
