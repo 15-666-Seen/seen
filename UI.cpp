@@ -1,8 +1,8 @@
 #include "UI.hpp"
 
-GameplayUI::GameplayUI(glm::uvec2 const &drawable_size)
+GameplayUI::GameplayUI()
 {
-    aspect = float(drawable_size.x) / float(drawable_size.y);
+    dialogueText.emplace_back("Testing Dialogue");
 }
 
 void GameplayUI::setInteractionText(Furniture *f)
@@ -24,20 +24,21 @@ void GameplayUI::setMissionText(std::string s)
 
 void GameplayUI::setDialogueTexts(std::vector<std::string> v)
 {
-    dialogueText.size() = v;
+    dialogueText = v;
 }
 
-void GameplayUI::DrawUI()
+void GameplayUI::DrawUI(glm::uvec2 const &drawable_size)
 {
     // use DrawLines to overlay some text:
-    glDisable(GL_DEPTH_TEST);
+    float aspect = float(drawable_size.x) / float(drawable_size.y);
+    const float H = 0.1f;
 
     DrawLines lines(glm::mat4(1.0f / aspect, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
                               0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
                               1.0f));
 
     lines.draw_text(interactionText.c_str(),
-                    glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
+                    glm::vec3(-aspect + 0.1f * H, 1.0 - 2 * H, 0.0),
                     glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
                     glm::u8vec4(0x00, 0x00, 0x00, 0x00));
 
@@ -46,10 +47,11 @@ void GameplayUI::DrawUI()
                     glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
                     glm::u8vec4(0x00, 0x00, 0x00, 0x00));
 
-    lines.draw_text(dialogueText[0].c_str(),
-                    glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
-                    glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
-                    glm::u8vec4(0x00, 0x00, 0x00, 0x00));
+    if (dialogueText.size() > 0)
+        lines.draw_text(dialogueText[0].c_str(),
+                        glm::vec3(-aspect + 0.5f * H, -0.3 + 0.1f * H, 0.0),
+                        glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+                        glm::u8vec4(0x00, 0x00, 0x00, 0x00));
 }
 
 void GameplayUI::InteractOnClick(glm::vec2 const &click_pos)

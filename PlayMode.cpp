@@ -69,6 +69,9 @@ PlayMode::PlayMode() : scene(*phonebank_scene)
 
   // start player walking at nearest walk point:
   player.at = walkmesh->nearest_walk_point(player.transform->position);
+
+  // UI
+  gameplayUI = new GameplayUI();
 }
 
 PlayMode::~PlayMode() {}
@@ -307,11 +310,11 @@ void PlayMode::draw(glm::uvec2 const &drawable_size)
                         // FYI you can change it.
 
   scene.draw(*player.camera);
-
+  glDisable(GL_DEPTH_TEST);
   /* In case you are wondering if your walkmesh is lining up with your scene,
   try:
   {
-          glDisable(GL_DEPTH_TEST);
+
           DrawLines lines(player.camera->make_projection() *
   glm::mat4(player.camera->transform->make_world_to_local())); for (auto const
   &tri : walkmesh->triangles) { lines.draw(walkmesh->vertices[tri.x],
@@ -323,25 +326,10 @@ void PlayMode::draw(glm::uvec2 const &drawable_size)
           }
   }
   */
-  { // use DrawLines to overlay some text:
-    glDisable(GL_DEPTH_TEST);
-    float aspect = float(drawable_size.x) / float(drawable_size.y);
-    DrawLines lines(glm::mat4(1.0f / aspect, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-                              0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-                              1.0f));
 
-    constexpr float H = 0.09f;
-    lines.draw_text("Mouse motion looks; WASD moves; escape ungrabs mouse",
-                    glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
-                    glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
-                    glm::u8vec4(0x00, 0x00, 0x00, 0x00));
-    float ofs = 2.0f / drawable_size.y;
-    lines.draw_text(
-        "Mouse motion looks; WASD moves; escape ungrabs mouse",
-        glm::vec3(-aspect + 0.1f * H + ofs, -1.0 + +0.1f * H + ofs, 0.0),
-        glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
-        glm::u8vec4(0xff, 0xff, 0xff, 0x00));
-  }
-  // TODO: Replace with GameplayUI.DrawUI();
+  // render UI and text
+  glDisable(GL_DEPTH_TEST);
+  gameplayUI->DrawUI(drawable_size);
+
   GL_ERRORS();
 }
