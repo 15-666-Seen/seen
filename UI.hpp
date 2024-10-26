@@ -3,8 +3,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include "Interactable.hpp"
-
 #include <deque>
 #include <string>
 
@@ -13,8 +11,8 @@ struct GameplayUI {
   GameplayUI();
 
   // upper left corner: interaction (press [F] to interact)
-  std::string interactionText = "";
-  void setInteractionText(InteractableInterface *interactable_it);
+  std::string interactionText = "Interaction Text Holder";
+  void setInteractionText(const std::string &text);
 
   // lower left corner: tutorial or mission (find the key without being killed)
   std::string missionText = "";

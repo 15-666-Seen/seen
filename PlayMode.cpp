@@ -106,6 +106,10 @@ bool PlayMode::handle_event(SDL_Event const &evt,
       down.downs += 1;
       down.pressed = true;
       return true;
+    } else if (evt.key.keysym.sym == SDLK_f) {
+      F.downs += 1;
+      F.pressed = true;
+      return true;
     }
   } else if (evt.type == SDL_KEYUP) {
     if (evt.key.keysym.sym == SDLK_a) {
@@ -119,6 +123,9 @@ bool PlayMode::handle_event(SDL_Event const &evt,
       return true;
     } else if (evt.key.keysym.sym == SDLK_s) {
       down.pressed = false;
+      return true;
+    } else {
+      F.pressed = false;
       return true;
     }
   } else if (evt.type == SDL_MOUSEBUTTONDOWN) {
@@ -260,7 +267,7 @@ void PlayMode::update(float elapsed) {
   down.downs = 0;
 
   // TODO: interactable items and furniture UPDATES
-  interactableManager.update(player.transform);
+  interactableManager.update(player.transform, gameplayUI, F.pressed);
 
   // TODO: UI updates
 

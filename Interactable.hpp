@@ -10,6 +10,7 @@
 
 #include "Load.hpp"
 #include "Scene.hpp"
+#include "UI.hpp"
 
 const float ITEM_INTERACT_DISTANCE = 1.0f;
 const float FURNITURE_INTERACT_DISTANCE = 1.0f;
@@ -107,7 +108,8 @@ struct InteractableManager {
   void load(Load<Scene> meshes);
 
   // in each frame, we check interactable objects
-  void update(Scene::Transform *player_transform);
+  void update(Scene::Transform *player_transform, GameplayUI *gameplayUI,
+              bool interact_pressed);
 
   // furniture interaction in current phase, used to forward phase
   FurnitureType cur_furniture = NONE;

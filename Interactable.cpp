@@ -36,6 +36,7 @@ Item::Item() {}
 bool Item::interact() { return can_interact; }
 
 bool Item::interactable(Scene::Transform *player_transform) {
+  std::cout << "Item interactable" << std::endl;
   // should be visible and phase_allow_interact
   if (!visible || !phase_allow_interact) {
     return false;
@@ -86,6 +87,8 @@ void InteractableManager::load(Load<Scene> scene) {
     // TODO: allowable need check
     furniture->phase_allow_interact = true;
     furniture->can_interact = true;
+
+    furnitures.push_back(furniture);
   }
 
   for (const auto &[mesh_name, item_type] : MeshNameToItemType) {
@@ -104,15 +107,28 @@ void InteractableManager::load(Load<Scene> scene) {
     item->visible = true;
     item->can_interact = true;
     item->phase_allow_interact = true;
+
+    items.push_back(item);
   }
 }
 
-void InteractableManager::update(Scene::Transform *player_transform) {
+void InteractableManager::update(Scene::Transform *player_transform,
+                                 GameplayUI *gameplayUI,
+                                 bool interact_pressed) {
+  std::string interaction_text = "";
   for (auto &furniture : furnitures) {
-    furniture->interactable(player_transform);
+    if (furniture->interactable(player_transform)) {
+      interaction_text = furniture->interact_text();
+      break;
+    }
   }
 
   for (auto &item : items) {
-    item->interactable(player_transform);
+    if (item->interactable(player_transform)) {
+      interaction_text = item->interact_text();
+      break;
+    }
   }
+
+  gameplayUI->setInteractionText(interaction_text);
 }
