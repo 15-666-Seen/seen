@@ -1,5 +1,8 @@
 #include "StoryManager.hpp"
 
+StoryManager::StoryManager() {
+}
+
 void StoryManager::SetUpManager(InteractableManager* im, GameplayUI* ui) {
     interactableManager = im;
     gameplayUI = ui;
@@ -11,21 +14,29 @@ void StoryManager::advanceStory() {
   bool set_up_next_phase = false;
 
   switch (current_phase) {
-
   case 0:
-    if () { // if player is in bed
+    if (interactableManager->cur_furniture == BED) { // if player is in bed
       current_phase++; // advance to the next phase
       set_up_next_phase = true;
     }
     break;
   case 1:
-
+      if (interactableManager->cur_furniture == CLOSET) { // if player is in closet
+          current_phase++; // advance to the next phase
+          set_up_next_phase = true;
+      }
     break;
   case 2:
-
+      if (false) { // if player is outside bedroom
+          current_phase++; // advance to the next phase
+          set_up_next_phase = true;
+      }
     break;
   case 3:
-
+      if (false) { // if player is outsidde house
+          current_phase++; // advance to the next phase
+          set_up_next_phase = true;
+      }
     break;
   default:
     assert(false);
@@ -36,10 +47,13 @@ void StoryManager::advanceStory() {
 }
 
 void StoryManager::setUpPhase() {
+  std::deque<std::string> v;
+  printf("Setting up for phase %d", current_phase);
+
   switch (current_phase) {
   case 0:
 
-     std::deque<std::string> v;
+     
      v.push_back("I should go to bed.");
      gameplayUI->setDialogueTexts(v);
 
@@ -48,7 +62,6 @@ void StoryManager::setUpPhase() {
     break;
   case 1:
 
-        std::deque<std::string> v;
         v.push_back("It's already 12.");
         v.push_back("What is that sound??");
         v.push_back("Someone's here. I need to hide in the closet.");
@@ -58,7 +71,6 @@ void StoryManager::setUpPhase() {
 
     break;
   case 2:
-        std::deque<std::string> v;
         v.push_back("I need to leave this house!!");
         gameplayUI->setDialogueTexts(v);
 
