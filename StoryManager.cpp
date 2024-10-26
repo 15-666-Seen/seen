@@ -27,13 +27,13 @@ void StoryManager::advanceStory() {
       }
     break;
   case 2:
-      if (false) { // if player is outside bedroom
+      if (interactableManager->cur_furniture == BEDROOM_DOOR) { // if player unlocks the door
           current_phase++; // advance to the next phase
           set_up_next_phase = true;
       }
     break;
   case 3:
-      if (false) { // if player is outsidde house
+      if (false) { // this is where the prototype ends
           current_phase++; // advance to the next phase
           set_up_next_phase = true;
       }
@@ -75,10 +75,6 @@ void StoryManager::setUpPhase() {
         gameplayUI->setDialogueTexts(v);
 
         gameplayUI->setMissionText("Leave this room.");
-
-    break;
-  case 3:
-        gameplayUI->setMissionText("Leave this house.");
 
     break;
   default:
