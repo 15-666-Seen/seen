@@ -1,6 +1,7 @@
 #include "WalkMesh.hpp"
 
 #include "read_write_chunk.hpp"
+#include "util.hpp"
 
 #include <glm/gtx/norm.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -50,22 +51,19 @@ glm::vec3 barycentric_weights(glm::vec3 const &a, glm::vec3 const &b,
   glm::vec3 v1 = c - a;
   glm::vec3 v2 = pt - a;
 
-  // Compute the dot products used in the formula
   float d00 = glm::dot(v0, v0);
   float d01 = glm::dot(v0, v1);
   float d11 = glm::dot(v1, v1);
   float d20 = glm::dot(v2, v0);
   float d21 = glm::dot(v2, v1);
 
-  // Compute the denominator of the barycentric coordinates
   float denom = d00 * d11 - d01 * d01;
 
-  // Compute the barycentric coordinates
-  float v = (d11 * d20 - d01 * d21) / denom;
-  float w = (d00 * d21 - d01 * d20) / denom;
-  float u = 1.0f - v - w;
+  float lambda1 = (d11 * d20 - d01 * d21) / denom;
+  float lambda2 = (d00 * d21 - d01 * d20) / denom;
+  float lambda0 = 1.0f - lambda1 - lambda2;
 
-  return glm::vec3(u, v, w);
+  return glm::vec3(lambda0, lambda1, lambda2);
 }
 
 WalkPoint WalkMesh::nearest_walk_point(glm::vec3 const &world_point) const {
@@ -160,18 +158,18 @@ void WalkMesh::walk_in_triangle(WalkPoint const &start, glm::vec3 const &step,
   end.weights = end_weights;
   end.indices = start.indices;
 
-  for (int cid = 0; cid < 3; ++cid) {
-    if (end_weights[cid] < 0.0f && v[cid] < 0.0f) {
-      float t = (0.0f - start.weights[cid]) / v[cid];
+  for (uint16_t i = 0; i < 3; ++i) {
+    if (end_weights[i] < 0.0f && v[i] < 0.0f) {
+      float t = (0.0f - start.weights[i]) / v[i];
       if (t < t_min) {
         t_min = t;
         time = t;
-        // note: start.indices[cid] move to end
-        int c1 = (cid + 1) % 3;
-        int c2 = (cid + 2) % 3;
+        // note: start.indices[c] move to end
+        uint8_t c1 = (i + 1) % 3;
+        uint8_t c2 = (i + 2) % 3;
         end.indices[0] = start.indices[c1];
         end.indices[1] = start.indices[c2];
-        end.indices[2] = start.indices[cid];
+        end.indices[2] = start.indices[i];
         end.weights[0] = start.weights[c1] + time * v[c1];
         end.weights[1] = start.weights[c2] + time * v[c2];
         end.weights[2] = 0.0f;
@@ -188,35 +186,58 @@ bool WalkMesh::cross_edge(WalkPoint const &start, WalkPoint *end_,
   assert(rotation_);
   auto &rotation = *rotation_;
 
-  assert(start.weights.z == 0.0f); //*must* be on an edge.
-  glm::uvec2 edge = glm::uvec2(start.indices);
-  glm::uvec2 next = glm::uvec2(start.indices.y, start.indices.x);
-  glm::vec3 const &nx = vertices[start.indices.y];
-  glm::vec3 const &ny = vertices[start.indices.x];
+  assert(start.weights.z == 0.0f); // *must* be on an edge.
 
-  // check if 'edge' is a non-boundary edge:
-  if (next_vertex.find(next) != next_vertex.end()) {
-    int nxt_idx = next_vertex.at(next);
-    glm::vec3 const &nz = vertices[nxt_idx];
-    end.indices = glm::uvec3(start.indices.y, start.indices.x,
-                             next_vertex.find(next)->second);
-    end.weights = glm::vec3(start.weights.y, start.weights.x, 0.0f);
-    // make 'end' represent the same (world) point, but on triangle (edge.y,
-    // edge.x, [other point]):
+  // Get the edge indices (assuming start.weights.z == 0 means we are on the
+  // edge opposite to the third vertex)
+  glm::uvec2 edge = glm::uvec2(
+      start.indices.x,
+      start.indices.y); // Assuming start.weights.z corresponds to edge (x, y)
 
-    // calculate 2 normals
-    glm::vec3 n1 =
-        glm::normalize(glm::cross(nx - ny, vertices[start.indices.z] - ny));
-    glm::vec3 n2 = glm::normalize(glm::cross(ny - nx, nz - nx));
+  // Check if 'edge' is a non-boundary edge:
+  auto adjacent = next_vertex.find(glm::uvec2(
+      edge.y, edge.x)); // Reverse the edge to find the adjacent triangle
+  if (adjacent != next_vertex.end()) {
+    // It is a non-boundary edge! Cross into the adjacent triangle.
+    glm::uvec3 adj_triangle =
+        glm::uvec3(edge.y, edge.x,
+                   adjacent->second); // The indices of the adjacent triangle
 
-    // make 'rotation' the rotation that takes (start.indices)'s normal to
-    // (end.indices)'s normal:
-    rotation = glm::rotation(n1, n2);
+    // Find the "third" vertex in the adjacent triangle (the one that's not part
+    // of the edge)
+    int third_vertex = (adj_triangle.x != edge.x && adj_triangle.x != edge.y)
+                           ? adj_triangle.x
+                       : (adj_triangle.y != edge.x && adj_triangle.y != edge.y)
+                           ? adj_triangle.y
+                           : adj_triangle.z;
+
+    // Update 'end' to reflect the same point in the new triangle:
+    end.indices = glm::uvec3(edge.y, edge.x, third_vertex); // The new triangle
+
+    // The barycentric coordinates in the new triangle will swap:
+    // We need to swap the barycentric coordinates associated with the edge
+    // vertices
+    end.weights = glm::vec3(start.weights.y, start.weights.x,
+                            0.0f); // Swap the first two coordinates
+
+    // Compute the normals of the original and new triangles:
+    glm::vec3 normal_start = glm::normalize(
+        glm::cross(vertices[start.indices.y] - vertices[start.indices.x],
+                   vertices[start.indices.z] - vertices[start.indices.x]));
+    glm::vec3 normal_end = glm::normalize(
+        glm::cross(vertices[end.indices.y] - vertices[end.indices.x],
+                   vertices[end.indices.z] - vertices[end.indices.x]));
+
+    // Calculate the quaternion rotation that takes the original triangle's
+    // normal to the new triangle's normal:
+    rotation = glm::rotation(normal_start, normal_end);
 
     return true;
   } else {
+    // This is a boundary edge; we cannot cross it.
     end = start;
-    rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+    rotation =
+        glm::quat(1.0f, 0.0f, 0.0f, 0.0f); // Identity rotation (no rotation)
     return false;
   }
 }
@@ -246,6 +267,7 @@ WalkMeshes::WalkMeshes(std::string const &filename) {
   read_chunk(file, "idxA", &index);
 
   if (file.peek() != EOF) {
+    wait_and_exit("WARNING: trailing data in walkmesh file '" + filename + "'");
     std::cerr << "WARNING: trailing data in walkmesh file '" << filename << "'"
               << std::endl;
   }
@@ -288,6 +310,7 @@ WalkMeshes::WalkMeshes(std::string const &filename) {
              triangles[ti].y < e.vertex_end) &&
             (e.vertex_begin <= triangles[ti].z &&
              triangles[ti].z < e.vertex_end))) {
+        wait_and_exit("Invalid triangle in '" + filename + "'");
         throw std::runtime_error("Invalid triangle in '" + filename + "'");
       }
       wm_triangles.emplace_back(triangles[ti].x - e.vertex_begin,
@@ -300,6 +323,8 @@ WalkMeshes::WalkMeshes(std::string const &filename) {
     auto ret =
         meshes.emplace(name, WalkMesh(wm_vertices, wm_normals, wm_triangles));
     if (!ret.second) {
+      wait_and_exit("WalkMesh with duplicated name '" + name + "' in '" +
+                    filename + "'");
       throw std::runtime_error("WalkMesh with duplicated name '" + name +
                                "' in '" + filename + "'");
     }
@@ -309,6 +334,7 @@ WalkMeshes::WalkMeshes(std::string const &filename) {
 WalkMesh const &WalkMeshes::lookup(std::string const &name) const {
   auto f = meshes.find(name);
   if (f == meshes.end()) {
+    wait_and_exit("WalkMesh with name '" + name + "' not found.");
     throw std::runtime_error("WalkMesh with name '" + name + "' not found.");
   }
   return f->second;
