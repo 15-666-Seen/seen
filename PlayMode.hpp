@@ -3,7 +3,7 @@
 #include "Scene.hpp"
 #include "UI.hpp"
 #include "WalkMesh.hpp"
-
+#include "StoryManager.hpp"
 
 #include <glm/glm.hpp>
 
@@ -46,4 +46,7 @@ struct PlayMode : Mode {
 
   // items and furniture management
   InteractableManager interactableManager;
+
+  // story manager
+  StoryManager *storyManager;
 };
