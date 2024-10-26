@@ -106,3 +106,13 @@ void InteractableManager::load(Load<Scene> scene) {
     item->phase_allow_interact = true;
   }
 }
+
+void InteractableManager::update(Scene::Transform *player_transform) {
+  for (auto &furniture : furnitures) {
+    furniture->interactable(player_transform);
+  }
+
+  for (auto &item : items) {
+    item->interactable(player_transform);
+  }
+}

@@ -4,7 +4,6 @@
 #include "UI.hpp"
 #include "WalkMesh.hpp"
 
-
 #include <glm/glm.hpp>
 
 #include <deque>

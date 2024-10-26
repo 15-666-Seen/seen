@@ -3,6 +3,7 @@
 
 #include <map>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include "Load.hpp"
@@ -16,16 +17,25 @@ const float FURNITURE_INTERACT_DISTANCE = 1.0f;
 enum ItemType { BEDROOM_KEY };
 static std::map<std::string, ItemType> MeshNameToItemType = {
     {"BedroomKey", BEDROOM_KEY}};
+static std::map<ItemType, std::string> ItemTypeToInteractText = {
+    {BEDROOM_KEY, "grab key"}};
 
 /* Type of interactable object that cannot be picked up */
-enum FurnitureType { BED, CLOSET, BEDROOM_DOOR, FRONT_DOOR, DESK };
-static std::map<FurnitureType, std::string> FurnitureTypeToString = {
-    {BED, "Bed"}, {BEDROOM_DOOR, "Bedroom Door"}};
+enum FurnitureType { NONE, BED, CLOSET, BEDROOM_DOOR, FRONT_DOOR, DESK };
+static std::map<FurnitureType, std::pair<std::string, std::string>>
+    FurnitureTypeToInteractText = {{BED, {"hide under bed", "exit hiding"}},
+                                   {BEDROOM_DOOR, {"open door", "close door"}}};
 static std::map<std::string, FurnitureType> MeshNameToFurnitureType = {
     {"Bed", BED}, {"BedroomDoor", BEDROOM_DOOR}};
 
+struct InteractableInterface {
+  virtual bool interact() = 0;
+  virtual bool interactable(Scene::Transform *player_transform) = 0;
+  virtual std::string interact_text() = 0;
+};
+
 /* A single furniture */
-struct Furniture {
+struct Furniture : InteractableInterface {
 
   Furniture();
 
@@ -37,14 +47,19 @@ struct Furniture {
   bool interactStatus = false; // is the player currently interacting with it?
   bool can_interact = false;
 
-  virtual bool interact();
+  virtual bool interact() override;
 
   // see if this furniture is close enough to be interacted with
-  virtual bool interactable(Scene::Transform *player_transform);
+  virtual bool interactable(Scene::Transform *player_transform) override;
+
+  virtual std::string interact_text() override {
+    return interactStatus ? FurnitureTypeToInteractText[type].second
+                          : FurnitureTypeToInteractText[type].first;
+  }
 };
 
 /* A single item */
-struct Item {
+struct Item : InteractableInterface {
 
   Item();
 
@@ -55,10 +70,14 @@ struct Item {
   bool phase_allow_interact;
   bool can_interact = false;
 
-  virtual bool interact();
+  virtual bool interact() override;
 
   // see if this item is good to be interacted with
-  virtual bool interactable(Scene::Transform *player_transform);
+  virtual bool interactable(Scene::Transform *player_transform) override;
+
+  virtual std::string interact_text() override {
+    return ItemTypeToInteractText[type];
+  }
 };
 
 /* Player inventory */
@@ -84,4 +103,10 @@ struct InteractableManager {
   std::vector<Furniture *> furnitures;
 
   void load(Load<Scene> meshes);
+
+  // in each frame, we check interactable objects
+  void update(Scene::Transform *player_transform);
+
+  // furniture interaction in current phase, used to forward phase
+  FurnitureType cur_furniture = NONE;
 };

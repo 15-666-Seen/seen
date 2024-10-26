@@ -3,18 +3,16 @@
 
 #include "Interactable.hpp"
 
-#include <string>
-#include <vector>
 #include <deque>
+#include <string>
 
 /* On screen UI during game play */
-struct GameplayUI
-{
+struct GameplayUI {
   GameplayUI();
 
   // upper left corner: interaction (press [F] to interact)
   std::string interactionText = "Interaction Text Holder";
-  void setInteractionText(Furniture *f);
+  void setInteractionText(InteractableInterface *interactable_it);
 
   // lower left corner: tutorial or mission (find the key without being killed)
   std::string missionText = "Mission Text";
@@ -41,6 +39,4 @@ struct MainMenu
 
 */
 
-struct Button
-{
-};
+struct Button {};

@@ -7,10 +7,9 @@ GameplayUI::GameplayUI() {
   dialogueText.emplace_back("Last Testing Dialogue");
 }
 
-void GameplayUI::setInteractionText(Furniture *f) {
-  if (f != nullptr) {
-    interactionText =
-        "Press [F] to interact with the " + FurnitureTypeToString[f->type];
+void GameplayUI::setInteractionText(InteractableInterface *interactable_it) {
+  if (interactable_it != nullptr) {
+    interactionText = "Press [F] to " + interactable_it->interact_text();
   } else {
     interactionText = "";
   }
