@@ -73,6 +73,12 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
 
   // UI
   gameplayUI = new GameplayUI();
+
+  // story manager
+  storyManager = new StoryManager();
+
+  // set up game. TODO: Move this to after the title screen when applicable.
+  storyManager->SetUpManager(&interactableManager, gameplayUI);
 }
 
 PlayMode::~PlayMode() {}
@@ -264,6 +270,9 @@ void PlayMode::update(float elapsed) {
   interactableManager.update(player.transform, gameplayUI, F.pressed);
 
   // TODO: UI updates
+
+  // Updating the story
+  storyManager->advanceStory();
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {

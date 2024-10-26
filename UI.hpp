@@ -15,7 +15,7 @@ struct GameplayUI {
   void setInteractionText(const std::string &text);
 
   // lower left corner: tutorial or mission (find the key without being killed)
-  std::string missionText = "Mission Text";
+  std::string missionText = "";
   void setMissionText(std::string s);
 
   // lower half of screen: dialogue ("The owner of this house is not human!!")
