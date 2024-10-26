@@ -1,7 +1,7 @@
+#pragma once
+
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-
-#include "Interactable.hpp"
 
 #include <deque>
 #include <string>
@@ -12,7 +12,7 @@ struct GameplayUI {
 
   // upper left corner: interaction (press [F] to interact)
   std::string interactionText = "Interaction Text Holder";
-  void setInteractionText(InteractableInterface *interactable_it);
+  void setInteractionText(const std::string &text);
 
   // lower left corner: tutorial or mission (find the key without being killed)
   std::string missionText = "Mission Text";

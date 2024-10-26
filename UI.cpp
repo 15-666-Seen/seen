@@ -7,9 +7,9 @@ GameplayUI::GameplayUI() {
   dialogueText.emplace_back("Last Testing Dialogue");
 }
 
-void GameplayUI::setInteractionText(InteractableInterface *interactable_it) {
-  if (interactable_it != nullptr) {
-    interactionText = "Press [F] to " + interactable_it->interact_text();
+void GameplayUI::setInteractionText(const std::string &text) {
+  if (!text.empty()) {
+    interactionText = "Press [F] to " + text;
   } else {
     interactionText = "";
   }
