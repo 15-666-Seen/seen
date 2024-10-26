@@ -2,7 +2,6 @@
 
 #include "LitColorTextureProgram.hpp"
 
-#include "DrawLines.hpp"
 #include "Load.hpp"
 #include "Mesh.hpp"
 #include "data_path.hpp"
@@ -67,6 +66,8 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
 
   // start player walking at nearest walk point:
   player.at = walkmesh->nearest_walk_point(player.transform->position);
+
+  // items & furniture loading
 
   // UI
   gameplayUI = new GameplayUI();

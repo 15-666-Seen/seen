@@ -1,6 +1,5 @@
 #include "Mesh.hpp"
 #include "read_write_chunk.hpp"
-#include "util.hpp"
 
 #include <glm/glm.hpp>
 
