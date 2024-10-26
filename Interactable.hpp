@@ -3,10 +3,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include <map>
 #include <unordered_set>
 #include <vector>
-#include <map>
-#include <map>
 
 #include "Scene.hpp"
 
@@ -28,11 +27,12 @@ enum FurnitureType
 	FRONT_DOOR,
 	DESK
 };
-static std::map<FurnitureType, std::string> FurnitureTypeToString = {{BED, "Bed"},
-																	 {CLOSET, "Closet"},
-																	 {BEDROOM_DOOR, "Bedroom Door"},
-																	 {FRONT_DOOR, "Front Door"},
-																	 {DESK, "Desk"}};
+static std::map<FurnitureType, std::string> FurnitureTypeToString = {
+	{BED, "Bed"},
+	{CLOSET, "Closet"},
+	{BEDROOM_DOOR, "Bedroom Door"},
+	{FRONT_DOOR, "Front Door"},
+	{DESK, "Desk"}};
 
 /* A single furniture */
 struct Furniture

@@ -1,8 +1,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include "Interactable.hpp"
 #include "DrawLines.hpp"
+#include "Interactable.hpp"
 
 #include <string>
 #include <vector>
@@ -28,7 +28,8 @@ struct GameplayUI
     /* Draw UI for each frame */
     void DrawUI(glm::uvec2 const &drawable_size);
 
-    /* Each time the mouse is clicked, figure out if its interacting with some UI controlled by this struct */
+    /* Each time the mouse is clicked, figure out if its interacting with some UI
+     * controlled by this struct */
     void InteractOnClick(glm::vec2 const &click_pos);
 };
 

@@ -9,7 +9,8 @@ void GameplayUI::setInteractionText(Furniture *f)
 {
     if (f != nullptr)
     {
-        interactionText = "Press [F] to interact with the " + FurnitureTypeToString[f->type];
+        interactionText =
+            "Press [F] to interact with the " + FurnitureTypeToString[f->type];
     }
     else
     {
@@ -17,10 +18,7 @@ void GameplayUI::setInteractionText(Furniture *f)
     }
 }
 
-void GameplayUI::setMissionText(std::string s)
-{
-    missionText = s;
-}
+void GameplayUI::setMissionText(std::string s) { missionText = s; }
 
 void GameplayUI::setDialogueTexts(std::vector<std::string> v)
 {
@@ -58,5 +56,6 @@ void GameplayUI::InteractOnClick(glm::vec2 const &click_pos)
 {
     // check if clicked on dialogue text
     // if so, advance dialogue
-    // if no more dialogue, hide the dialogue box and clicking can no longer interact with this
+    // if no more dialogue, hide the dialogue box and clicking can no longer
+    // interact with this
 }
