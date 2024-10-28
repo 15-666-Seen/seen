@@ -55,7 +55,7 @@ struct Furniture {
 
   virtual std::string interactText() {
     return interact_status ? FurnitureTypeToInteractText[type].second
-                          : FurnitureTypeToInteractText[type].first;
+                           : FurnitureTypeToInteractText[type].first;
   }
 };
 

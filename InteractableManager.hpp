@@ -24,7 +24,7 @@ struct Inventory {
 /* Manages the inventory, all items, all furniture*/
 struct InteractableManager {
 
-    int current_phase = 0;
+  int current_phase = 0;
   Inventory inventory = Inventory();
 
   GameplayUI *gameplayUI = nullptr;

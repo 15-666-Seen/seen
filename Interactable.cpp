@@ -72,7 +72,7 @@ bool Door::interact(float elapsed) {
   std::cout << "======================" << std::endl;
   std::cout << animation_time << std::endl;
   if (animation_time > 0.5f) {
-      interact_status = false;
+    interact_status = false;
   }
   // rotate the door along z axis
   transform->rotation =

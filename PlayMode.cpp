@@ -79,8 +79,6 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
   storyManager = new StoryManager();
   // set up game. TODO: Move this to after the title screen when applicable.
   storyManager->SetUpManager(gameplayUI, &interactableManager);
-  
-  
 }
 
 PlayMode::~PlayMode() {}
@@ -279,7 +277,6 @@ void PlayMode::update(float elapsed) {
 
   // Story manager update
   storyManager->advanceStory();
-
 
   // TODO: check phase updates -> update walkmesh?
   checkPhaseUpdates();

@@ -78,9 +78,9 @@ void InteractableManager::load(const Scene &scene, GameplayUI *a_gameplayUI) {
 void InteractableManager::update(Scene::Transform *player_transform,
                                  Scene::Camera *camera, bool interact_pressed,
                                  float elapsed) {
-  
+
   gameplayUI->setInteractionText(""); // Clear interaction text
-  interaction_notification = ""; // clear interaction text
+  interaction_notification = "";      // clear interaction text
 
   bool used_in_current_frame =
       updateFurniture(player_transform, camera, interact_pressed, elapsed);
@@ -130,14 +130,11 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
         interaction_notification = "Bedroom door is unlocked";
         furniture->interact_status = true;
 
-      } 
-      else if (furniture->type == BED) {
-          furniture->interact_status = true;
-          return true;
-        }
-
+      } else if (furniture->type == BED) {
+        furniture->interact_status = true;
+        return true;
       }
-    
+    }
 
     return true;
   }
@@ -181,9 +178,11 @@ void InteractableManager::setItemPhaseAvailability(ItemType item_type,
 }
 
 bool InteractableManager::interactStatusCheck(FurnitureType furniture_type) {
-    for (auto& furniture : furnitures) {
-        if (furniture->type == furniture_type) return furniture->interact_status;
-    }
-    wait_and_exit("Interactable Manager cpp interactStatusCheck() furniture not found.");
-    return false;
+  for (auto &furniture : furnitures) {
+    if (furniture->type == furniture_type)
+      return furniture->interact_status;
+  }
+  wait_and_exit(
+      "Interactable Manager cpp interactStatusCheck() furniture not found.");
+  return false;
 }
