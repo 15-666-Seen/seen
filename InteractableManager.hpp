@@ -33,17 +33,18 @@ struct InteractableManager {
   std::vector<Item *> items;
   std::vector<Furniture *> furnitures;
 
-  void load(Load<Scene> scenes, GameplayUI *a_gameplayUI,
+  void load(const Scene &scenes, GameplayUI *a_gameplayUI,
             StoryManager *a_storyManager);
 
   // in each frame, we check interactable objects
   void update(Scene::Transform *player_transform, Scene::Camera *camera,
-              bool interact_pressed);
+              bool interact_pressed, float elapsed);
 
   bool updateFurniture(Scene::Transform *player_transform,
-                       Scene::Camera *camera, bool interact_pressed);
+                       Scene::Camera *camera, bool interact_pressed,
+                       float elapsed);
   bool updateItem(Scene::Transform *player_transform, Scene::Camera *camera,
-                  bool interact_pressed);
+                  bool interact_pressed, float elapsed);
 
   void setFurniturePhaseAvailability(FurnitureType furniture_type, bool allow);
   void setItemPhaseAvailability(ItemType item_type, bool allow);

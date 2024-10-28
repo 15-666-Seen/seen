@@ -29,7 +29,7 @@ bool iteractCheck(Scene::Transform *player_transform, glm::vec3 object_pos,
 Item::Item() {}
 
 // TODO: different type of items should have different interact text
-bool Item::interact() {
+bool Item::interact(float elapsed) {
   if (type == BEDROOM_KEY) {
     std::cout << "You picked up a bedroom key!" << std::endl;
     visible = false;
@@ -53,13 +53,7 @@ bool Item::interactable(Scene::Transform *player_transform,
 /* FURNITURE */
 Furniture::Furniture() {}
 
-bool Furniture::interact() {
-  if (type == BEDROOM_DOOR) {
-    std::cout << "You opened the bedroom door!" << std::endl;
-    return true;
-  }
-  return true;
-}
+bool Furniture::interact(float elapsed) { return true; }
 
 bool Furniture::interactable(Scene::Transform *player_transform,
                              Scene::Camera *camera) {
@@ -70,4 +64,19 @@ bool Furniture::interactable(Scene::Transform *player_transform,
 
   return iteractCheck(player_transform, getCenterPos(), camera,
                       FURNITURE_INTERACT_DISTANCE);
+}
+
+/* DOOR */
+bool Door::interact(float elapsed) {
+  animation_time += elapsed;
+  std::cout << "======================" << std::endl;
+  std::cout << animation_time << std::endl;
+  if (animation_time > 0.5f) {
+    interactStatus = false;
+  }
+  // rotate the door along z axis
+  transform->rotation =
+      glm::angleAxis(glm::radians(90.0f) * (animation_time / 0.5f),
+                     glm::vec3(0.0f, 0.0f, 1.0f));
+  return true;
 }

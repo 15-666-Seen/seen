@@ -397,6 +397,7 @@ void Scene::set(
   drawables = other.drawables;
   for (auto &d : drawables) {
     d.transform = transform_to_transform.at(d.transform);
+    mesh_name_to_transform[d.mesh_name] = d.transform;
   }
 
   // copy other's cameras, updating transform pointers:

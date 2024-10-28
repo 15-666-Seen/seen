@@ -29,14 +29,14 @@ bool Inventory::removeItem(ItemType item_type) {
 // =============================================================================
 
 /* INTERACTABLE MANAGER */
-void InteractableManager::load(Load<Scene> scene, GameplayUI *a_gameplayUI,
+void InteractableManager::load(const Scene &scene, GameplayUI *a_gameplayUI,
                                StoryManager *a_storyManager) {
   this->gameplayUI = a_gameplayUI;
   this->storyManager = a_storyManager;
 
   for (const auto &[mesh_name, furniture_type] : MeshNameToFurnitureType) {
-    auto it = scene->mesh_name_to_transform.find(mesh_name);
-    if (it == scene->mesh_name_to_transform.end()) {
+    auto it = scene.mesh_name_to_transform.find(mesh_name);
+    if (it == scene.mesh_name_to_transform.end()) {
       wait_and_exit("Furniture mesh not found: " + mesh_name);
     }
     Furniture *furniture;
@@ -49,6 +49,7 @@ void InteractableManager::load(Load<Scene> scene, GameplayUI *a_gameplayUI,
 
     furniture->type = furniture_type;
     furniture->transform = it->second;
+
     // TODO: allowable need check
     furniture->phase_allow_interact = true;
     furniture->can_interact = true;
@@ -57,8 +58,8 @@ void InteractableManager::load(Load<Scene> scene, GameplayUI *a_gameplayUI,
   }
 
   for (const auto &[mesh_name, item_type] : MeshNameToItemType) {
-    auto it = scene->mesh_name_to_transform.find(mesh_name);
-    if (it == scene->mesh_name_to_transform.end()) {
+    auto it = scene.mesh_name_to_transform.find(mesh_name);
+    if (it == scene.mesh_name_to_transform.end()) {
       wait_and_exit("Item mesh not found: " + mesh_name);
     }
 
@@ -77,15 +78,16 @@ void InteractableManager::load(Load<Scene> scene, GameplayUI *a_gameplayUI,
 }
 
 void InteractableManager::update(Scene::Transform *player_transform,
-                                 Scene::Camera *camera, bool interact_pressed) {
+                                 Scene::Camera *camera, bool interact_pressed,
+                                 float elapsed) {
   interaction_notification = "";
   std::string interaction_text = "";
   gameplayUI->setInteractionText(interaction_text);
 
   bool used_in_current_frame =
-      updateFurniture(player_transform, camera, interact_pressed);
+      updateFurniture(player_transform, camera, interact_pressed, elapsed);
   if (!used_in_current_frame) {
-    updateItem(player_transform, camera, interact_pressed);
+    updateItem(player_transform, camera, interact_pressed, elapsed);
   }
 
   // some notification to show
@@ -96,8 +98,14 @@ void InteractableManager::update(Scene::Transform *player_transform,
 
 bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
                                           Scene::Camera *camera,
-                                          bool interact_pressed) {
+                                          bool interact_pressed,
+                                          float elapsed) {
   for (auto &furniture : furnitures) {
+    // if it's in animation status, continue animation
+    if (furniture->interactStatus) {
+      furniture->interact(elapsed);
+    }
+
     if (!furniture->interactable(player_transform, camera)) {
       continue;
     }
@@ -118,14 +126,14 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
         }
         interaction_notification = "Bedroom door is unlocked";
         storyManager->advanceStory();
-        furniture->interact();
+        furniture->interactStatus = true;
         setFurniturePhaseAvailability(BEDROOM_DOOR, false);
       } else if (furniture->type == BED) {
         if (storyManager->getCurrentPhase() == 0) {
           storyManager->advanceStory();
           setFurniturePhaseAvailability(BED, false);
           setItemPhaseAvailability(BEDROOM_KEY, true);
-          furniture->interact();
+          furniture->interactStatus = true;
           return true;
         }
       }
@@ -138,7 +146,7 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
 
 bool InteractableManager::updateItem(Scene::Transform *player_transform,
                                      Scene::Camera *camera,
-                                     bool interact_pressed) {
+                                     bool interact_pressed, float elapsed) {
   for (auto &item : items) {
     if (!item->interactable(player_transform, camera)) {
       continue;
@@ -146,7 +154,7 @@ bool InteractableManager::updateItem(Scene::Transform *player_transform,
     gameplayUI->setInteractionText(item->interactText());
     if (interact_pressed) {
       inventory.addItem(item->type);
-      item->interact();
+      item->interact(elapsed);
     }
     return true;
   }
