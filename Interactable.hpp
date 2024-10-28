@@ -39,11 +39,13 @@ struct Furniture {
 
   // if the furniture is allowed to be interact in this phase
   bool phase_allow_interact = false;
-  bool interactStatus = false; // is the player currently interacting with it?
+  // is the player currently interacting with it?
+  bool interactStatus = false;
+  // TODO: TBD
   bool can_interact = false;
 
   // when calling interact, pre-condition must be valid
-  virtual bool interact();
+  virtual bool interact(float elapsed);
 
   // see if this furniture is close enough to be interacted with
   virtual bool interactable(Scene::Transform *player_transform,
@@ -62,6 +64,9 @@ struct Door : Furniture {
     glm::vec4 center_local_offset = glm::vec4(0.5f, 0.0f, 0.0f, 1.0f);
     return transform->make_local_to_world() * center_local_offset;
   }
+
+  virtual bool interact(float elapsed) override;
+  float animation_time = 0.0f;
 };
 
 /* A single item */
@@ -76,7 +81,7 @@ struct Item {
   bool phase_allow_interact;
   bool can_interact = false;
 
-  virtual bool interact();
+  virtual bool interact(float elapsed);
 
   // see if this item is good to be interacted with
   virtual bool interactable(Scene::Transform *player_transform,

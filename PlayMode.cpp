@@ -26,7 +26,6 @@ Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
                      Mesh const &mesh = phonebank_meshes->lookup(mesh_name);
 
                      scene.drawables.emplace_back(transform, mesh_name);
-                     scene.mesh_name_to_transform[mesh_name] = transform;
                      Scene::Drawable &drawable = scene.drawables.back();
 
                      drawable.pipeline = lit_color_texture_program_pipeline;
@@ -79,7 +78,7 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
   storyManager->SetUpManager(gameplayUI);
 
   // items & furniture loading
-  interactableManager.load(phonebank_scene, gameplayUI, storyManager);
+  interactableManager.load(scene, gameplayUI, storyManager);
 }
 
 PlayMode::~PlayMode() {}
@@ -273,7 +272,7 @@ void PlayMode::update(float elapsed) {
     bool interact_pressed = F.pressed;
     F.pressed = false;
     interactableManager.update(player.transform, player.camera,
-                               interact_pressed);
+                               interact_pressed, elapsed);
   }
 
   // TODO: UI updates
