@@ -4,12 +4,8 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include "UI.hpp"
-#include "Interactable.hpp"
 
 #include <cassert>
-#include <string>
-#include <vector>
-
 
 struct StoryManager {
 
@@ -18,15 +14,16 @@ struct StoryManager {
   const int total_phase = 4;
   int current_phase = 0;
 
-  GameplayUI * gameplayUI;
-  InteractableManager * interactableManager;
+  GameplayUI *gameplayUI;
 
   /* Initial set up of the story manager */
-  virtual void SetUpManager(InteractableManager *im, GameplayUI *ui);
+  void SetUpManager(GameplayUI *ui);
 
   /* called per frame to test if we need to go to the next stage */
-  virtual void advanceStory();
+  void advanceStory();
 
   /* set up phase[current_phase] */
-  virtual void setUpPhase();
+  void setUpPhase();
+
+  int getCurrentPhase() { return current_phase; }
 };

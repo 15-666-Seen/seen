@@ -3,17 +3,15 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include <iostream>
 #include <map>
-#include <unordered_set>
 #include <utility>
-#include <vector>
 
-#include "Load.hpp"
 #include "Scene.hpp"
-#include "UI.hpp"
 
-const float ITEM_INTERACT_DISTANCE = 1.0f;
-const float FURNITURE_INTERACT_DISTANCE = 1.0f;
+static constexpr float ITEM_INTERACT_DISTANCE = 5.0f;
+static constexpr float FURNITURE_INTERACT_DISTANCE = 5.0f;
+static constexpr float INTERACT_ANGLE = 2.2f;
 
 /* interactable object that can be picked up */
 // =========================  mesh name must match =========================
@@ -26,19 +24,13 @@ static std::map<ItemType, std::string> ItemTypeToInteractText = {
 /* Type of interactable object that cannot be picked up */
 enum FurnitureType { NONE, BED, CLOSET, BEDROOM_DOOR, FRONT_DOOR, DESK };
 static std::map<FurnitureType, std::pair<std::string, std::string>>
-    FurnitureTypeToInteractText = {{BED, {"hide under bed", "exit hiding"}},
+    FurnitureTypeToInteractText = {{BED, {"sleep", "exit hiding"}},
                                    {BEDROOM_DOOR, {"open door", "close door"}}};
 static std::map<std::string, FurnitureType> MeshNameToFurnitureType = {
     {"Bed", BED}, {"BedroomDoor", BEDROOM_DOOR}};
 
-struct InteractableInterface {
-  virtual bool interact() = 0;
-  virtual bool interactable(Scene::Transform *player_transform) = 0;
-  virtual std::string interact_text() = 0;
-};
-
 /* A single furniture */
-struct Furniture : InteractableInterface {
+struct Furniture {
 
   Furniture();
 
@@ -46,23 +38,34 @@ struct Furniture : InteractableInterface {
   Scene::Transform *transform;
 
   // if the furniture is allowed to be interact in this phase
-  bool phase_allow_interact;
+  bool phase_allow_interact = false;
   bool interactStatus = false; // is the player currently interacting with it?
   bool can_interact = false;
 
-  virtual bool interact() override;
+  // when calling interact, pre-condition must be valid
+  virtual bool interact();
 
   // see if this furniture is close enough to be interacted with
-  virtual bool interactable(Scene::Transform *player_transform) override;
+  virtual bool interactable(Scene::Transform *player_transform,
+                            Scene::Camera *camera);
 
-  virtual std::string interact_text() override {
+  virtual glm::vec3 getCenterPos() { return transform->position; }
+
+  virtual std::string interactText() {
     return interactStatus ? FurnitureTypeToInteractText[type].second
                           : FurnitureTypeToInteractText[type].first;
   }
 };
 
+struct Door : Furniture {
+  virtual glm::vec3 getCenterPos() override {
+    glm::vec4 center_local_offset = glm::vec4(0.5f, 0.0f, 0.0f, 1.0f);
+    return transform->make_local_to_world() * center_local_offset;
+  }
+};
+
 /* A single item */
-struct Item : InteractableInterface {
+struct Item {
 
   Item();
 
@@ -73,44 +76,11 @@ struct Item : InteractableInterface {
   bool phase_allow_interact;
   bool can_interact = false;
 
-  virtual bool interact() override;
+  virtual bool interact();
 
   // see if this item is good to be interacted with
-  virtual bool interactable(Scene::Transform *player_transform) override;
+  virtual bool interactable(Scene::Transform *player_transform,
+                            Scene::Camera *camera);
 
-  virtual std::string interact_text() override {
-    return ItemTypeToInteractText[type];
-  }
-};
-
-/* Player inventory */
-struct Inventory {
-
-  Inventory();
-
-  std::unordered_set<ItemType> items; // all items
-  int size = 5;                       // can initially hold 5 items
-  int holding_item = 0; // the item the player currently hold s. 0 = nothing
-
-  virtual bool hasItem(ItemType item_type);
-  virtual bool addItem(ItemType item_type);
-  virtual bool removeItem(ItemType item_type);
-};
-
-/* Manages the inventory, all items, all furniture*/
-struct InteractableManager {
-
-  Inventory inventory = Inventory();
-
-  std::vector<Item *> items; // better name? This collides with inventory->items
-  std::vector<Furniture *> furnitures;
-
-  void load(Load<Scene> meshes);
-
-  // in each frame, we check interactable objects
-  void update(Scene::Transform *player_transform, GameplayUI *gameplayUI,
-              bool interact_pressed);
-
-  // furniture interaction in current phase, used to forward phase
-  FurnitureType cur_furniture = NONE;
+  virtual std::string interactText() { return ItemTypeToInteractText[type]; }
 };

@@ -22,6 +22,8 @@
 #include <unordered_map>
 #include <vector>
 
+static constexpr float PLAYER_HEIGHT = 3.8f;
+
 struct Scene {
   struct Transform {
     // Transform names are useful for debugging and looking up locations in a
@@ -60,6 +62,10 @@ struct Scene {
     Drawable(Transform *transform_) : transform(transform_) {
       assert(transform);
     }
+    Drawable(Transform *transform_, const std::string &mesh_name_)
+        : transform(transform_), mesh_name(mesh_name_) {
+      assert(transform);
+    }
     Transform *transform;
 
     // Contains all the data needed to run the OpenGL pipeline:
@@ -93,6 +99,9 @@ struct Scene {
         GLenum target = GL_TEXTURE_2D;
       } textures[TextureCount];
     } pipeline;
+
+    std::string mesh_name;
+    bool visible = true;
   };
 
   struct Camera {

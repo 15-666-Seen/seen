@@ -1,15 +1,12 @@
 #include "Mode.hpp"
 
-#include "Interactable.hpp"
+#include "InteractableManager.hpp"
 #include "Scene.hpp"
+#include "StoryManager.hpp"
 #include "UI.hpp"
 #include "WalkMesh.hpp"
-#include "StoryManager.hpp"
 
 #include <glm/glm.hpp>
-
-#include <deque>
-#include <vector>
 
 struct PlayMode : Mode {
   PlayMode();
@@ -50,4 +47,5 @@ struct PlayMode : Mode {
 
   // story manager
   StoryManager *storyManager;
+  void checkPhaseUpdates();
 };

@@ -4,6 +4,7 @@
 
 #include "Load.hpp"
 #include "Mesh.hpp"
+#include "Scene.hpp"
 #include "data_path.hpp"
 #include "gl_errors.hpp"
 
@@ -12,36 +13,37 @@
 
 GLuint phonebank_meshes_for_lit_color_texture_program = 0;
 Load<MeshBuffer> phonebank_meshes(LoadTagDefault, []() -> MeshBuffer const * {
-  MeshBuffer const *ret = new MeshBuffer(data_path("bedroom.pnct"));
+  MeshBuffer const *ret = new MeshBuffer(data_path("bedroom_scene.pnct"));
   phonebank_meshes_for_lit_color_texture_program =
       ret->make_vao_for_program(lit_color_texture_program->program);
   return ret;
 });
 
 Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
-  return new Scene(
-      data_path("bedroom.scene"), [&](Scene &scene, Scene::Transform *transform,
-                                      std::string const &mesh_name) {
-        Mesh const &mesh = phonebank_meshes->lookup(mesh_name);
+  return new Scene(data_path("bedroom_scene.scene"),
+                   [&](Scene &scene, Scene::Transform *transform,
+                       std::string const &mesh_name) {
+                     Mesh const &mesh = phonebank_meshes->lookup(mesh_name);
 
-        scene.drawables.emplace_back(transform);
-        scene.mesh_name_to_transform[mesh_name] = transform;
-        Scene::Drawable &drawable = scene.drawables.back();
+                     scene.drawables.emplace_back(transform, mesh_name);
+                     scene.mesh_name_to_transform[mesh_name] = transform;
+                     Scene::Drawable &drawable = scene.drawables.back();
 
-        drawable.pipeline = lit_color_texture_program_pipeline;
+                     drawable.pipeline = lit_color_texture_program_pipeline;
 
-        drawable.pipeline.vao = phonebank_meshes_for_lit_color_texture_program;
-        drawable.pipeline.type = mesh.type;
-        drawable.pipeline.start = mesh.start;
-        drawable.pipeline.count = mesh.count;
-      });
+                     drawable.pipeline.vao =
+                         phonebank_meshes_for_lit_color_texture_program;
+                     drawable.pipeline.type = mesh.type;
+                     drawable.pipeline.start = mesh.start;
+                     drawable.pipeline.count = mesh.count;
+                   });
 });
 
-WalkMesh const *walkmesh = nullptr;
+const WalkMesh *walkmesh = nullptr;
 Load<WalkMeshes>
 phonebank_walkmeshes(LoadTagDefault, []() -> WalkMeshes const * {
-  WalkMeshes *ret = new WalkMeshes(data_path("bedroom.w"));
-  walkmesh = &ret->lookup("WalkMesh");
+  WalkMeshes *ret = new WalkMeshes(data_path("bedroom_scene.w"));
+  walkmesh = &ret->lookup("WalkMeshP0");
   return ret;
 });
 
@@ -59,7 +61,7 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
   player.camera->transform->parent = player.transform;
 
   // player's eyes are 1.8 units above the ground:
-  player.camera->transform->position = glm::vec3(0.0f, 0.0f, 1.0f);
+  player.camera->transform->position = glm::vec3(0.0f, 0.0f, PLAYER_HEIGHT);
 
   // rotate camera facing direction (-z) to player facing direction (+y):
   player.camera->transform->rotation =
@@ -68,17 +70,16 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
   // start player walking at nearest walk point:
   player.at = walkmesh->nearest_walk_point(player.transform->position);
 
-  // TODO: items & furniture loading
-  interactableManager.load(phonebank_scene);
-
   // UI
   gameplayUI = new GameplayUI();
 
   // story manager
   storyManager = new StoryManager();
-
   // set up game. TODO: Move this to after the title screen when applicable.
-  storyManager->SetUpManager(&interactableManager, gameplayUI);
+  storyManager->SetUpManager(gameplayUI);
+
+  // items & furniture loading
+  interactableManager.load(phonebank_scene, gameplayUI, storyManager);
 }
 
 PlayMode::~PlayMode() {}
@@ -166,7 +167,7 @@ void PlayMode::update(float elapsed) {
   // player walking:
   {
     // combine inputs into a move:
-    constexpr float PlayerSpeed = 3.0f;
+    constexpr float PlayerSpeed = 6.0f;
     glm::vec2 move = glm::vec2(0.0f);
     if (left.pressed && !right.pressed)
       move.x = -1.0f;
@@ -240,12 +241,12 @@ void PlayMode::update(float elapsed) {
 
     { // update player's rotation to respect local (smooth) up-vector:
 
-      glm::quat adjust =
-          glm::rotation(player.transform->rotation *
-                            glm::vec3(0.0f, 0.0f, 1.0f), // current up vector
-                        walkmesh->to_world_smooth_normal(
-                            player.at) // smoothed up vector at walk location
-          );
+      glm::quat adjust = glm::rotation(
+          player.transform->rotation *
+              glm::vec3(0.0f, 0.0f, PLAYER_HEIGHT), // current up vector
+          walkmesh->to_world_smooth_normal(
+              player.at) // smoothed up vector at walk location
+      );
       player.transform->rotation =
           glm::normalize(adjust * player.transform->rotation);
     }
@@ -266,13 +267,19 @@ void PlayMode::update(float elapsed) {
   up.downs = 0;
   down.downs = 0;
 
-  // TODO: interactable items and furniture UPDATES
-  interactableManager.update(player.transform, gameplayUI, F.pressed);
+  {
+    // interactable items and furniture UPDATES
+    // avoid multiple interactions in one frame
+    bool interact_pressed = F.pressed;
+    F.pressed = false;
+    interactableManager.update(player.transform, player.camera,
+                               interact_pressed);
+  }
 
   // TODO: UI updates
 
-  // Updating the story
-  storyManager->advanceStory();
+  // TODO: check phase updates -> update walkmesh?
+  checkPhaseUpdates();
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
@@ -321,4 +328,11 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
   gameplayUI->DrawUI(drawable_size);
 
   GL_ERRORS();
+}
+
+void PlayMode::checkPhaseUpdates() {
+  if (storyManager->getCurrentPhase() == 2) {
+    walkmesh = &phonebank_walkmeshes->lookup("WalkMeshP1");
+    player.at = walkmesh->nearest_walk_point(player.transform->position);
+  }
 }

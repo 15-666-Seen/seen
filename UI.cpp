@@ -1,11 +1,7 @@
 #include "UI.hpp"
 #include "DrawLines.hpp"
 
-GameplayUI::GameplayUI() {
-  dialogueText.emplace_back("Testing Dialogue");
-  dialogueText.emplace_back("More Testing Dialogue");
-  dialogueText.emplace_back("Last Testing Dialogue");
-}
+GameplayUI::GameplayUI() {}
 
 void GameplayUI::setInteractionText(const std::string &text) {
   if (!text.empty()) {
@@ -17,8 +13,14 @@ void GameplayUI::setInteractionText(const std::string &text) {
 
 void GameplayUI::setMissionText(std::string s) { missionText = s; }
 
-void GameplayUI::setDialogueTexts(std::deque<std::string> v) {
+void GameplayUI::setDialogueTexts(const std::deque<std::string> &v) {
   dialogueText = v;
+}
+
+void GameplayUI::addDialogueText(const std::string &s) {
+  if (dialogueText.empty() || dialogueText.back() != s) {
+    dialogueText.push_back(s);
+  }
 }
 
 void GameplayUI::DrawUI(glm::uvec2 const &drawable_size) {

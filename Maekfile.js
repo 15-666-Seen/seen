@@ -129,7 +129,6 @@ if (maek.OS === 'windows') {
 // objFileBase (optional): base name object file to produce (if not supplied, set to options.objDir + '/' + cppFile without the extension)
 //returns objFile: objFileBase + a platform-dependant suffix ('.o' or '.obj')
 const game_names = [
-	maek.CPP('util.cpp'),
 	maek.CPP('WalkMesh.cpp'),
 	maek.CPP('PlayMode.cpp'),
 	maek.CPP('main.cpp'),
@@ -141,6 +140,7 @@ const game_names = [
 ];
 
 const common_names = [
+	maek.CPP('util.cpp'),
 	maek.CPP('data_path.cpp'),
 	maek.CPP('PathFont.cpp'),
 	maek.CPP('PathFont-font.cpp'),
@@ -149,6 +149,7 @@ const common_names = [
 	maek.CPP('Scene.cpp'),
 	maek.CPP('Mesh.cpp'),
 	maek.CPP('Interactable.cpp'),
+	maek.CPP('InteractableManager.cpp'),
 	maek.CPP('UI.cpp'),
 	maek.CPP('StoryManager.cpp'),
 	maek.CPP('load_save_png.cpp'),

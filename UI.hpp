@@ -21,7 +21,8 @@ struct GameplayUI {
   // lower half of screen: dialogue ("The owner of this house is not human!!")
   std::deque<std::string> dialogueText;
   // TODO: add background image for the dialogue
-  void setDialogueTexts(std::deque<std::string> v);
+  void setDialogueTexts(const std::deque<std::string> &v);
+  void addDialogueText(const std::string &s);
 
   /* Draw UI for each frame */
   void DrawUI(glm::uvec2 const &drawable_size);
