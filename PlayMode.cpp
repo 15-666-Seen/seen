@@ -178,8 +178,10 @@ void PlayMode::update(float elapsed) {
       move.y = 1.0f;
 
     // make it so that moving diagonally doesn't go faster:
-    if (move != glm::vec2(0.0f))
+    if (move != glm::vec2(0.0f)) {
       move = glm::normalize(move) * PlayerSpeed * elapsed;
+      cameraShake(elapsed);
+    }
 
     // get move in world coordinate system:
     glm::vec3 remain = player.transform->make_local_to_world() *
@@ -335,4 +337,25 @@ void PlayMode::checkPhaseUpdates() {
     walkmesh = &phonebank_walkmeshes->lookup("WalkMeshP1");
     player.at = walkmesh->nearest_walk_point(player.transform->position);
   }
+}
+
+void PlayMode::cameraShake(float elapsed) {
+  static float R = 0.5f;
+  static float theta_max = 3.1415926f / 3.0f;
+  static float angle_speed = theta_max / 0.175f;
+
+  player.theta += angle_speed * elapsed;
+  if (player.theta > theta_max) {
+    player.theta = theta_max;
+    angle_speed = -angle_speed;
+  } else if (player.theta < -theta_max) {
+    player.theta = -theta_max;
+    angle_speed = -angle_speed;
+  }
+
+  float dright = R * glm::sin(player.theta);
+  float dheight = R * (1 - glm::cos(player.theta));
+
+  player.camera->transform->position =
+      glm::vec3(dright, 0.0f, dheight + PLAYER_HEIGHT);
 }
