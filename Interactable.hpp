@@ -40,7 +40,7 @@ struct Furniture {
   // if the furniture is allowed to be interact in this phase
   bool phase_allow_interact = false;
   // is the player currently interacting with it?
-  bool interactStatus = false;
+  bool interact_status = false;
   // TODO: TBD
   bool can_interact = false;
 
@@ -54,7 +54,7 @@ struct Furniture {
   virtual glm::vec3 getCenterPos() { return transform->position; }
 
   virtual std::string interactText() {
-    return interactStatus ? FurnitureTypeToInteractText[type].second
+    return interact_status ? FurnitureTypeToInteractText[type].second
                           : FurnitureTypeToInteractText[type].first;
   }
 };

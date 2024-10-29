@@ -29,10 +29,8 @@ bool Inventory::removeItem(ItemType item_type) {
 // =============================================================================
 
 /* INTERACTABLE MANAGER */
-void InteractableManager::load(const Scene &scene, GameplayUI *a_gameplayUI,
-                               StoryManager *a_storyManager) {
+void InteractableManager::load(const Scene &scene, GameplayUI *a_gameplayUI) {
   this->gameplayUI = a_gameplayUI;
-  this->storyManager = a_storyManager;
 
   for (const auto &[mesh_name, furniture_type] : MeshNameToFurnitureType) {
     auto it = scene.mesh_name_to_transform.find(mesh_name);
@@ -80,9 +78,9 @@ void InteractableManager::load(const Scene &scene, GameplayUI *a_gameplayUI,
 void InteractableManager::update(Scene::Transform *player_transform,
                                  Scene::Camera *camera, bool interact_pressed,
                                  float elapsed) {
-  interaction_notification = "";
-  std::string interaction_text = "";
-  gameplayUI->setInteractionText(interaction_text);
+  
+  gameplayUI->setInteractionText(""); // Clear interaction text
+  interaction_notification = ""; // clear interaction text
 
   bool used_in_current_frame =
       updateFurniture(player_transform, camera, interact_pressed, elapsed);
@@ -92,7 +90,7 @@ void InteractableManager::update(Scene::Transform *player_transform,
 
   // some notification to show
   if (!interaction_notification.empty()) {
-    gameplayUI->addDialogueText(interaction_notification);
+    gameplayUI->insertDialogueText(interaction_notification);
   }
 }
 
@@ -101,22 +99,26 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
                                           bool interact_pressed,
                                           float elapsed) {
   for (auto &furniture : furnitures) {
+
     // if it's in animation status, continue animation
-    if (furniture->interactStatus) {
+    if (furniture->interact_status) {
       furniture->interact(elapsed);
     }
 
     if (!furniture->interactable(player_transform, camera)) {
       continue;
     }
+
     // as long as its interactable, set the interaction text
     gameplayUI->setInteractionText(furniture->interactText());
+
     if (interact_pressed) {
       cur_furniture = furniture->type;
 
       // TODO: set different notification
       if (furniture->type == BEDROOM_DOOR) {
-        if (storyManager->getCurrentPhase() == 0) {
+
+        if (current_phase == 0) {
           interaction_notification = "I'd better go sleep first";
           return true;
         }
@@ -124,20 +126,18 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
           interaction_notification = "The door is locked";
           return true;
         }
+
         interaction_notification = "Bedroom door is unlocked";
-        storyManager->advanceStory();
-        furniture->interactStatus = true;
-        setFurniturePhaseAvailability(BEDROOM_DOOR, false);
-      } else if (furniture->type == BED) {
-        if (storyManager->getCurrentPhase() == 0) {
-          storyManager->advanceStory();
-          setFurniturePhaseAvailability(BED, false);
-          setItemPhaseAvailability(BEDROOM_KEY, true);
-          furniture->interactStatus = true;
+        furniture->interact_status = true;
+
+      } 
+      else if (furniture->type == BED) {
+          furniture->interact_status = true;
           return true;
         }
+
       }
-    }
+    
 
     return true;
   }
@@ -178,4 +178,12 @@ void InteractableManager::setItemPhaseAvailability(ItemType item_type,
       return;
     }
   }
+}
+
+bool InteractableManager::interactStatusCheck(FurnitureType furniture_type) {
+    for (auto& furniture : furnitures) {
+        if (furniture->type == furniture_type) return furniture->interact_status;
+    }
+    wait_and_exit("Interactable Manager cpp interactStatusCheck() furniture not found.");
+    return false;
 }

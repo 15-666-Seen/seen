@@ -72,13 +72,15 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
   // UI
   gameplayUI = new GameplayUI();
 
+  // items & furniture loading
+  interactableManager.load(scene, gameplayUI);
+
   // story manager
   storyManager = new StoryManager();
   // set up game. TODO: Move this to after the title screen when applicable.
-  storyManager->SetUpManager(gameplayUI);
-
-  // items & furniture loading
-  interactableManager.load(scene, gameplayUI, storyManager);
+  storyManager->SetUpManager(gameplayUI, &interactableManager);
+  
+  
 }
 
 PlayMode::~PlayMode() {}
@@ -275,7 +277,9 @@ void PlayMode::update(float elapsed) {
                                interact_pressed, elapsed);
   }
 
-  // TODO: UI updates
+  // Story manager update
+  storyManager->advanceStory();
+
 
   // TODO: check phase updates -> update walkmesh?
   checkPhaseUpdates();
