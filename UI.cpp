@@ -17,6 +17,12 @@ void GameplayUI::setDialogueTexts(const std::deque<std::string> &v) {
   dialogueText = v;
 }
 
+void GameplayUI::insertDialogueText(const std::string& s) {
+    if (dialogueText.empty() || dialogueText.front() != s) {
+        dialogueText.push_front(s);
+    }
+}
+
 void GameplayUI::addDialogueText(const std::string &s) {
   if (dialogueText.empty() || dialogueText.back() != s) {
     dialogueText.push_back(s);

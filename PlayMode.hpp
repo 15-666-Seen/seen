@@ -37,7 +37,9 @@ struct PlayMode : Mode {
     Scene::Transform *transform = nullptr;
     // camera is at player's head and will be pitched by mouse up/down motion:
     Scene::Camera *camera = nullptr;
+    float theta = 0.0f;
   } player;
+  void cameraShake(float elapsed);
 
   // In game UI
   GameplayUI *gameplayUI;
