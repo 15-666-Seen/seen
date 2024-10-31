@@ -38,12 +38,11 @@ Load< LitColorTextureProgram > lit_color_texture_program(LoadTagEarly, []() -> L
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-
 	lit_color_texture_program_pipeline.textures[0].texture = tex;
 	lit_color_texture_program_pipeline.textures[0].target = GL_TEXTURE_2D;
+	lit_color_texture_program_pipeline.tex_name_to_glint[""] = tex;
 
-
-	
+	// load all in folder
 
 
 	GLuint tex1;
@@ -60,9 +59,6 @@ Load< LitColorTextureProgram > lit_color_texture_program(LoadTagEarly, []() -> L
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
 
-	//std::vector< glm::u8vec4 > tex_data1(1, glm::u8vec4(0xff, 0, 0, 0xff));
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data1.data());
-
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -70,11 +66,8 @@ Load< LitColorTextureProgram > lit_color_texture_program(LoadTagEarly, []() -> L
 	glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(data);
 
-
-	lit_color_texture_program_pipeline.textures[1].texture = tex1;
-	lit_color_texture_program_pipeline.textures[1].target = GL_TEXTURE_2D;
-
-
+	lit_color_texture_program_pipeline.textures.push_back({tex1, GL_TEXTURE_2D });
+	lit_color_texture_program_pipeline.tex_name_to_glint["wood"] = tex1;
 
 
 	return ret;

@@ -118,13 +118,8 @@ void Scene::draw(glm::mat4 const &world_to_clip,
 
     // Set 2D texture to sample from :
     GLuint TEX_sampler2D = glGetUniformLocation(pipeline.program, "TEX");
-
-    GLint cur_texure = 1;//;
-    //assert(texture_map.find(drawable.tex_name) != texture_map.end());
-    printf("i think %s \n", drawable.tex_name.c_str());// texture_map.find(drawable.tex_name)->second);
-    for (auto a : texture_map) {
-        printf("aaa %s \n", a.first.c_str());
-    }
+    printf("%d \n", drawable.tex);
+    GLint cur_texure = drawable.tex - 1; // converting from 1 index to 0 indexed? (idk what is actually happening but this works)
     glUniform1i(TEX_sampler2D, cur_texure);
 
     
@@ -454,6 +449,7 @@ GLuint Scene::LoadTexture(std::string f) {
     glBindTexture(GL_TEXTURE_2D, 0);
 
     stbi_image_free(data);
+
     return tex;
 
 }

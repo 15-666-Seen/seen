@@ -27,7 +27,6 @@ Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
 
                      scene.drawables.emplace_back(transform, mesh_name);
                      Scene::Drawable &drawable = scene.drawables.back();
-                     drawable.tex_name = mesh.tex;
 
                      drawable.pipeline = lit_color_texture_program_pipeline;
 
@@ -37,16 +36,8 @@ Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
                      drawable.pipeline.start = mesh.start;
                      drawable.pipeline.count = mesh.count;
 
-                     if (auto search = scene.texture_map.find(mesh.tex); search == scene.texture_map.end()) {
-                         GLuint g = scene.LoadTexture(mesh.tex); // load current texture
-                         scene.texture_map[mesh.tex] = g; // add to texture map
-    
-                         // add to pipeline texture
-                         Scene::Drawable::Pipeline::TextureInfo t;
-                         t.texture = g;
-                         drawable.pipeline.textures.push_back(t);
-                   
-                     }
+                     drawable.tex = drawable.pipeline.tex_name_to_glint[mesh.tex];
+                     
                    });
 });
 
@@ -66,9 +57,6 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
   // create a player camera attached to a child of the player transform:
   scene.transforms.emplace_back();
   scene.cameras.emplace_back(&scene.transforms.back());
-
-  // copy over the textures
-  scene.texture_map.insert(phonebank_scene->texture_map.begin(), phonebank_scene->texture_map.end());
 
   player.camera = &scene.cameras.back();
   player.camera->fovy = glm::radians(60.0f);

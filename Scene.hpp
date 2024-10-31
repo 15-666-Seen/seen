@@ -73,10 +73,6 @@ struct Scene {
         : transform(transform_), mesh_name(mesh_name_) {
       assert(transform);
     }
-    Drawable(Transform* transform_, const std::string& mesh_name_, const std::string &tex_name_)
-        : transform(transform_), mesh_name(mesh_name_), tex_name(tex_name_) {
-        assert(transform);
-    }
 
     Transform *transform;
 
@@ -112,12 +108,14 @@ struct Scene {
           GLenum target = GL_TEXTURE_2D;
       };
 
-      std::vector<TextureInfo> textures = { TextureInfo(), TextureInfo() };
+      std::vector<TextureInfo> textures = { TextureInfo()};
+
+      std::unordered_map<std::string, GLint> tex_name_to_glint;
 
     } pipeline;
 
     std::string mesh_name;
-    std::string tex_name = "wood"; // texture name
+    GLint tex;
     bool visible = true;
   };
 
