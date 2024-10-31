@@ -41,7 +41,7 @@ Load< LitColorTextureProgram > lit_color_texture_program(LoadTagEarly, []() -> L
 
 	lit_color_texture_program_pipeline.textures[0].texture = tex;
 	lit_color_texture_program_pipeline.textures[0].target = GL_TEXTURE_2D;
-	lit_color_texture_program_pipeline.tex_name_to_glint[""] = tex;
+	lit_color_texture_program_pipeline.tex_name_to_glint["0"] = tex;
 
 
 	// load all in folder
