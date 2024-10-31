@@ -21,7 +21,7 @@ struct Mesh {
   GLenum type = GL_TRIANGLES; // type of primitives in mesh
   GLuint start = 0;           // index of first vertex
   GLuint count = 0;           // count of vertices
-  std::string tex = "";
+  std::string tex = "wood.png";
 
   // Bounding box.
   // useful for debug visualization and (perhaps, eventually) collision

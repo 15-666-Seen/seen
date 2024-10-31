@@ -7,8 +7,7 @@
 
 #include <fstream>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+
 
 //-------------------------
 
@@ -118,7 +117,7 @@ void Scene::draw(glm::mat4 const &world_to_clip,
 
     // Set 2D texture to sample from :
     GLuint TEX_sampler2D = glGetUniformLocation(pipeline.program, "TEX");
-    printf("%d \n", drawable.tex);
+    //printf("%d \n", drawable.tex);
     GLint cur_texure = drawable.tex - 1; // converting from 1 index to 0 indexed? (idk what is actually happening but this works)
     glUniform1i(TEX_sampler2D, cur_texure);
 
@@ -427,29 +426,3 @@ void Scene::set(
   }
 }
 
-//--------
-GLuint Scene::LoadTexture(std::string f) {
-
-    f = "UI/" + f + ".png";
-    int width, height, channels;
-    unsigned char* data = stbi_load(f.c_str(), &width, &height, &channels, 4); // 4 = RGBA format
-    if (!data) {
-        throw std::runtime_error("Failed to load texture: " + f);
-    }
-
-    GLuint tex;
-    glGenTextures(1, &tex);
-
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    stbi_image_free(data);
-
-    return tex;
-
-}

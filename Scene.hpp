@@ -30,8 +30,6 @@ static constexpr float PLAYER_HEIGHT = 3.8f;
 
 struct Scene {
 
-  GLuint LoadTexture(std::string f);
-
   struct Transform {
     // Transform names are useful for debugging and looking up locations in a
     // loaded scene:

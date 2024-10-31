@@ -5,6 +5,8 @@
 #include "Load.hpp"
 #include "Mesh.hpp"
 #include "Scene.hpp"
+#include "util.hpp"
+
 #include "data_path.hpp"
 #include "gl_errors.hpp"
 
@@ -37,6 +39,11 @@ Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
                      drawable.pipeline.count = mesh.count;
 
                      drawable.tex = drawable.pipeline.tex_name_to_glint[mesh.tex];
+                     if (auto s = drawable.pipeline.tex_name_to_glint.find(mesh.tex);
+                         s == drawable.pipeline.tex_name_to_glint.end()) {
+                         printf("Texture missing in scene loading for mesh %s \n", mesh_name.c_str());
+                         drawable.tex = 1;
+                     } 
                      
                    });
 });
