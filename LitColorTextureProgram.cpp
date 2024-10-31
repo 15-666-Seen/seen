@@ -31,7 +31,7 @@ Load< LitColorTextureProgram > lit_color_texture_program(LoadTagEarly, []() -> L
 	glGenTextures(1, &tex);
 
 	glBindTexture(GL_TEXTURE_2D, tex);
-	std::vector< glm::u8vec4 > tex_data(1, glm::u8vec4(0, 0xff, 0, 0xff));
+	std::vector< glm::u8vec4 > tex_data(1, glm::u8vec4(0xff));
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data.data());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
