@@ -27,6 +27,7 @@ Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
 
                      scene.drawables.emplace_back(transform, mesh_name);
                      Scene::Drawable &drawable = scene.drawables.back();
+                     drawable.tex_name = mesh.tex;
 
                      drawable.pipeline = lit_color_texture_program_pipeline;
 
@@ -35,6 +36,17 @@ Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
                      drawable.pipeline.type = mesh.type;
                      drawable.pipeline.start = mesh.start;
                      drawable.pipeline.count = mesh.count;
+
+                     if (auto search = scene.texture_map.find(mesh.tex); search == scene.texture_map.end()) {
+                         GLuint g = scene.LoadTexture(mesh.tex); // load current texture
+                         scene.texture_map[mesh.tex] = g; // add to texture map
+    
+                         // add to pipeline texture
+                         Scene::Drawable::Pipeline::TextureInfo t;
+                         t.texture = g;
+                         drawable.pipeline.textures.push_back(t);
+                   
+                     }
                    });
 });
 
@@ -54,6 +66,10 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
   // create a player camera attached to a child of the player transform:
   scene.transforms.emplace_back();
   scene.cameras.emplace_back(&scene.transforms.back());
+
+  // copy over the textures
+  scene.texture_map.insert(phonebank_scene->texture_map.begin(), phonebank_scene->texture_map.end());
+
   player.camera = &scene.cameras.back();
   player.camera->fovy = glm::radians(60.0f);
   player.camera->near = 0.01f;
@@ -69,6 +85,7 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
   // start player walking at nearest walk point:
   player.at = walkmesh->nearest_walk_point(player.transform->position);
 
+  
   // UI
   gameplayUI = new GameplayUI();
 
@@ -296,6 +313,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
                glm::value_ptr(glm::vec3(0.0f, 0.0f, -1.0f)));
   glUniform3fv(lit_color_texture_program->LIGHT_ENERGY_vec3, 1,
                glm::value_ptr(glm::vec3(1.0f, 1.0f, 0.95f)));
+ 
   glUseProgram(0);
 
   glClearColor(0.5f, 0.5f, 0.5f, 1.0f);

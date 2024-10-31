@@ -7,6 +7,9 @@
 
 #include <fstream>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 //-------------------------
 
 glm::mat4x3 Scene::Transform::make_local_to_parent() const {
@@ -89,7 +92,9 @@ void Scene::draw(glm::mat4 const &world_to_clip,
                  glm::mat4x3 const &world_to_light) const {
 
   // Iterate through all drawables, sending each one to OpenGL:
+
   for (auto const &drawable : drawables) {
+
     // Reference to drawable's pipeline for convenience:
     Scene::Drawable::Pipeline const &pipeline = drawable.pipeline;
 
@@ -111,6 +116,18 @@ void Scene::draw(glm::mat4 const &world_to_clip,
     // Set attribute sources:
     glBindVertexArray(pipeline.vao);
 
+    // Set 2D texture to sample from :
+    GLuint TEX_sampler2D = glGetUniformLocation(pipeline.program, "TEX");
+
+    GLint cur_texure = 1;//;
+    //assert(texture_map.find(drawable.tex_name) != texture_map.end());
+    printf("i think %s \n", drawable.tex_name.c_str());// texture_map.find(drawable.tex_name)->second);
+    for (auto a : texture_map) {
+        printf("aaa %s \n", a.first.c_str());
+    }
+    glUniform1i(TEX_sampler2D, cur_texure);
+
+    
     // Configure program uniforms:
 
     // the object-to-world matrix is used in all three of these uniforms:
@@ -145,25 +162,27 @@ void Scene::draw(glm::mat4 const &world_to_clip,
     if (pipeline.set_uniforms)
       pipeline.set_uniforms();
 
+    //cur_texure = 0;
+    //printf("curt %d", cur_texure);
     // set up textures:
-    for (uint32_t i = 0; i < Drawable::Pipeline::TextureCount; ++i) {
-      if (pipeline.textures[i].texture != 0) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(pipeline.textures[i].target,
-                      pipeline.textures[i].texture);
+    //for (uint32_t i = 0; i < Drawable::Pipeline::TextureCount; ++i) {
+    if (pipeline.textures[cur_texure].texture != 0) {
+        glActiveTexture(GL_TEXTURE0 + cur_texure);
+        glBindTexture(pipeline.textures[cur_texure].target,
+                      pipeline.textures[cur_texure].texture);
       }
-    }
+    //}
 
     // draw the object:
     glDrawArrays(pipeline.type, pipeline.start, pipeline.count);
 
     // un-bind textures:
-    for (uint32_t i = 0; i < Drawable::Pipeline::TextureCount; ++i) {
-      if (pipeline.textures[i].texture != 0) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(pipeline.textures[i].target, 0);
+    //for (uint32_t i = 0; i < Drawable::Pipeline::TextureCount; ++i) {
+    if (pipeline.textures[cur_texure].texture != 0) {
+        glActiveTexture(GL_TEXTURE0 + cur_texure);
+        glBindTexture(pipeline.textures[cur_texure].target, 0);
       }
-    }
+    //}
     glActiveTexture(GL_TEXTURE0);
   }
 
@@ -411,4 +430,30 @@ void Scene::set(
   for (auto &l : lights) {
     l.transform = transform_to_transform.at(l.transform);
   }
+}
+
+//--------
+GLuint Scene::LoadTexture(std::string f) {
+
+    f = "UI/" + f + ".png";
+    int width, height, channels;
+    unsigned char* data = stbi_load(f.c_str(), &width, &height, &channels, 4); // 4 = RGBA format
+    if (!data) {
+        throw std::runtime_error("Failed to load texture: " + f);
+    }
+
+    GLuint tex;
+    glGenTextures(1, &tex);
+
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    stbi_image_free(data);
+    return tex;
+
 }

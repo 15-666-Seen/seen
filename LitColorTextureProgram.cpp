@@ -3,6 +3,8 @@
 #include "gl_compile_program.hpp"
 #include "gl_errors.hpp"
 
+#include "stb_image.h"
+
 Scene::Drawable::Pipeline lit_color_texture_program_pipeline;
 
 Load< LitColorTextureProgram > lit_color_texture_program(LoadTagEarly, []() -> LitColorTextureProgram const * {
@@ -28,7 +30,7 @@ Load< LitColorTextureProgram > lit_color_texture_program(LoadTagEarly, []() -> L
 	glGenTextures(1, &tex);
 
 	glBindTexture(GL_TEXTURE_2D, tex);
-	std::vector< glm::u8vec4 > tex_data(1, glm::u8vec4(0xff));
+	std::vector< glm::u8vec4 > tex_data(1, glm::u8vec4(0, 0xff,0, 0xff));
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data.data());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -39,6 +41,41 @@ Load< LitColorTextureProgram > lit_color_texture_program(LoadTagEarly, []() -> L
 
 	lit_color_texture_program_pipeline.textures[0].texture = tex;
 	lit_color_texture_program_pipeline.textures[0].target = GL_TEXTURE_2D;
+
+
+	
+
+
+	GLuint tex1;
+	glGenTextures(1, &tex1);
+
+	glBindTexture(GL_TEXTURE_2D, tex1);
+
+	std::string f = "UI/wood.png";
+	int width, height, channels;
+	unsigned char* data = stbi_load(f.c_str(), &width, &height, &channels, 4); // 4 = RGBA format
+	if (!data) {
+		throw std::runtime_error("Failed to load texture: " + f);
+	}
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+
+	//std::vector< glm::u8vec4 > tex_data1(1, glm::u8vec4(0xff, 0, 0, 0xff));
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data1.data());
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	stbi_image_free(data);
+
+
+	lit_color_texture_program_pipeline.textures[1].texture = tex1;
+	lit_color_texture_program_pipeline.textures[1].target = GL_TEXTURE_2D;
+
+
+
 
 	return ret;
 });
