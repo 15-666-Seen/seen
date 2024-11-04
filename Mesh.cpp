@@ -56,19 +56,23 @@ MeshBuffer::MeshBuffer(std::string const &filename) {
   std::vector<char> strings;
   read_chunk(file, "str0", &strings);
 
+
   { // read index chunk, add to meshes:
     struct IndexEntry {
       uint32_t name_begin, name_end;
+      uint32_t text_begin, text_end;
       uint32_t vertex_begin, vertex_end;
     };
-    static_assert(sizeof(IndexEntry) == 16, "Index entry should be packed");
+    static_assert(sizeof(IndexEntry) == 24, "Index entry should be packed. 16 before, 24 after text_begin and end");
 
     std::vector<IndexEntry> index;
     read_chunk(file, "idx0", &index);
 
     for (auto const &entry : index) {
       if (!(entry.name_begin <= entry.name_end &&
-            entry.name_end <= strings.size())) {
+          entry.text_begin <= entry.text_end &&
+          entry.name_end == entry.text_begin &&
+          entry.text_end <= strings.size())) {
         throw std::runtime_error("index entry has out-of-range name begin/end");
       }
       if (!(entry.vertex_begin <= entry.vertex_end &&
@@ -76,11 +80,15 @@ MeshBuffer::MeshBuffer(std::string const &filename) {
         throw std::runtime_error(
             "index entry has out-of-range vertex start/count");
       }
+      std::string texture(&strings[0] + entry.text_begin,
+                            &strings[0] + entry.text_end);
+
       std::string name(&strings[0] + entry.name_begin,
                        &strings[0] + entry.name_end);
       Mesh mesh;
       mesh.type = GL_TRIANGLES;
       mesh.start = entry.vertex_begin;
+      mesh.tex = texture;
       mesh.count = entry.vertex_end - entry.vertex_begin;
       for (uint32_t v = entry.vertex_begin; v < entry.vertex_end; ++v) {
         mesh.min = glm::min(mesh.min, data[v].Position);

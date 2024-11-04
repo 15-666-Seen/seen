@@ -3,10 +3,13 @@
 #include "gl_compile_program.hpp"
 #include "gl_errors.hpp"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 Scene::Drawable::Pipeline lit_color_texture_program_pipeline;
 
-Load< LitColorTextureProgram > lit_color_texture_program(LoadTagEarly, []() -> LitColorTextureProgram const * {
-	LitColorTextureProgram *ret = new LitColorTextureProgram();
+Load< LitColorTextureProgram > lit_color_texture_program(LoadTagEarly, []() -> LitColorTextureProgram const* {
+	LitColorTextureProgram* ret = new LitColorTextureProgram();
 
 	//----- build the pipeline template -----
 	lit_color_texture_program_pipeline.program = ret->program;
@@ -36,9 +39,34 @@ Load< LitColorTextureProgram > lit_color_texture_program(LoadTagEarly, []() -> L
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-
 	lit_color_texture_program_pipeline.textures[0].texture = tex;
 	lit_color_texture_program_pipeline.textures[0].target = GL_TEXTURE_2D;
+	lit_color_texture_program_pipeline.tex_name_to_glint["0"] = tex;
+
+
+	// load all in folder
+	std::string filepath = data_path("textures/lit_textures");
+	std::vector<std::string> filenames;
+
+	try {
+		for (const auto& entry : std::filesystem::directory_iterator(filepath)) {
+			if (entry.is_regular_file()) {
+				std::string extension = entry.path().extension().string();
+				if (extension == ".png" || extension == ".jpg") { // only want png or jpg files
+					filenames.push_back(entry.path().filename().string());
+				}
+			}
+		}
+	}
+	catch (const std::filesystem::filesystem_error& e) {
+		std::cerr << "Filepath doesn't exist: " << e.what() << std::endl;
+	}
+
+	for (const auto f : filenames) {
+		GLuint gli = ret->LoadTexture(filepath, f);
+		lit_color_texture_program_pipeline.textures.push_back({ gli, GL_TEXTURE_2D });
+		lit_color_texture_program_pipeline.tex_name_to_glint[f] = gli;
+	}
 
 	return ret;
 });
@@ -142,3 +170,32 @@ LitColorTextureProgram::~LitColorTextureProgram() {
 	program = 0;
 }
 
+
+//--------
+GLuint LitColorTextureProgram::LoadTexture(const std::string filepath, const std::string filename) {
+
+	std::string f = filepath + "/" + filename;
+	
+	int width, height, channels;
+	unsigned char* data = stbi_load(f.c_str(), &width, &height, &channels, 4); // 4 = RGBA format
+	if (!data) {
+		throw std::runtime_error("Failed to load texture: " + f);
+	}
+	printf("%s size %d %d \n", f.c_str(), width, height);
+
+	GLuint tex;
+	glGenTextures(1, &tex);
+
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	stbi_image_free(data);
+
+	return tex;
+
+}

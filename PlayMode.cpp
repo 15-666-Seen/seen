@@ -5,6 +5,8 @@
 #include "Load.hpp"
 #include "Mesh.hpp"
 #include "Scene.hpp"
+#include "util.hpp"
+
 #include "data_path.hpp"
 #include "gl_errors.hpp"
 
@@ -35,6 +37,14 @@ Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
                      drawable.pipeline.type = mesh.type;
                      drawable.pipeline.start = mesh.start;
                      drawable.pipeline.count = mesh.count;
+
+                     drawable.tex = drawable.pipeline.tex_name_to_glint[mesh.tex];
+                     if (auto s = drawable.pipeline.tex_name_to_glint.find(mesh.tex);
+                         s == drawable.pipeline.tex_name_to_glint.end()) {
+                         printf("Texture missing in scene loading for mesh %s \n", mesh_name.c_str());
+                         drawable.tex = 1;
+                     } 
+                     
                    });
 });
 
@@ -54,6 +64,7 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
   // create a player camera attached to a child of the player transform:
   scene.transforms.emplace_back();
   scene.cameras.emplace_back(&scene.transforms.back());
+
   player.camera = &scene.cameras.back();
   player.camera->fovy = glm::radians(60.0f);
   player.camera->near = 0.01f;
@@ -69,6 +80,7 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
   // start player walking at nearest walk point:
   player.at = walkmesh->nearest_walk_point(player.transform->position);
 
+  
   // UI
   gameplayUI = new GameplayUI();
 
@@ -296,6 +308,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
                glm::value_ptr(glm::vec3(0.0f, 0.0f, -1.0f)));
   glUniform3fv(lit_color_texture_program->LIGHT_ENERGY_vec3, 1,
                glm::value_ptr(glm::vec3(1.0f, 1.0f, 0.95f)));
+ 
   glUseProgram(0);
 
   glClearColor(0.5f, 0.5f, 0.5f, 1.0f);

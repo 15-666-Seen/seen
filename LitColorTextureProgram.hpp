@@ -4,10 +4,15 @@
 #include "Load.hpp"
 #include "Scene.hpp"
 
+#include "data_path.hpp"
+
+#include <filesystem>
+
 //Shader program that draws transformed, lit, textured vertices tinted with vertex colors:
 struct LitColorTextureProgram {
 	LitColorTextureProgram();
 	~LitColorTextureProgram();
+
 
 	GLuint program = 0;
 
@@ -28,9 +33,10 @@ struct LitColorTextureProgram {
 	GLuint LIGHT_DIRECTION_vec3 = -1U;
 	GLuint LIGHT_ENERGY_vec3 = -1U;
 	GLuint LIGHT_CUTOFF_float = -1U;
+
+	//--------
+	GLuint LoadTexture(const std::string filepath, const std::string filename);
 	
-	//Textures:
-	//TEXTURE0 - texture that is accessed by TexCoord
 };
 
 extern Load< LitColorTextureProgram > lit_color_texture_program;
@@ -38,3 +44,6 @@ extern Load< LitColorTextureProgram > lit_color_texture_program;
 //For convenient scene-graph setup, copy this object:
 // NOTE: by default, has texture bound to 1-pixel white texture -- so it's okay to use with vertex-color-only meshes.
 extern Scene::Drawable::Pipeline lit_color_texture_program_pipeline;
+
+
+
