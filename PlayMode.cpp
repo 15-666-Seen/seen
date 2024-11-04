@@ -371,8 +371,7 @@ void PlayMode::checkPhaseUpdates() {
 }
 
 void PlayMode::cameraShake(float elapsed) {
-  return;
-  static float R = 0.5f;
+  static float R = 0.12f;
   static float theta_max = 3.1415926f / 3.0f;
   static float angle_speed = theta_max / 0.175f;
 
