@@ -50,4 +50,6 @@ struct PlayMode : Mode {
   // story manager
   StoryManager *storyManager;
   void checkPhaseUpdates();
+
+  bool gStop = false;
 };

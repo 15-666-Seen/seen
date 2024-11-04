@@ -22,7 +22,7 @@
 #include <unordered_map>
 #include <vector>
 
-static constexpr float PLAYER_HEIGHT = 3.8f;
+static constexpr float PLAYER_HEIGHT = 1.2f;
 
 struct Scene {
   struct Transform {
@@ -116,6 +116,9 @@ struct Scene {
     float near = 0.01f;               // near plane
     // computed from the above:
     glm::mat4 make_projection() const;
+
+    float yaw = 0.0f;
+    float pitch = 0.0f;
   };
 
   struct Light {
@@ -147,6 +150,7 @@ struct Scene {
   std::list<Light> lights;
 
   std::unordered_map<std::string, Transform *> mesh_name_to_transform;
+  std::unordered_map<std::string, Drawable *> mesh_name_to_drawable;
 
   // The "draw" function provides a convenient way to pass all the things in a
   // scene to OpenGL:
