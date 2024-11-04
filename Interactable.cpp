@@ -33,6 +33,7 @@ bool Item::interact(float elapsed) {
   if (type == BEDROOM_KEY) {
     std::cout << "You picked up a bedroom key!" << std::endl;
     visible = false;
+    this->drawable->visible = false;
     phase_allow_interact = false;
     return true;
   }
@@ -46,7 +47,7 @@ bool Item::interactable(Scene::Transform *player_transform,
     return false;
   }
 
-  return iteractCheck(player_transform, transform->position, camera,
+  return iteractCheck(player_transform, drawable->transform->position, camera,
                       ITEM_INTERACT_DISTANCE);
 }
 
@@ -69,13 +70,11 @@ bool Furniture::interactable(Scene::Transform *player_transform,
 /* DOOR */
 bool Door::interact(float elapsed) {
   animation_time += elapsed;
-  std::cout << "======================" << std::endl;
-  std::cout << animation_time << std::endl;
   if (animation_time > 0.5f) {
     interact_status = false;
   }
   // rotate the door along z axis
-  transform->rotation =
+  drawable->transform->rotation =
       glm::angleAxis(glm::radians(90.0f) * (animation_time / 0.5f),
                      glm::vec3(0.0f, 0.0f, 1.0f));
   return true;

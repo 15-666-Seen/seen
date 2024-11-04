@@ -35,7 +35,7 @@ struct Furniture {
   Furniture();
 
   FurnitureType type;
-  Scene::Transform *transform;
+  Scene::Drawable *drawable;
 
   // if the furniture is allowed to be interact in this phase
   bool phase_allow_interact = false;
@@ -51,7 +51,7 @@ struct Furniture {
   virtual bool interactable(Scene::Transform *player_transform,
                             Scene::Camera *camera);
 
-  virtual glm::vec3 getCenterPos() { return transform->position; }
+  virtual glm::vec3 getCenterPos() { return drawable->transform->position; }
 
   virtual std::string interactText() {
     return interact_status ? FurnitureTypeToInteractText[type].second
@@ -62,7 +62,7 @@ struct Furniture {
 struct Door : Furniture {
   virtual glm::vec3 getCenterPos() override {
     glm::vec4 center_local_offset = glm::vec4(0.5f, 0.0f, 0.0f, 1.0f);
-    return transform->make_local_to_world() * center_local_offset;
+    return drawable->transform->make_local_to_world() * center_local_offset;
   }
 
   virtual bool interact(float elapsed) override;
@@ -75,7 +75,7 @@ struct Item {
   Item();
 
   ItemType type;
-  Scene::Transform *transform;
+  Scene::Drawable *drawable;
 
   bool visible;
   bool phase_allow_interact;

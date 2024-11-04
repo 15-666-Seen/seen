@@ -98,6 +98,8 @@ void Scene::draw(glm::mat4 const &world_to_clip,
     Scene::Drawable::Pipeline const &pipeline = drawable.pipeline;
 
     // don't draw invisible items
+    if (!drawable.visible)
+      continue;
 
     // skip any drawables without a shader program set:
     if (pipeline.program == 0)
@@ -408,6 +410,14 @@ void Scene::set(
 
   // copy other's drawables, updating transform pointers:
   drawables = other.drawables;
+  for (auto &d : drawables) {
+    mesh_name_to_drawable[d.mesh_name] = &d;
+
+    // if the name contains "phase", invisible
+    if (d.mesh_name.find("phase") != std::string::npos) {
+      d.visible = false;
+    }
+  }
   for (auto &d : drawables) {
     d.transform = transform_to_transform.at(d.transform);
     mesh_name_to_transform[d.mesh_name] = d.transform;

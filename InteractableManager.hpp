@@ -35,8 +35,8 @@ struct InteractableManager {
   void load(const Scene &scenes, GameplayUI *a_gameplayUI);
 
   // in each frame, we check interactable objects
-  void update(Scene::Transform *player_transform, Scene::Camera *camera,
-              bool interact_pressed, float elapsed);
+  int update(Scene::Transform *player_transform, Scene::Camera *camera,
+             bool interact_pressed, float elapsed);
 
   bool updateFurniture(Scene::Transform *player_transform,
                        Scene::Camera *camera, bool interact_pressed,
