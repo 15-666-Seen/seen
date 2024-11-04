@@ -1,6 +1,7 @@
 #include "UI.hpp"
 #include "DrawLines.hpp"
 
+
 GameplayUI::GameplayUI() {}
 
 void GameplayUI::setInteractionText(const std::string &text) {

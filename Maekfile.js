@@ -151,6 +151,7 @@ const common_names = [
 	maek.CPP('Interactable.cpp'),
 	maek.CPP('InteractableManager.cpp'),
 	maek.CPP('UI.cpp'),
+	maek.CPP('UIShaderProgram.cpp'),
 	maek.CPP('StoryManager.cpp'),
 	maek.CPP('load_save_png.cpp'),
 	maek.CPP('gl_compile_program.cpp'),

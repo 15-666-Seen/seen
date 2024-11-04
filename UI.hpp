@@ -6,6 +6,8 @@
 #include <deque>
 #include <string>
 
+#include "UIShaderProgram.hpp"
+
 /* On screen UI during game play */
 struct GameplayUI {
   GameplayUI();

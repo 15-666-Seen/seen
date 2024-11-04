@@ -321,7 +321,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
                         // FYI you can change it.
 
   scene.draw(*player.camera);
-  glDisable(GL_DEPTH_TEST);
+ 
   /* In case you are wondering if your walkmesh is lining up with your scene,
   try:
   {
@@ -341,6 +341,18 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
   // render UI and text
   glDisable(GL_DEPTH_TEST);
   gameplayUI->DrawUI(drawable_size);
+
+
+
+  UIShader lines(glm::mat4(1.0f / player.camera->aspect, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+      0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+      1.0f));
+
+      lines.draw_box(glm::mat4(0.9f * player.camera->aspect, 0.0f, 0.0f, 0.0f, 0.0f, 0.3f, 0.0f,
+          0.f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -0.45f, 0.0f,
+          1.0f));
+
+
 
   GL_ERRORS();
 }
