@@ -3,8 +3,7 @@
 #include "gl_compile_program.hpp"
 #include "gl_errors.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+
 
 Scene::Drawable::Pipeline lit_color_texture_program_pipeline;
 
@@ -174,14 +173,8 @@ LitColorTextureProgram::~LitColorTextureProgram() {
 //--------
 GLuint LitColorTextureProgram::LoadTexture(const std::string filepath, const std::string filename) {
 
-	std::string f = filepath + "/" + filename;
-	
 	int width, height, channels;
-	unsigned char* data = stbi_load(f.c_str(), &width, &height, &channels, 4); // 4 = RGBA format
-	if (!data) {
-		throw std::runtime_error("Failed to load texture: " + f);
-	}
-	printf("%s size %d %d \n", f.c_str(), width, height);
+	unsigned char* data = loadImg(filepath, filename, width, height, channels);
 
 	GLuint tex;
 	glGenTextures(1, &tex);
@@ -194,7 +187,7 @@ GLuint LitColorTextureProgram::LoadTexture(const std::string filepath, const std
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	stbi_image_free(data);
+	freeImg(data);
 
 	return tex;
 

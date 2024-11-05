@@ -340,19 +340,12 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 
   // render UI and text
   glDisable(GL_DEPTH_TEST);
+  
+
+
+
+  
   gameplayUI->DrawUI(drawable_size);
-
-
-
-  UIShader lines(glm::mat4(1.0f / player.camera->aspect, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-      0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-      1.0f));
-
-      lines.draw_box(glm::mat4(0.9f * player.camera->aspect, 0.0f, 0.0f, 0.0f, 0.0f, 0.3f, 0.0f,
-          0.f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -0.45f, 0.0f,
-          1.0f));
-
-
 
   GL_ERRORS();
 }

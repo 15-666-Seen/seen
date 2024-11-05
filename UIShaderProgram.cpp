@@ -37,11 +37,38 @@ SpriteProgram::SpriteProgram() {
 
 	//look up the locations of vertex attributes:
 	Position_vec4 = glGetAttribLocation(program, "Position");
-	Color_vec4 = glGetAttribLocation(program, "Color");
+	UV_vec2 = glGetAttribLocation(program, "TexCoord");
 
 	//look up the locations of uniforms:
 	OBJECT_TO_CLIP_mat4 = glGetUniformLocation(program, "OBJECT_TO_CLIP");
+
+
+	//set TEX to always refer to texture binding zero:
+	glUseProgram(program); //bind program -- glUniform* calls refer to this program now
+
+	// load dialogue box texture
+	GLuint tex;
+	glGenTextures(1, &tex);
+
+	int width, height, channels;
+	unsigned char* data = loadImg(data_path("textures/UI"), "dialogue.png", width, height, channels);
+
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	dialogue_texture = tex;
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	freeImg(data);
+
+	glUseProgram(0); 
 }
+
+
 
 SpriteProgram::~SpriteProgram() {
 	glDeleteProgram(program);
@@ -71,7 +98,7 @@ static Load<void> setup_buffers(LoadTagDefault, []()
 			// set vertex_buffer as the source of glVertexAttribPointer() commands:
 			glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
 
-			// set up the vertex array object to describe arrays of PongMode::Vertex:
+			// set up the vertex array object 
 			glVertexAttribPointer(
 				sprite_program->Position_vec4,						// attribute
 				3,													// size
@@ -84,14 +111,14 @@ static Load<void> setup_buffers(LoadTagDefault, []()
 			//[Note that it is okay to bind a vec3 input to a vec4 attribute -- the w component will be filled with 1.0 automatically]
 
 			glVertexAttribPointer(
-				sprite_program->Color_vec4,						 // attribute
-				4,												 // size
-				GL_UNSIGNED_BYTE,								 // type
+				sprite_program->UV_vec2,						 // attribute
+				2,												 // size
+				GL_FLOAT,										 // type
 				GL_TRUE,										 // normalized
 				sizeof(UIShader::Vertex),						 // stride
-				(GLbyte*)0 + offsetof(UIShader::Vertex, Color) // offset
+				(GLbyte*)0 + offsetof(UIShader::Vertex, UV) // offset
 			);
-			glEnableVertexAttribArray(sprite_program->Color_vec4);
+			glEnableVertexAttribArray(sprite_program->UV_vec2);
 
 			// done referring to vertex_buffer, so unbind it:
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -107,34 +134,25 @@ UIShader::UIShader(glm::mat4 const& world_to_clip_) : world_to_clip(world_to_cli
 {
 }
 
-void UIShader::draw(glm::vec3 const& a, glm::vec3 const& b, glm::u8vec4 const& color)
+void UIShader::draw(glm::vec3 const& a, glm::vec2 const& uv)
 {
-	attribs.emplace_back(a, color);
-	attribs.emplace_back(b, color);
+	attribs.emplace_back(a, uv);
+	
 }
 
-void UIShader::draw_box(glm::mat4x3 const& mat, glm::u8vec4 const& color)
+void UIShader::draw_dialogue_box(glm::mat4x3 const& mat)
 {
 	// draw cube as three edge sets:
+	//draw(mat * glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f), glm::vec2(1.f, 0.f)); // top
+	draw(mat * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f), glm::vec2(0.f, 1.f)); // top left
+	draw(mat * glm::vec4(1.0f, -1.0f, -1.0f, 1.0f), glm::vec2(1.f,0.f)); // btm right
+	draw(mat * glm::vec4(1.0f, 1.0f, -1.0f, 1.0f), glm::vec2(1.f,1.f)); // top right
 
-	draw(mat * glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f), mat * glm::vec4(1.0f, -1.0f, -1.0f, 1.0f), color);
-	draw(mat * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f), mat * glm::vec4(1.0f, 1.0f, -1.0f, 1.0f), color);
-	draw(mat * glm::vec4(-1.0f, -1.0f, 1.0f, 1.0f), mat * glm::vec4(1.0f, -1.0f, 1.0f, 1.0f), color);
-	draw(mat * glm::vec4(-1.0f, 1.0f, 1.0f, 1.0f), mat * glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), color);
-
-	draw(mat * glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f), mat * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f), color);
-	draw(mat * glm::vec4(1.0f, -1.0f, -1.0f, 1.0f), mat * glm::vec4(1.0f, 1.0f, -1.0f, 1.0f), color);
-	draw(mat * glm::vec4(-1.0f, -1.0f, 1.0f, 1.0f), mat * glm::vec4(-1.0f, 1.0f, 1.0f, 1.0f), color);
-	draw(mat * glm::vec4(1.0f, -1.0f, 1.0f, 1.0f), mat * glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), color);
-
-	draw(mat * glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f), mat * glm::vec4(-1.0f, -1.0f, 1.0f, 1.0f), color);
-	draw(mat * glm::vec4(1.0f, -1.0f, -1.0f, 1.0f), mat * glm::vec4(1.0f, -1.0f, 1.0f, 1.0f), color);
-	draw(mat * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f), mat * glm::vec4(-1.0f, 1.0f, 1.0f, 1.0f), color);
-	draw(mat * glm::vec4(1.0f, 1.0f, -1.0f, 1.0f), mat * glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), color);
+	draw(mat * glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f), glm::vec2(0.f, 0.f)); // bt, left
+	draw(mat * glm::vec4(1.0f, -1.0f, -1.0f, 1.0f), glm::vec2(1.f, 0.f)); // btm right
+	draw(mat * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f), glm::vec2(0.f, 1.f)); // top left
 }
 
-//void UIShader::draw_sprite(glm::mat4x3 const& mat, Sprite const& sp) {
-//}
 
 UIShader::~UIShader()
 {
@@ -148,6 +166,15 @@ UIShader::~UIShader()
 
 	// set sprite_program as current program:
 	glUseProgram(sprite_program->program);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// Set 2D texture to sample from :
+	GLuint TEX_sampler2D = glGetUniformLocation(sprite_program->program, "TEX");
+	glUniform1i(TEX_sampler2D, sprite_program->dialogue_texture - 1);
+
+	glActiveTexture(GL_TEXTURE0 + sprite_program->dialogue_texture - 1);
+	glBindTexture(GL_TEXTURE_2D, sprite_program->dialogue_texture);
 
 	// upload OBJECT_TO_CLIP to the proper uniform location:
 	glUniformMatrix4fv(sprite_program->OBJECT_TO_CLIP_mat4, 1, GL_FALSE, glm::value_ptr(world_to_clip));
@@ -159,9 +186,13 @@ UIShader::~UIShader()
 	glDrawArrays(GL_TRIANGLES, 0, GLsizei(attribs.size()));
 
 	// reset vertex array to none:
+	glDisable(GL_BLEND);
 	glBindVertexArray(0);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// reset current program to none:
 	glUseProgram(0);
 }
+
 
