@@ -103,6 +103,7 @@ LitColorTextureProgram::LitColorTextureProgram() {
       "	color = Color;\n"
       "	texCoord = TexCoord;\n"
       "}\n",
+
       // fragment shader:
       "#version 330\n"
       "uniform sampler2D TEX;\n"
@@ -127,6 +128,9 @@ LitColorTextureProgram::LitColorTextureProgram() {
       "		e = nl * LIGHT_ENERGY;\n"
       "	} else if (LIGHT_TYPE == 1) { //hemi light \n"
       "		e = (dot(n,-LIGHT_DIRECTION) * 0.5 + 0.5) * LIGHT_ENERGY;\n"
+      "		e.x = max(0.15, e.x);\n"
+      "		e.y = max(0.15, e.y);\n"
+      "		e.z = max(0.15, e.z);\n"
       "	} else if (LIGHT_TYPE == 2) { //spot light \n"
       "		vec3 l = (LIGHT_LOCATION - position);\n"
       "		float dis2 = dot(l,l);\n"
@@ -165,8 +169,8 @@ LitColorTextureProgram::LitColorTextureProgram() {
   GLuint TEX_sampler2D = glGetUniformLocation(program, "TEX");
 
   // set TEX to always refer to texture binding zero:
-  glUseProgram(
-      program); // bind program -- glUniform* calls refer to this program now
+  glUseProgram(program); 
+  // bind program -- glUniform* calls refer to this program now
 
   glUniform1i(TEX_sampler2D, 0); // set TEX to sample from GL_TEXTURE0
 
