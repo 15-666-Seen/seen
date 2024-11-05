@@ -32,9 +32,11 @@ bool Inventory::removeItem(ItemType item_type) {
 void InteractableManager::load(const Scene &scene, GameplayUI *a_gameplayUI) {
   this->gameplayUI = a_gameplayUI;
 
+  return;
+
   for (const auto &[mesh_name, furniture_type] : MeshNameToFurnitureType) {
-    auto it = scene.mesh_name_to_transform.find(mesh_name);
-    if (it == scene.mesh_name_to_transform.end()) {
+    auto it = scene.mesh_name_to_drawable.find(mesh_name);
+    if (it == scene.mesh_name_to_drawable.end()) {
       wait_and_exit("Furniture mesh not found: " + mesh_name);
     }
     Furniture *furniture;
@@ -46,7 +48,7 @@ void InteractableManager::load(const Scene &scene, GameplayUI *a_gameplayUI) {
     }
 
     furniture->type = furniture_type;
-    furniture->transform = it->second;
+    furniture->drawable = it->second;
 
     // TODO: allowable need check
     furniture->phase_allow_interact = true;
@@ -56,15 +58,15 @@ void InteractableManager::load(const Scene &scene, GameplayUI *a_gameplayUI) {
   }
 
   for (const auto &[mesh_name, item_type] : MeshNameToItemType) {
-    auto it = scene.mesh_name_to_transform.find(mesh_name);
-    if (it == scene.mesh_name_to_transform.end()) {
+    auto it = scene.mesh_name_to_drawable.find(mesh_name);
+    if (it == scene.mesh_name_to_drawable.end()) {
       wait_and_exit("Item mesh not found: " + mesh_name);
     }
 
     // create new item
     Item *item = new Item();
     item->type = item_type;
-    item->transform = it->second;
+    item->drawable = it->second;
 
     // TODO: allowable need check
     item->visible = true;
@@ -75,9 +77,9 @@ void InteractableManager::load(const Scene &scene, GameplayUI *a_gameplayUI) {
   }
 }
 
-void InteractableManager::update(Scene::Transform *player_transform,
-                                 Scene::Camera *camera, bool interact_pressed,
-                                 float elapsed) {
+int InteractableManager::update(Scene::Transform *player_transform,
+                                Scene::Camera *camera, bool interact_pressed,
+                                float elapsed) {
 
   gameplayUI->setInteractionText(""); // Clear interaction text
   interaction_notification = "";      // clear interaction text
@@ -92,6 +94,8 @@ void InteractableManager::update(Scene::Transform *player_transform,
   if (!interaction_notification.empty()) {
     gameplayUI->insertDialogueText(interaction_notification);
   }
+
+  return -1;
 }
 
 bool InteractableManager::updateFurniture(Scene::Transform *player_transform,

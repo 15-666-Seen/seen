@@ -15,44 +15,43 @@
 
 GLuint phonebank_meshes_for_lit_color_texture_program = 0;
 Load<MeshBuffer> phonebank_meshes(LoadTagDefault, []() -> MeshBuffer const * {
-  MeshBuffer const *ret = new MeshBuffer(data_path("bedroom_scene.pnct"));
+  MeshBuffer const *ret = new MeshBuffer(data_path("house.pnct"));
   phonebank_meshes_for_lit_color_texture_program =
       ret->make_vao_for_program(lit_color_texture_program->program);
   return ret;
 });
 
 Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
-  return new Scene(data_path("bedroom_scene.scene"),
-                   [&](Scene &scene, Scene::Transform *transform,
-                       std::string const &mesh_name) {
-                     Mesh const &mesh = phonebank_meshes->lookup(mesh_name);
+  return new Scene(data_path("house.scene"), [&](Scene &scene,
+                                                 Scene::Transform *transform,
+                                                 std::string const &mesh_name) {
+    Mesh const &mesh = phonebank_meshes->lookup(mesh_name);
 
-                     scene.drawables.emplace_back(transform, mesh_name);
-                     Scene::Drawable &drawable = scene.drawables.back();
+    scene.drawables.emplace_back(transform, mesh_name);
+    Scene::Drawable &drawable = scene.drawables.back();
 
-                     drawable.pipeline = lit_color_texture_program_pipeline;
+    drawable.pipeline = lit_color_texture_program_pipeline;
 
-                     drawable.pipeline.vao =
-                         phonebank_meshes_for_lit_color_texture_program;
-                     drawable.pipeline.type = mesh.type;
-                     drawable.pipeline.start = mesh.start;
-                     drawable.pipeline.count = mesh.count;
+    drawable.pipeline.vao = phonebank_meshes_for_lit_color_texture_program;
+    drawable.pipeline.type = mesh.type;
+    drawable.pipeline.start = mesh.start;
+    drawable.pipeline.count = mesh.count;
 
-                     drawable.tex = drawable.pipeline.tex_name_to_glint[mesh.tex];
-                     if (auto s = drawable.pipeline.tex_name_to_glint.find(mesh.tex);
-                         s == drawable.pipeline.tex_name_to_glint.end()) {
-                         printf("Texture missing in scene loading for mesh %s \n", mesh_name.c_str());
-                         drawable.tex = 1;
-                     } 
-                     
-                   });
+    drawable.tex = drawable.pipeline.tex_name_to_glint[mesh.tex];
+    if (auto s = drawable.pipeline.tex_name_to_glint.find(mesh.tex);
+        s == drawable.pipeline.tex_name_to_glint.end()) {
+      printf("Texture missing in scene loading for mesh %s \n",
+             mesh_name.c_str());
+      drawable.tex = 1;
+    }
+  });
 });
 
 const WalkMesh *walkmesh = nullptr;
 Load<WalkMeshes>
 phonebank_walkmeshes(LoadTagDefault, []() -> WalkMeshes const * {
-  WalkMeshes *ret = new WalkMeshes(data_path("bedroom_scene.w"));
-  walkmesh = &ret->lookup("WalkMeshP0");
+  WalkMeshes *ret = new WalkMeshes(data_path("house.w"));
+  walkmesh = &ret->lookup("phase");
   return ret;
 });
 
@@ -68,10 +67,7 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
   player.camera = &scene.cameras.back();
   player.camera->fovy = glm::radians(60.0f);
   player.camera->near = 0.01f;
-  player.camera->transform->parent = player.transform;
-
-  // player's eyes are 1.8 units above the ground:
-  player.camera->transform->position = glm::vec3(0.0f, 0.0f, PLAYER_HEIGHT);
+  player.camera->transform->parent = nullptr;
 
   // rotate camera facing direction (-z) to player facing direction (+y):
   player.camera->transform->rotation =
@@ -80,7 +76,11 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
   // start player walking at nearest walk point:
   player.at = walkmesh->nearest_walk_point(player.transform->position);
 
-  
+  // player's eyes are 1.8 units above the ground:
+  player.camera->transform->position =
+      glm::vec3(player.transform->position.x, player.transform->position.y,
+                player.transform->position.z + PLAYER_HEIGHT);
+
   // UI
   gameplayUI = new GameplayUI();
 
@@ -144,6 +144,9 @@ bool PlayMode::handle_event(SDL_Event const &evt,
     int x, y;
     SDL_GetMouseState(&x, &y);
     gameplayUI->InteractOnClick(x, y);
+    if (gameplayUI->dialogueText.size() == 0) {
+      gStop = false;
+    }
 
     if (SDL_GetRelativeMouseMode() == SDL_FALSE) {
       SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -151,22 +154,32 @@ bool PlayMode::handle_event(SDL_Event const &evt,
     }
   } else if (evt.type == SDL_MOUSEMOTION) {
     if (SDL_GetRelativeMouseMode() == SDL_TRUE) {
+      if (gStop) {
+        return true;
+      }
+
       glm::vec2 motion = glm::vec2(evt.motion.xrel / float(window_size.y),
-                                   -evt.motion.yrel / float(window_size.y));
-      glm::vec3 upDir = walkmesh->to_world_smooth_normal(player.at);
-      player.transform->rotation =
-          glm::angleAxis(-motion.x * player.camera->fovy, upDir) *
-          player.transform->rotation;
+                                   evt.motion.yrel / float(window_size.y));
 
-      float pitch = glm::pitch(player.camera->transform->rotation);
-      pitch += motion.y * player.camera->fovy;
-      // camera looks down -z (basically at the player's feet) when pitch is at
-      // zero.
-      pitch = std::min(pitch, 0.95f * 3.1415926f);
-      pitch = std::max(pitch, 0.05f * 3.1415926f);
-      player.camera->transform->rotation =
-          glm::angleAxis(pitch, glm::vec3(1.0f, 0.0f, 0.0f));
+      auto &camera = player.camera;
 
+      camera->yaw += motion.x * camera->fovy;
+      camera->pitch += motion.y * camera->fovy;
+      // camera pitch should be limited to (-pi/2, pi/2)
+      camera->pitch =
+          glm::clamp(camera->pitch, -glm::pi<float>() / 2.0f + 0.0001f,
+                     glm::pi<float>() / 2.0f - 0.0001f);
+
+      // use it to get the new rotation, first by having lookAt
+      glm::vec3 lookAt =
+          glm::vec3(sin(camera->yaw) * cos(camera->pitch),
+                    cos(camera->yaw) * cos(camera->pitch), sin(camera->pitch));
+      glm::vec3 lookRight =
+          glm::normalize(glm::vec3(-lookAt.y, lookAt.x, 0.0f));
+      glm::vec3 lookUp = glm::cross(lookAt, lookRight);
+
+      glm::mat3 rotationMatrix(lookRight, lookUp, lookAt);
+      camera->transform->rotation = glm::quat_cast(rotationMatrix);
       return true;
     }
   }
@@ -175,10 +188,14 @@ bool PlayMode::handle_event(SDL_Event const &evt,
 }
 
 void PlayMode::update(float elapsed) {
+  if (gStop) {
+    return;
+  }
+
   // player walking:
   {
     // combine inputs into a move:
-    constexpr float PlayerSpeed = 6.0f;
+    constexpr float PlayerSpeed = 4.0f;
     glm::vec2 move = glm::vec2(0.0f);
     if (left.pressed && !right.pressed)
       move.x = -1.0f;
@@ -198,6 +215,13 @@ void PlayMode::update(float elapsed) {
     // get move in world coordinate system:
     glm::vec3 remain = player.transform->make_local_to_world() *
                        glm::vec4(move.x, move.y, 0.0f, 0.0f);
+    const auto &camera = player.camera;
+    glm::vec3 lookAt =
+        glm::vec3(sin(camera->yaw) * cos(camera->pitch),
+                  cos(camera->yaw) * cos(camera->pitch), sin(camera->pitch));
+    glm::vec3 lookRight = glm::normalize(glm::vec3(-lookAt.y, lookAt.x, 0.0f));
+    remain = lookRight * remain.x -
+             lookAt * remain.y; // TODO: idk why it should be negative for y
 
     // using a for() instead of a while() here so that if walkpoint gets stuck
     // in
@@ -251,6 +275,9 @@ void PlayMode::update(float elapsed) {
 
     // update player's position to respect walking:
     player.transform->position = walkmesh->to_world_point(player.at);
+    camera->transform->position =
+        glm::vec3(player.transform->position.x, player.transform->position.y,
+                  player.transform->position.z + PLAYER_HEIGHT);
 
     { // update player's rotation to respect local (smooth) up-vector:
 
@@ -290,6 +317,9 @@ void PlayMode::update(float elapsed) {
   }
 
   // Story manager update
+  if (gameplayUI->dialogueText.size() > 0) {
+    gStop = true;
+  }
   storyManager->advanceStory();
 
   // TODO: check phase updates -> update walkmesh?
@@ -308,7 +338,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
                glm::value_ptr(glm::vec3(0.0f, 0.0f, -1.0f)));
   glUniform3fv(lit_color_texture_program->LIGHT_ENERGY_vec3, 1,
                glm::value_ptr(glm::vec3(1.0f, 1.0f, 0.95f)));
- 
+
   glUseProgram(0);
 
   glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -358,7 +388,7 @@ void PlayMode::checkPhaseUpdates() {
 }
 
 void PlayMode::cameraShake(float elapsed) {
-  static float R = 0.5f;
+  static float R = 0.12f;
   static float theta_max = 3.1415926f / 3.0f;
   static float angle_speed = theta_max / 0.175f;
 
