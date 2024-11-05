@@ -6,6 +6,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include <filesystem>
+
 Scene::Drawable::Pipeline lit_color_texture_program_pipeline;
 
 Load<LitColorTextureProgram>
@@ -155,6 +157,7 @@ LitColorTextureProgram::LitColorTextureProgram() {
   NORMAL_TO_LIGHT_mat3 = glGetUniformLocation(program, "NORMAL_TO_LIGHT");
 
   LIGHT_TYPE_int = glGetUniformLocation(program, "LIGHT_TYPE");
+  std::cout << "LIGHT_TYPE_int " << LIGHT_TYPE_int << std::endl;
   LIGHT_LOCATION_vec3 = glGetUniformLocation(program, "LIGHT_LOCATION");
   LIGHT_DIRECTION_vec3 = glGetUniformLocation(program, "LIGHT_DIRECTION");
   LIGHT_ENERGY_vec3 = glGetUniformLocation(program, "LIGHT_ENERGY");
