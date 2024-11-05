@@ -101,6 +101,7 @@ bool PlayMode::handle_event(SDL_Event const &evt,
   if (evt.type == SDL_KEYDOWN) {
     if (evt.key.keysym.sym == SDLK_ESCAPE) {
       SDL_SetRelativeMouseMode(SDL_FALSE);
+      gamePause = !gamePause;
       return true;
     } else if (evt.key.keysym.sym == SDLK_a) {
       left.downs += 1;
@@ -188,7 +189,7 @@ bool PlayMode::handle_event(SDL_Event const &evt,
 }
 
 void PlayMode::update(float elapsed) {
-  if (gStop) {
+  if (gStop || gamePause) {
     return;
   }
 
@@ -207,9 +208,10 @@ void PlayMode::update(float elapsed) {
       move.y = 1.0f;
 
     // make it so that moving diagonally doesn't go faster:
+    glm::vec3 camera_shift = glm::vec3(0.0f);
     if (move != glm::vec2(0.0f)) {
       move = glm::normalize(move) * PlayerSpeed * elapsed;
-      cameraShake(elapsed);
+      camera_shift = cameraShake(elapsed);
     }
 
     // get move in world coordinate system:
@@ -277,7 +279,8 @@ void PlayMode::update(float elapsed) {
     player.transform->position = walkmesh->to_world_point(player.at);
     camera->transform->position =
         glm::vec3(player.transform->position.x, player.transform->position.y,
-                  player.transform->position.z + PLAYER_HEIGHT);
+                  player.transform->position.z + PLAYER_HEIGHT) +
+        camera_shift;
 
     { // update player's rotation to respect local (smooth) up-vector:
 
@@ -327,6 +330,8 @@ void PlayMode::update(float elapsed) {
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
+  if (gamePause)
+    return;
   // update camera aspect ratio for drawable:
   player.camera->aspect = float(drawable_size.x) / float(drawable_size.y);
 
@@ -387,8 +392,8 @@ void PlayMode::checkPhaseUpdates() {
   }
 }
 
-void PlayMode::cameraShake(float elapsed) {
-  static float R = 0.12f;
+glm::vec3 PlayMode::cameraShake(float elapsed) {
+  static float R = 0.2f;
   static float theta_max = 3.1415926f / 3.0f;
   static float angle_speed = theta_max / 0.175f;
 
@@ -404,6 +409,5 @@ void PlayMode::cameraShake(float elapsed) {
   float dright = R * glm::sin(player.theta);
   float dheight = R * (1 - glm::cos(player.theta));
 
-  player.camera->transform->position =
-      glm::vec3(dright, 0.0f, dheight + PLAYER_HEIGHT);
+  return glm::vec3(dright, 0.0f, dheight);
 }
