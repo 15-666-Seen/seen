@@ -3,6 +3,7 @@
 #include "GL.hpp"
 #include "Load.hpp"
 #include "Scene.hpp"
+#include "img_loader.hpp"
 
 #include "data_path.hpp"
 

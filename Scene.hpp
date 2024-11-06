@@ -13,8 +13,6 @@
 
 #include "GL.hpp"
 
-
-
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
@@ -24,9 +22,7 @@
 #include <unordered_map>
 #include <vector>
 
-
-
-static constexpr float PLAYER_HEIGHT = 3.8f;
+static constexpr float PLAYER_HEIGHT = 1.2f;
 
 struct Scene {
 
@@ -74,7 +70,6 @@ struct Scene {
 
     Transform *transform;
 
-
     // Contains all the data needed to run the OpenGL pipeline:
     struct Pipeline {
       GLuint program = 0; // shader program; passed to glUseProgram
@@ -99,14 +94,14 @@ struct Scene {
       std::function<void()>
           set_uniforms; //(optional) function to set any other useful uniforms
 
-      // texture objects 
-      //enum : uint32_t { TextureCount = 4 };
+      // texture objects
+      // enum : uint32_t { TextureCount = 4 };
       struct TextureInfo {
-          GLuint texture = 0;
-          GLenum target = GL_TEXTURE_2D;
+        GLuint texture = 0;
+        GLenum target = GL_TEXTURE_2D;
       };
 
-      std::vector<TextureInfo> textures = { TextureInfo()};
+      std::vector<TextureInfo> textures = {TextureInfo()};
 
       std::unordered_map<std::string, GLint> tex_name_to_glint;
 
@@ -129,6 +124,9 @@ struct Scene {
     float near = 0.01f;               // near plane
     // computed from the above:
     glm::mat4 make_projection() const;
+
+    float yaw = 0.0f;
+    float pitch = 0.0f;
   };
 
   struct Light {
@@ -160,9 +158,10 @@ struct Scene {
   std::list<Light> lights;
 
   std::unordered_map<std::string, Transform *> mesh_name_to_transform;
+  std::unordered_map<std::string, Drawable *> mesh_name_to_drawable;
 
-  //Textures:
-  std::unordered_map<std::string, GLint> texture_map = { {"", 0}};
+  // Textures:
+  std::unordered_map<std::string, GLint> texture_map = {{"", 0}};
 
   // The "draw" function provides a convenient way to pass all the things in a
   // scene to OpenGL:

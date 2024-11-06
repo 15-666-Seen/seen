@@ -7,8 +7,6 @@
 
 #include <fstream>
 
-
-
 //-------------------------
 
 glm::mat4x3 Scene::Transform::make_local_to_parent() const {
@@ -98,6 +96,8 @@ void Scene::draw(glm::mat4 const &world_to_clip,
     Scene::Drawable::Pipeline const &pipeline = drawable.pipeline;
 
     // don't draw invisible items
+    if (!drawable.visible)
+      continue;
 
     // skip any drawables without a shader program set:
     if (pipeline.program == 0)
@@ -117,11 +117,12 @@ void Scene::draw(glm::mat4 const &world_to_clip,
 
     // Set 2D texture to sample from :
     GLuint TEX_sampler2D = glGetUniformLocation(pipeline.program, "TEX");
-    //printf("%d \n", drawable.tex);
-    GLint cur_texure = drawable.tex - 1; // converting from 1 index to 0 indexed? (idk what is actually happening but this works)
+    // std::cout << drawable.mesh_name << " " << drawable.tex << std::endl;
+    GLint cur_texure =
+        drawable.tex - 1; // converting from 1 index to 0 indexed? (idk what is
+                          // actually happening but this works)
     glUniform1i(TEX_sampler2D, cur_texure);
 
-    
     // Configure program uniforms:
 
     // the object-to-world matrix is used in all three of these uniforms:
@@ -156,26 +157,26 @@ void Scene::draw(glm::mat4 const &world_to_clip,
     if (pipeline.set_uniforms)
       pipeline.set_uniforms();
 
-    //cur_texure = 0;
-    //printf("curt %d", cur_texure);
+    // cur_texure = 0;
+    // printf("curt %d", cur_texure);
     // set up textures:
-    //for (uint32_t i = 0; i < Drawable::Pipeline::TextureCount; ++i) {
+    // for (uint32_t i = 0; i < Drawable::Pipeline::TextureCount; ++i) {
     if (pipeline.textures[cur_texure].texture != 0) {
-        glActiveTexture(GL_TEXTURE0 + cur_texure);
-        glBindTexture(pipeline.textures[cur_texure].target,
-                      pipeline.textures[cur_texure].texture);
-      }
+      glActiveTexture(GL_TEXTURE0 + cur_texure);
+      glBindTexture(pipeline.textures[cur_texure].target,
+                    pipeline.textures[cur_texure].texture);
+    }
     //}
 
     // draw the object:
     glDrawArrays(pipeline.type, pipeline.start, pipeline.count);
 
     // un-bind textures:
-    //for (uint32_t i = 0; i < Drawable::Pipeline::TextureCount; ++i) {
+    // for (uint32_t i = 0; i < Drawable::Pipeline::TextureCount; ++i) {
     if (pipeline.textures[cur_texure].texture != 0) {
-        glActiveTexture(GL_TEXTURE0 + cur_texure);
-        glBindTexture(pipeline.textures[cur_texure].target, 0);
-      }
+      glActiveTexture(GL_TEXTURE0 + cur_texure);
+      glBindTexture(pipeline.textures[cur_texure].target, 0);
+    }
     //}
     glActiveTexture(GL_TEXTURE0);
   }
@@ -409,6 +410,14 @@ void Scene::set(
   // copy other's drawables, updating transform pointers:
   drawables = other.drawables;
   for (auto &d : drawables) {
+    mesh_name_to_drawable[d.mesh_name] = &d;
+
+    // if the name contains "phase", invisible
+    if (d.mesh_name.find("phase") != std::string::npos) {
+      d.visible = false;
+    }
+  }
+  for (auto &d : drawables) {
     d.transform = transform_to_transform.at(d.transform);
     mesh_name_to_transform[d.mesh_name] = d.transform;
   }
@@ -425,4 +434,3 @@ void Scene::set(
     l.transform = transform_to_transform.at(l.transform);
   }
 }
-

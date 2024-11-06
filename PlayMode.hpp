@@ -24,7 +24,7 @@ struct PlayMode : Mode {
   struct Button {
     uint8_t downs = 0;
     uint8_t pressed = 0;
-  } left, right, down, up, F;
+  } left, right, down, up, F, esc;
 
   // local copy of the game scene (so code can change it during gameplay):
   Scene scene;
@@ -39,7 +39,7 @@ struct PlayMode : Mode {
     Scene::Camera *camera = nullptr;
     float theta = 0.0f;
   } player;
-  void cameraShake(float elapsed);
+  glm::vec3 cameraShake(float elapsed);
 
   // In game UI
   GameplayUI *gameplayUI;
@@ -50,4 +50,7 @@ struct PlayMode : Mode {
   // story manager
   StoryManager *storyManager;
   void checkPhaseUpdates();
+
+  bool gStop = false;
+  bool gamePause = false;
 };

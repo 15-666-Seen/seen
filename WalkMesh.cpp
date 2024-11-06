@@ -231,6 +231,8 @@ bool WalkMesh::cross_edge(WalkPoint const &start, WalkPoint *end_,
     // Calculate the quaternion rotation that takes the original triangle's
     // normal to the new triangle's normal:
     rotation = glm::rotation(normal_start, normal_end);
+    rotation =
+        glm::quat(1.0f, 0.0f, 0.0f, 0.0f); // Identity rotation (no rotation)
 
     return true;
   } else {
