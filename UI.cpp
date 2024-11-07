@@ -1,6 +1,7 @@
 #include "UI.hpp"
 #include "DrawLines.hpp"
 
+GameplayUI::GameplayUI() {}
 
 void GameplayUI::setInteractionText(const std::string &text) {
   if (!text.empty()) {
@@ -40,10 +41,9 @@ void GameplayUI::DrawUI(glm::uvec2 const &drawable_size) {
   float aspect = float(drawable_size.x) / float(drawable_size.y);
   //const float H = 0.1f;
 
-  glm::mat4 world_to_clip = glm::mat4(1.0f / aspect, 0.0f, 0.0f, 0.0f,
-      0.0f, 1.0f, 0.0f, 0.0f, 
-      0.0f, 0.0f, 1.0f, 0.0f, 
-      0.0f, 0.0f, 0.0f, 1.0f);//world to clip
+  glm::mat4 world_to_clip =
+      glm::mat4(1.0f / aspect, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f); // world to clip
 
   //DrawLines lines(world_to_clip);
 
@@ -93,9 +93,6 @@ void GameplayUI::DrawUI(glm::uvec2 const &drawable_size) {
 	dialogue.draw(100.f, drawable_size, width, glm::vec2(x, y), 1.3f);
 	//std::cout << dialogue.text_content << std::endl;
   }
-
-  
-
 }
 
 void GameplayUI::InteractOnClick(int const x, int const y) {

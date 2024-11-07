@@ -5,6 +5,7 @@
 #include "Load.hpp"
 #include "Mesh.hpp"
 #include "Scene.hpp"
+#include "sound_prep.hpp"
 #include "util.hpp"
 
 #include "data_path.hpp"
@@ -51,7 +52,7 @@ const WalkMesh *walkmesh = nullptr;
 Load<WalkMeshes>
 phonebank_walkmeshes(LoadTagDefault, []() -> WalkMeshes const * {
   WalkMeshes *ret = new WalkMeshes(data_path("house.w"));
-  walkmesh = &ret->lookup("phase");
+  walkmesh = &ret->lookup("phase0");
   return ret;
 });
 
@@ -209,9 +210,27 @@ void PlayMode::update(float elapsed) {
 
     // make it so that moving diagonally doesn't go faster:
     glm::vec3 camera_shift = glm::vec3(0.0f);
+    isPlayerWalking = false;
     if (move != glm::vec2(0.0f)) {
+      isPlayerWalking = true;
       move = glm::normalize(move) * PlayerSpeed * elapsed;
       camera_shift = cameraShake(elapsed);
+    } else {
+      player.theta = 0.0f;
+    }
+
+    if (isPlayerWalking) {
+      glm::vec3 base_player_pos = player.transform->make_local_to_world() *
+                                  glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+      if (!walking_sound) {
+        walking_sound =
+            Sound::loop_3D(*footstep_sample, 0.8f, base_player_pos, 1.0f);
+      } else {
+        walking_sound->set_position(base_player_pos, 1.0f);
+      }
+    } else if (!isPlayerWalking && walking_sound) {
+      walking_sound->stop(1.0f / 60.0f);
+      walking_sound.reset();
     }
 
     // get move in world coordinate system:
@@ -338,7 +357,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
   // set up light type and position for lit_color_texture_program:
   // TODO: consider using the Light(s) in the scene to do this
   glUseProgram(lit_color_texture_program->program);
-  glUniform1i(lit_color_texture_program->LIGHT_TYPE_int, 1);
+  glUniform1i(lit_color_texture_program->LIGHT_TYPE_int, 4);
   glUniform3fv(lit_color_texture_program->LIGHT_DIRECTION_vec3, 1,
                glm::value_ptr(glm::vec3(0.0f, 0.0f, -1.0f)));
   glUniform3fv(lit_color_texture_program->LIGHT_ENERGY_vec3, 1,
@@ -356,7 +375,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
                         // FYI you can change it.
 
   scene.draw(*player.camera);
- 
+
   /* In case you are wondering if your walkmesh is lining up with your scene,
   try:
   {
@@ -376,27 +395,23 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
   // render UI and text
   
   glDisable(GL_DEPTH_TEST);
-  
 
-
-
-  
   gameplayUI->DrawUI(drawable_size);
 
   GL_ERRORS();
 }
 
 void PlayMode::checkPhaseUpdates() {
-  if (storyManager->getCurrentPhase() == 2) {
-    walkmesh = &phonebank_walkmeshes->lookup("WalkMeshP1");
+  if (storyManager->getCurrentPhase() == 1) {
+    walkmesh = &phonebank_walkmeshes->lookup("phase1");
     player.at = walkmesh->nearest_walk_point(player.transform->position);
   }
 }
 
 glm::vec3 PlayMode::cameraShake(float elapsed) {
-  static float R = 0.2f;
+  static float R = 0.3f;
   static float theta_max = 3.1415926f / 3.0f;
-  static float angle_speed = theta_max / 0.175f;
+  static float angle_speed = theta_max / 0.3f;
 
   player.theta += angle_speed * elapsed;
   if (player.theta > theta_max) {

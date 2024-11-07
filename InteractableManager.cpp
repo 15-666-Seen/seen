@@ -12,7 +12,6 @@ bool Inventory::hasItem(ItemType item_type) {
 }
 bool Inventory::addItem(ItemType item_type) {
   if (items.find(item_type) != items.end()) {
-    assert(false && "Item already in inventory");
     return false;
   }
   items.insert(item_type);
@@ -32,8 +31,6 @@ bool Inventory::removeItem(ItemType item_type) {
 void InteractableManager::load(const Scene &scene, GameplayUI *a_gameplayUI) {
   this->gameplayUI = a_gameplayUI;
 
-  return;
-
   for (const auto &[mesh_name, furniture_type] : MeshNameToFurnitureType) {
     auto it = scene.mesh_name_to_drawable.find(mesh_name);
     if (it == scene.mesh_name_to_drawable.end()) {
@@ -41,7 +38,7 @@ void InteractableManager::load(const Scene &scene, GameplayUI *a_gameplayUI) {
     }
     Furniture *furniture;
     // Special case to add offset for door
-    if (furniture_type == BEDROOM_DOOR) {
+    if (furniture_type == BEDROOM_DOOR || furniture_type == DOOR1) {
       furniture = new Door();
     } else {
       furniture = new Furniture();
@@ -51,7 +48,7 @@ void InteractableManager::load(const Scene &scene, GameplayUI *a_gameplayUI) {
     furniture->drawable = it->second;
 
     // TODO: allowable need check
-    furniture->phase_allow_interact = true;
+    furniture->phase_allow_interact = false;
     furniture->can_interact = true;
 
     furnitures.push_back(furniture);
@@ -104,8 +101,7 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
                                           float elapsed) {
   for (auto &furniture : furnitures) {
 
-    // if it's in animation status, continue animation
-    if (furniture->interact_status) {
+    if (furniture->isInteracting()) {
       furniture->interact(elapsed);
     }
 
@@ -122,21 +118,22 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
       // TODO: set different notification
       if (furniture->type == BEDROOM_DOOR) {
 
+        // phase 0 can directly open the door
         if (current_phase == 0) {
-          interaction_notification = "I'd better go sleep first";
+          Door *door = dynamic_cast<Door *>(furniture);
+          door->state = Door::DoorState::OPENING;
+          furniture->phase_allow_interact = false;
           return true;
         }
-        if (!inventory.hasItem(BEDROOM_KEY)) {
-          interaction_notification = "The door is locked";
-          return true;
-        }
-
-        interaction_notification = "Bedroom door is unlocked";
-        furniture->interact_status = true;
 
       } else if (furniture->type == BED) {
-        furniture->interact_status = true;
+        furniture->interact_status = 1;
         return true;
+      } else if (furniture->type == DOOR1) {
+        if (!inventory.hasItem(DOOR1_KEY)) {
+          interaction_notification = "This door is locked.";
+          return true;
+        }
       }
     }
 
@@ -181,12 +178,22 @@ void InteractableManager::setItemPhaseAvailability(ItemType item_type,
   }
 }
 
-bool InteractableManager::interactStatusCheck(FurnitureType furniture_type) {
+int InteractableManager::interactStatusCheck(FurnitureType furniture_type) {
   for (auto &furniture : furnitures) {
     if (furniture->type == furniture_type)
       return furniture->interact_status;
   }
   wait_and_exit(
       "Interactable Manager cpp interactStatusCheck() furniture not found.");
-  return false;
+  return 0;
+}
+
+int InteractableManager::interactStatusCheck(ItemType item_type) {
+  for (auto &item : items) {
+    if (item->type == item_type)
+      return item->interact_status;
+  }
+  wait_and_exit(
+      "Interactable Manager cpp interactStatusCheck() item not found.");
+  return 0;
 }

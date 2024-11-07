@@ -82,6 +82,7 @@ void Scene::draw(Camera const &camera) const {
   glm::mat4 world_to_clip = camera.make_projection() *
                             glm::mat4(camera.transform->make_world_to_local());
   glm::mat4x3 world_to_light = glm::mat4x3(1.0f);
+  world_to_light[3] = glm::vec4(-camera.transform->position, 1.0f);
   draw(world_to_clip, world_to_light);
 }
 

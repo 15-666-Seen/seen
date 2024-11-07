@@ -3,8 +3,6 @@
 #include "gl_compile_program.hpp"
 #include "gl_errors.hpp"
 
-
-
 #include <filesystem>
 
 Scene::Drawable::Pipeline lit_color_texture_program_pipeline;
@@ -139,10 +137,18 @@ LitColorTextureProgram::LitColorTextureProgram() {
       "		float c = dot(l,-LIGHT_DIRECTION);\n"
       "		nl *= smoothstep(LIGHT_CUTOFF,mix(LIGHT_CUTOFF,1.0,0.1), c);\n"
       "		e = nl * LIGHT_ENERGY;\n"
-      "	} else { //(LIGHT_TYPE == 3) //directional light \n"
+      "	} else if (LIGHT_TYPE == 3) { //(LIGHT_TYPE == 3) //directional light\n"
       "		e = max(0.0, dot(n,-LIGHT_DIRECTION)) * LIGHT_ENERGY;\n"
-      "	}\n"
-      "	vec4 albedo = texture(TEX, texCoord) * color;\n"
+      "	} else { // LIGHT_TYPE == 4 shadow light\n"
+      "   float distance = pow(length(position), 2.0) + 0.01f;\n"
+      "   e.x = min(1.0, 2.0/distance);\n"
+      "   e.y = min(1.0, 2.0/distance);\n"
+      "   e.z = min(1.0, 2.0/distance);\n"
+      "		e.x = max(0.02, e.x);\n"
+      "		e.y = max(0.02, e.y);\n"
+      "		e.z = max(0.02, e.z);\n"
+      " }\n"
+      "	vec4 albedo = texture(TEX, fract(-texCoord)) * color;\n"
       "	fragColor = vec4(e*albedo.rgb, albedo.a);\n"
       "}\n");
   // As you can see above, adjacent strings in C/C++ are concatenated.
@@ -160,7 +166,6 @@ LitColorTextureProgram::LitColorTextureProgram() {
   NORMAL_TO_LIGHT_mat3 = glGetUniformLocation(program, "NORMAL_TO_LIGHT");
 
   LIGHT_TYPE_int = glGetUniformLocation(program, "LIGHT_TYPE");
-  std::cout << "LIGHT_TYPE_int " << LIGHT_TYPE_int << std::endl;
   LIGHT_LOCATION_vec3 = glGetUniformLocation(program, "LIGHT_LOCATION");
   LIGHT_DIRECTION_vec3 = glGetUniformLocation(program, "LIGHT_DIRECTION");
   LIGHT_ENERGY_vec3 = glGetUniformLocation(program, "LIGHT_ENERGY");
@@ -169,7 +174,7 @@ LitColorTextureProgram::LitColorTextureProgram() {
   GLuint TEX_sampler2D = glGetUniformLocation(program, "TEX");
 
   // set TEX to always refer to texture binding zero:
-  glUseProgram(program); 
+  glUseProgram(program);
   // bind program -- glUniform* calls refer to this program now
 
   glUniform1i(TEX_sampler2D, 0); // set TEX to sample from GL_TEXTURE0
@@ -186,8 +191,8 @@ LitColorTextureProgram::~LitColorTextureProgram() {
 GLuint LitColorTextureProgram::LoadTexture(const std::string filepath,
                                            const std::string filename) {
 
-	int width, height, channels;
-	unsigned char* data = loadImg(filepath, filename, width, height, channels);
+  int width, height, channels;
+  unsigned char *data = loadImg(filepath, filename, width, height, channels);
 
   GLuint tex;
   glGenTextures(1, &tex);
@@ -201,7 +206,7 @@ GLuint LitColorTextureProgram::LoadTexture(const std::string filepath,
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-	freeImg(data);
+  freeImg(data);
 
   return tex;
 }
