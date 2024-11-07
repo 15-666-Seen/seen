@@ -79,15 +79,18 @@ void StoryManager::setUpPhase() {
 
   case 2:
     interactableManager->setItemPhaseAvailability(FILE1, false);
-    interactableManager->setFurniturePhaseAvailability(BED, true);
+    interactableManager->setFurniturePhaseAvailability(BED, false);
+    interactableManager->setItemPhaseAvailability(BEDROOM_KEY, true);
+    interactableManager->setFurniturePhaseAvailability(BEDROOM_DOOR, true);
 
     gameplayUI->addDialogueText(
         "[XXXXXXXXXXXXXXX   Something Secret  XXXXXXXXXXXXXXX]");
     gameplayUI->addDialogueText("...");
+    interactableManager->closeBedroomDoor();
     gameplayUI->addDialogueText(
-        "Wait, what's that noise? I better hide somewhere.");
+        "Wait, the door is closed? I need to find a way out.");
 
-    gameplayUI->setMissionText("Hide under the bed");
+    gameplayUI->setMissionText("Leave Bedroom");
 
     break;
   default:
