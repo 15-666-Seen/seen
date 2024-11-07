@@ -36,9 +36,9 @@ struct Character {
 };
 
 struct Text {
-    const std::string text_file = "BungeeHairline-Regular.ttf";
-    FT_F26Dot6  font_size = 1;
-    FT_F26Dot6  font_scale = 1; // number of units per pixel
+    const std::string text_file = "RubikDistressed-Regular.ttf";
+    FT_F26Dot6  font_size = 2;
+    FT_F26Dot6  font_scale = 2; // number of units per pixel
 
     float anim_time = 1.0f; // time (seconds) to complete animation
     float time = 0.f; // current time for new text

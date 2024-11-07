@@ -117,6 +117,7 @@ Text::Text()
         glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
+		//glDisable(GL_BLEND);
         GL_ERRORS();
     }
 }
@@ -257,11 +258,16 @@ void Text::draw(float dt, const glm::vec2& drawable_size, float width, const glm
             { xpos + w, ypos + h, 1.0f, 0.0f }
         };
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         glBindTexture(GL_TEXTURE_2D, ch.TextureID);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        glDisable(GL_BLEND);
 
         char_x += (ch.Advance >> 6) * ss_scale;
 
