@@ -56,4 +56,6 @@ struct InteractableManager {
   // furniture interaction in current phase, used to forward phase
   FurnitureType cur_furniture = NONE; // TODO: NOT used
   std::string interaction_notification = "";
+
+  void closeBedroomDoor();
 };

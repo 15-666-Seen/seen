@@ -126,6 +126,17 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
           return true;
         }
 
+        else if (current_phase == 2) {
+          Door *door = dynamic_cast<Door *>(furniture);
+          if (!inventory.hasItem(BEDROOM_KEY)) {
+            interaction_notification = "This door is locked.";
+            return true;
+          } else {
+            door->state = Door::DoorState::OPENING;
+            furniture->phase_allow_interact = false;
+            return true;
+          }
+        }
       } else if (furniture->type == BED) {
         furniture->interact_status = 1;
         return true;
@@ -196,4 +207,18 @@ int InteractableManager::interactStatusCheck(ItemType item_type) {
   wait_and_exit(
       "Interactable Manager cpp interactStatusCheck() item not found.");
   return 0;
+}
+
+void InteractableManager::closeBedroomDoor() {
+  for (auto &furniture : furnitures) {
+    if (furniture->type == BEDROOM_DOOR) {
+      Door *door = dynamic_cast<Door *>(furniture);
+      door->state = Door::DoorState::CLOSED;
+      door->animation_time = 0.0f;
+      door->interact_status = 0;
+      door->drawable->transform->rotation =
+          glm::angleAxis(glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+      return;
+    }
+  }
 }
