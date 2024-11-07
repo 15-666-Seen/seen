@@ -1,8 +1,11 @@
 #include "Interactable.hpp"
-#include "Scene.hpp"
-#include <glm/glm.hpp>
 
+#include <glm/glm.hpp>
 #include <iostream>
+
+#include "Scene.hpp"
+#include "UI.hpp"
+#include "sound_prep.hpp"
 
 bool iteractCheck(Scene::Transform *player_transform, glm::vec3 object_pos,
                   Scene::Camera *camera, float distance_threshold) {
@@ -17,7 +20,7 @@ bool iteractCheck(Scene::Transform *player_transform, glm::vec3 object_pos,
   // player's looking at the furniture
   glm::vec3 player_look_dir = camera->transform->make_local_to_world()[2];
   glm::vec3 fur_to_player = object_pos - player_eye_pos;
-  // if there angle is small enough, it is interactable
+  // if there angle is small enough, it is interact-able
   float angle = glm::acos(
       glm::dot(glm::normalize(player_look_dir), glm::normalize(fur_to_player)));
 
@@ -31,10 +34,11 @@ Item::Item() {}
 // TODO: different type of items should have different interact text
 bool Item::interact(float elapsed) {
   if (type == BEDROOM_KEY) {
-    std::cout << "You picked up a bedroom key!" << std::endl;
     visible = false;
     this->drawable->visible = false;
-    phase_allow_interact = false;
+    return true;
+  } else if (type == FILE1) {
+    interact_status = 1;
     return true;
   }
   return true;
@@ -69,13 +73,19 @@ bool Furniture::interactable(Scene::Transform *player_transform,
 
 /* DOOR */
 bool Door::interact(float elapsed) {
+  if (animation_time == 0.0f) {
+    interact_sound = Sound::play_3D(*door_open_sample, 2.0f,
+                                    drawable->transform->position, 10.0f);
+  }
   animation_time += elapsed;
   if (animation_time > 0.5f) {
-    interact_status = false;
+    state = Door::DoorState::OPEN;
+    interact_status = 1;
+    return false;
   }
   // rotate the door along z axis
   drawable->transform->rotation =
-      glm::angleAxis(glm::radians(90.0f) * (animation_time / 0.5f),
+      glm::angleAxis(glm::radians(-90.0f) * (animation_time / 0.5f),
                      glm::vec3(0.0f, 0.0f, 1.0f));
   return true;
 }

@@ -50,7 +50,8 @@ struct InteractableManager {
   // all interactable objects valid check
   bool interactValidCheck(FurnitureType furniture_type);
 
-  bool interactStatusCheck(FurnitureType furniture_type);
+  int interactStatusCheck(FurnitureType furniture_type);
+  int interactStatusCheck(ItemType item_type);
 
   // furniture interaction in current phase, used to forward phase
   FurnitureType cur_furniture = NONE; // TODO: NOT used
