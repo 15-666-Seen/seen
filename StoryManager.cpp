@@ -62,6 +62,7 @@ void StoryManager::setUpPhase() {
 
     interactableManager->setFurniturePhaseAvailability(BEDROOM_DOOR, true);
     interactableManager->setFurniturePhaseAvailability(DOOR1, true);
+    interactableManager->setItemPhaseAvailability(FILE1, false);
 
     break;
   case 1:
@@ -86,7 +87,6 @@ void StoryManager::setUpPhase() {
     gameplayUI->addDialogueText(
         "[XXXXXXXXXXXXXXX   Something Secret  XXXXXXXXXXXXXXX]");
     gameplayUI->addDialogueText("...");
-    interactableManager->closeBedroomDoor();
     gameplayUI->addDialogueText(
         "Wait, the door is closed? I need to find a way out.");
 
