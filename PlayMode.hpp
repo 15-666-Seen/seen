@@ -56,4 +56,7 @@ struct PlayMode : Mode {
 
   bool isPlayerWalking = false;
   std::shared_ptr<Sound::PlayingSample> walking_sound;
+
+  // ghosts
+  void setupGhosts();
 };
