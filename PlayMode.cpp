@@ -374,6 +374,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
   */
 
   // render UI and text
+  
   glDisable(GL_DEPTH_TEST);
   
 
