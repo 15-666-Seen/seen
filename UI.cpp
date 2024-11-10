@@ -1,7 +1,9 @@
 #include "UI.hpp"
 #include "DrawLines.hpp"
 
-GameplayUI::GameplayUI() {}
+GameplayUI::GameplayUI() { mission.init("BungeeHairline-Regular.ttf");
+mission.set_color(glm::vec3(1.0f, 1.0f, 1.0f));
+}
 
 void GameplayUI::setInteractionText(const std::string &text) {
   if (!text.empty()) {
