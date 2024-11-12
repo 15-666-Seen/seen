@@ -1,6 +1,5 @@
 #pragma once
 
-#include <map>
 #include <string>
 
 #include "Scene.hpp"
@@ -17,5 +16,3 @@ struct Ghost {
 
   bool active = false;
 };
-
-static std::map<std::string, Ghost *> GhostMap;
