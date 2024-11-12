@@ -56,8 +56,16 @@ Character Character::Load(hb_codepoint_t request, FT_Face typeface){
         };
 }
 
-Text::Text()
+//Text::Text();
+
+void Text::init(std::string ttf_file)
 {
+	if (init_flag) {
+		return;
+	}
+	if (ttf_file != "") {
+		text_file = ttf_file;
+	}
     // (try to) load freetype library and typeface
     {
         FT_Library ftlibrary;
@@ -71,12 +79,12 @@ Text::Text()
     {
         // https://learnopengl.com/code_viewer_gh.php?code=src/7.in_practice/2.text_rendering/text.vs
         const auto vertex_shader = "#version 330 core\n"
-            "layout (location = 0) in vec4 vertex;\n"
+            "in vec4 vertex;\n"     //layout (location = 0) in vec4 vertex;\n
             "out vec2 TexCoords;\n"
             "uniform mat4 projection;\n"
             "void main()\n"
             "{\n"
-            "    gl_Position = projection * vec4(vertex.xy, 0.0, 1.0);\n"
+            "    gl_Position = projection * vec4(vertex.xyz, 1.0);\n"
             "    TexCoords = vertex.zw;\n"
             "}\n";
 
@@ -90,6 +98,7 @@ Text::Text()
             "{\n"
             "	vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);\n"
             "   color = vec4(textColor, 1.0) * sampled;\n"
+			"   if (color.a < 0.1) discard;\n"
             "}\n";
         draw_text_program = gl_compile_program(vertex_shader, fragment_shader);
 
@@ -98,9 +107,15 @@ Text::Text()
 
     // set initial harfbuzz buffer params/data
     {
-        Text::set_font_size(font_size, font_scale, true); // make sure to set the font size once upon initialization
+        std::cout << "setting font size to " << font_size << " and scale to " << font_scale << std::endl;
+        /* FT_F26Dot6 zero = 0;*/
+        FT_Set_Char_Size(typeface, 0, (FT_F26Dot6)font_size * font_scale, 0, 0); // 64 units per pixel
+        if (FT_Load_Char(typeface, 'X', FT_LOAD_RENDER))
+            throw std::runtime_error("Failed to load char \"X\" from typeface!");
+        // reset these characters to regenerate them with the new font size
+        chars.clear();
         hb_typeface = hb_ft_font_create(typeface, nullptr);
-        set_text("Initial text"); /// TODO: remove
+        //set_text("Initial text"); /// TODO: remove
     }
 
     // initialize openGL for rendering
@@ -117,9 +132,11 @@ Text::Text()
         glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
-		//glDisable(GL_BLEND);
+		glDisable(GL_BLEND);
         GL_ERRORS();
     }
+
+	init_flag = true;
 }
 
 void Text::update_buffer(const std::string& new_text)
@@ -141,6 +158,9 @@ void Text::update_buffer(const std::string& new_text)
 
 void Text::set_text(const std::string& new_text)
 {
+    if (!init_flag) {
+        init();
+    }
     text_content = new_text;
     update_buffer(text_content);
 	anim_time = text_content.size() / 40.f; // reset animation time
@@ -153,6 +173,14 @@ void Text::set_text(const std::string& new_text)
 void Text::set_bound(float new_bound)
 {
 	right_bound = new_bound;
+}
+
+void Text::set_color(const glm::vec3 new_color) {
+    color = new_color;
+}
+
+void Text::set_color2(const glm::vec3 new_color) {
+	color2 = new_color;
 }
 
 void Text::set_color2_index(uint8_t index) {
@@ -171,11 +199,15 @@ void Text::highlight()
     update_buffer("**" + text_content + "**");
 }
 
+
 void Text::set_font_size(FT_F26Dot6 new_font_size, FT_F26Dot6 new_font_scale, bool override)
 {
+    if (!init_flag) {
+        init();
+    }
     if ((font_size != new_font_size || font_scale != new_font_scale) || override) {
-        font_size = (FT_F26Dot6)(new_font_size);
-        font_scale = (FT_F26Dot6)(new_font_scale);
+        font_size = new_font_size;
+        font_scale = new_font_scale;
         std::cout << "setting font size to " << font_size << " and scale to " << font_scale << std::endl;
         /* FT_F26Dot6 zero = 0;*/
         FT_Set_Char_Size(typeface, 0, (FT_F26Dot6)font_size * font_scale, 0, 0); // 64 units per pixel
@@ -187,15 +219,20 @@ void Text::set_font_size(FT_F26Dot6 new_font_size, FT_F26Dot6 new_font_scale, bo
 }
 
 
-void Text::draw(float dt, const glm::vec2& drawable_size, float width, const glm::vec2& pos, float ss_scale, glm::vec3 primary_color) {
+void Text::draw(float dt, const glm::vec2& drawable_size, float width, const glm::vec2& pos, float ss_scale, bool animate) {
     // drawable_size - window size
     // width - how wide the displayed string gets to be
     // pos - position in screenspace where the text gets rendered
     // ss_scale - screenspace scale (lower quality but cheap)
     // primary_color - RGB color for the primary color
+	if (!init_flag) {
+		init();
+	}
+
 	if (text_content.empty() || text_content == "") {
 		return;
 	}
+	if (!animate) dt = 100.f; // if not animating, just draw the text
 
     FT_F26Dot6 new_font_scale = (FT_F26Dot6)((float)drawable_size.y * (32.0f / 720.0f) * 32.f); // scale font size off window height
     set_font_size(font_size, new_font_scale);
@@ -203,7 +240,8 @@ void Text::draw(float dt, const glm::vec2& drawable_size, float width, const glm
     projection = glm::ortho(0.0f, drawable_size.x, 0.0f, drawable_size.y);
 
     glUseProgram(draw_text_program);
-
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // Use member variable color2 for the secondary color
     glUniformMatrix4fv(glGetUniformLocation(draw_text_program, "projection"), 1, GL_FALSE, &projection[0][0]);
     glActiveTexture(GL_TEXTURE0);
@@ -226,9 +264,9 @@ void Text::draw(float dt, const glm::vec2& drawable_size, float width, const glm
 
     // Set initial color
     glUniform3f(glGetUniformLocation(draw_text_program, "textColor"),
-        use_secondary ? color2.x : primary_color.x,
-        use_secondary ? color2.y : primary_color.y,
-        use_secondary ? color2.z : primary_color.z);
+        use_secondary ? color2.x : color.x,
+        use_secondary ? color2.y : color.y,
+        use_secondary ? color2.z : color.z);
 
     for (unsigned int i = 0; i < static_cast<unsigned int>(amnt * num_chars); i++) {
         hb_codepoint_t char_req = glyph_info[i].codepoint;
@@ -258,8 +296,8 @@ void Text::draw(float dt, const glm::vec2& drawable_size, float width, const glm
             { xpos + w, ypos + h, 1.0f, 0.0f }
         };
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glDepthMask(GL_FALSE);
+        
 
         glBindTexture(GL_TEXTURE_2D, ch.TextureID);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -267,7 +305,8 @@ void Text::draw(float dt, const glm::vec2& drawable_size, float width, const glm
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        glDisable(GL_BLEND);
+        //glDepthMask(GL_TRUE);
+        
 
         char_x += (ch.Advance >> 6) * ss_scale;
 
@@ -294,15 +333,17 @@ void Text::draw(float dt, const glm::vec2& drawable_size, float width, const glm
 
             // Update the text color
             glUniform3f(glGetUniformLocation(draw_text_program, "textColor"),
-                use_secondary ? color2.x : primary_color.x,
-                use_secondary ? color2.y : primary_color.y,
-                use_secondary ? color2.z : primary_color.z);
+                use_secondary ? color2.x : color.x,
+                use_secondary ? color2.y : color.y,
+                use_secondary ? color2.z : color.z);
         }
     }
 
+    glDisable(GL_BLEND);
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
     glUseProgram(0);
+    GL_ERRORS();
 }
 
 
