@@ -15,6 +15,7 @@ struct GameplayUI {
   GameplayUI();
 
   Text interaction, mission, dialogue;
+  
 
   // upper left corner: interaction (press [F] to interact)
   std::string interactionText = "Interaction Text Holder";

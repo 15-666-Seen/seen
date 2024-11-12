@@ -51,7 +51,7 @@ void InteractableManager::load(const Scene &scene, GameplayUI *a_gameplayUI) {
     furniture->phase_allow_interact = false;
     furniture->can_interact = true;
 
-    furnitures.push_back(furniture);
+    furnituresMap[furniture_type] = furniture;
   }
 
   for (const auto &[mesh_name, item_type] : MeshNameToItemType) {
@@ -70,7 +70,7 @@ void InteractableManager::load(const Scene &scene, GameplayUI *a_gameplayUI) {
     item->can_interact = true;
     item->phase_allow_interact = false;
 
-    items.push_back(item);
+    itemsMap[item_type] = item;
   }
 }
 
@@ -99,7 +99,7 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
                                           Scene::Camera *camera,
                                           bool interact_pressed,
                                           float elapsed) {
-  for (auto &furniture : furnitures) {
+  for (auto &[_, furniture] : furnituresMap) {
 
     if (furniture->isInteracting()) {
       furniture->interact(elapsed);
@@ -126,6 +126,17 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
           return true;
         }
 
+        else if (current_phase == 2) {
+          Door *door = dynamic_cast<Door *>(furniture);
+          if (!inventory.hasItem(BEDROOM_KEY)) {
+            interaction_notification = "This door is locked.";
+            return true;
+          } else {
+            door->state = Door::DoorState::OPENING;
+            furniture->phase_allow_interact = false;
+            return true;
+          }
+        }
       } else if (furniture->type == BED) {
         furniture->interact_status = 1;
         return true;
@@ -145,7 +156,7 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
 bool InteractableManager::updateItem(Scene::Transform *player_transform,
                                      Scene::Camera *camera,
                                      bool interact_pressed, float elapsed) {
-  for (auto &item : items) {
+  for (auto &[_, item] : itemsMap) {
     if (!item->interactable(player_transform, camera)) {
       continue;
     }
@@ -153,6 +164,10 @@ bool InteractableManager::updateItem(Scene::Transform *player_transform,
     if (interact_pressed) {
       inventory.addItem(item->type);
       item->interact(elapsed);
+
+      if (item->type == FILE1) {
+        closeDoor(BEDROOM_DOOR);
+      }
     }
     return true;
   }
@@ -161,39 +176,32 @@ bool InteractableManager::updateItem(Scene::Transform *player_transform,
 
 void InteractableManager::setFurniturePhaseAvailability(
     FurnitureType furniture_type, bool allow) {
-  for (auto &furniture : furnitures) {
-    if (furniture->type == furniture_type) {
-      furniture->phase_allow_interact = allow;
-      return;
-    }
-  }
+  furnituresMap[furniture_type]->phase_allow_interact = allow;
 }
 void InteractableManager::setItemPhaseAvailability(ItemType item_type,
                                                    bool allow) {
-  for (auto &item : items) {
-    if (item->type == item_type) {
-      item->phase_allow_interact = allow;
-      return;
-    }
-  }
+  itemsMap[item_type]->phase_allow_interact = allow;
 }
 
 int InteractableManager::interactStatusCheck(FurnitureType furniture_type) {
-  for (auto &furniture : furnitures) {
-    if (furniture->type == furniture_type)
-      return furniture->interact_status;
-  }
+  return furnituresMap[furniture_type]->interact_status;
   wait_and_exit(
       "Interactable Manager cpp interactStatusCheck() furniture not found.");
   return 0;
 }
 
 int InteractableManager::interactStatusCheck(ItemType item_type) {
-  for (auto &item : items) {
-    if (item->type == item_type)
-      return item->interact_status;
-  }
+  return itemsMap[item_type]->interact_status;
   wait_and_exit(
       "Interactable Manager cpp interactStatusCheck() item not found.");
   return 0;
+}
+
+void InteractableManager::closeDoor(FurnitureType furniture_type) {
+  Door *door = dynamic_cast<Door *>(furnituresMap[furniture_type]);
+  door->state = Door::DoorState::CLOSED;
+  door->interact_status = 0; // set interaction text
+  door->drawable->transform->rotation =
+      glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+  door->animation_time = 0.0f;
 }

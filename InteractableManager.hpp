@@ -29,8 +29,8 @@ struct InteractableManager {
 
   GameplayUI *gameplayUI = nullptr;
 
-  std::vector<Item *> items;
-  std::vector<Furniture *> furnitures;
+  std::unordered_map<ItemType, Item *> itemsMap;
+  std::unordered_map<FurnitureType, Furniture *> furnituresMap;
 
   void load(const Scene &scenes, GameplayUI *a_gameplayUI);
 
@@ -56,4 +56,6 @@ struct InteractableManager {
   // furniture interaction in current phase, used to forward phase
   FurnitureType cur_furniture = NONE; // TODO: NOT used
   std::string interaction_notification = "";
+
+  void closeDoor(FurnitureType furniture_type);
 };

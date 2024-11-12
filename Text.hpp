@@ -36,7 +36,7 @@ struct Character {
 };
 
 struct Text {
-    const std::string text_file = "RubikDistressed-Regular.ttf";
+    std::string text_file = "RubikDistressed-Regular.ttf";
     FT_F26Dot6  font_size = 2;
     FT_F26Dot6  font_scale = 2; // number of units per pixel
 
@@ -64,16 +64,25 @@ struct Text {
     // using hb_codepoint_t as the codepoint type from hb_buffer_get_glyph_positions
     std::map<hb_codepoint_t, Character> chars;
 
+    glm::vec3 color = glm::vec3(0.3f, 0.f, 0.f);
 	glm::vec3 color2 = glm::vec3(0.3f, 0.f, 0.f);
     bool color2_bit_array[64] = {false};
 
-    Text();
+	bool init_flag = false;     // flag to check if the Text has been initialized
+
+    //Text();
+
+	void init(std::string ttf_file = "");
 
     void update_buffer(const std::string& new_text);
 
     void set_text(const std::string& new_text);
 
 	void set_bound(float new_bound);
+
+	void set_color(const glm::vec3 new_color);
+
+	void set_color2(const glm::vec3 new_color);
 
     void set_color2_index(uint8_t index);
 
@@ -83,5 +92,5 @@ struct Text {
 
     void set_font_size(FT_F26Dot6 new_font_size, FT_F26Dot6 new_font_scale, bool override = false);
 
-    void draw(float dt, const glm::vec2& drawable_size, float width, const glm::vec2& pos, float ss_scale, glm::vec3 color);
+    void draw(float dt, const glm::vec2& drawable_size, float width, const glm::vec2& pos, float ss_scale, bool animate = false);
 };
