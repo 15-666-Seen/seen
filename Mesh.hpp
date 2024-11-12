@@ -71,6 +71,9 @@ struct MeshBuffer {
 
   Attrib Position;
   Attrib Normal;
+  Attrib Tangent;
+  Attrib Bitangent;
   Attrib Color;
   Attrib TexCoord;
+  
 };

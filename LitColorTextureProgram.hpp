@@ -14,12 +14,13 @@ struct LitColorTextureProgram {
 	LitColorTextureProgram();
 	~LitColorTextureProgram();
 
-
 	GLuint program = 0;
 
 	//Attribute (per-vertex variable) locations:
 	GLuint Position_vec4 = -1U;
 	GLuint Normal_vec3 = -1U;
+	GLuint Tangent_vec3 = -1U;
+	GLuint Bitangent_vec3 = -1U;
 	GLuint Color_vec4 = -1U;
 	GLuint TexCoord_vec2 = -1U;
 

@@ -21,10 +21,13 @@ MeshBuffer::MeshBuffer(std::string const &filename) {
   struct Vertex {
     glm::vec3 Position;
     glm::vec3 Normal;
+    glm::vec3 Tangent;
+    glm::vec3 Bitangent;
     glm::u8vec4 Color;
     glm::vec2 TexCoord;
+    
   };
-  static_assert(sizeof(Vertex) == 3 * 4 + 3 * 4 + 4 * 1 + 2 * 4,
+  static_assert(sizeof(Vertex) == 3 * 4 + 3 * 4 + 3 * 4 + 3 * 4 + 4 * 1 + 2 * 4,
                 "Vertex is packed.");
   std::vector<Vertex> data;
 
@@ -45,6 +48,13 @@ MeshBuffer::MeshBuffer(std::string const &filename) {
                       offsetof(Vertex, Position));
     Normal =
         Attrib(3, GL_FLOAT, GL_FALSE, sizeof(Vertex), offsetof(Vertex, Normal));
+
+    Tangent =
+        Attrib(3, GL_FLOAT, GL_FALSE, sizeof(Vertex), offsetof(Vertex, Tangent));
+
+    Bitangent =
+        Attrib(3, GL_FLOAT, GL_FALSE, sizeof(Vertex), offsetof(Vertex, Bitangent));
+
     Color = Attrib(4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex),
                    offsetof(Vertex, Color));
     TexCoord = Attrib(2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
@@ -63,7 +73,7 @@ MeshBuffer::MeshBuffer(std::string const &filename) {
       uint32_t text_begin, text_end;
       uint32_t vertex_begin, vertex_end;
     };
-    static_assert(sizeof(IndexEntry) == 24, "Index entry should be packed. 16 before, 24 after text_begin and end");
+    static_assert(sizeof(IndexEntry) == 24, "Index entry should be packed. 16 before, 24 after text_begin and end are added");
 
     std::vector<IndexEntry> index;
     read_chunk(file, "idx0", &index);
@@ -151,6 +161,8 @@ GLuint MeshBuffer::make_vao_for_program(GLuint program) const {
   };
   bind_attribute("Position", Position);
   bind_attribute("Normal", Normal);
+  bind_attribute("Tangent", Tangent);
+  bind_attribute("Bitangent", Bitangent);
   bind_attribute("Color", Color);
   bind_attribute("TexCoord", TexCoord);
   glBindBuffer(GL_ARRAY_BUFFER, 0);

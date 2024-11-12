@@ -105,16 +105,18 @@ LitColorTextureProgram::LitColorTextureProgram() {
       "uniform mat3 NORMAL_TO_LIGHT;\n"
       "in vec4 Position;\n"
       "in vec3 Normal;\n"
+      "in vec3 Tangent;\n"
+      "in vec3 Bitangent;\n"
       "in vec4 Color;\n"
       "in vec2 TexCoord;\n"
       "out vec3 position;\n"
-      "out vec3 normal;\n"
+      "out mat3 TBN;\n"
       "out vec4 color;\n"
       "out vec2 texCoord;\n"
       "void main() {\n"
       "	gl_Position = OBJECT_TO_CLIP * Position;\n"
       "	position = OBJECT_TO_LIGHT * Position;\n"
-      "	normal = NORMAL_TO_LIGHT * Normal;\n"
+      "	TBN = mat3(NORMAL_TO_LIGHT * Tangent, NORMAL_TO_LIGHT * Bitangent, NORMAL_TO_LIGHT * Normal);\n"
       "	color = Color;\n"
       "	texCoord = TexCoord;\n"
       "}\n",
@@ -129,12 +131,14 @@ LitColorTextureProgram::LitColorTextureProgram() {
       "uniform vec3 LIGHT_ENERGY;\n"
       "uniform float LIGHT_CUTOFF;\n"
       "in vec3 position;\n"
-      "in vec3 normal;\n"
+      "in mat3 TBN;\n"
       "in vec4 color;\n"
       "in vec2 texCoord;\n"
       "out vec4 fragColor;\n"
       "void main() {\n"
-      "	vec3 n = normalize(normal);\n"
+      " vec3 normal = texture(TEX_NORMAL, fract(-texCoord)).rgb; \n"
+      " normal = normalize(normal * 2.0 - 1.0);\n"
+      "	vec3 n = normalize(TBN * normal);\n"
       "	vec3 e;\n"
       "	if (LIGHT_TYPE == 0) { //point light \n"
       "		vec3 l = (LIGHT_LOCATION - position);\n"
@@ -166,7 +170,7 @@ LitColorTextureProgram::LitColorTextureProgram() {
       "		e.y = max(0.02, e.y);\n"
       "		e.z = max(0.02, e.z);\n"
       " }\n"
-      "	vec4 albedo = texture(TEX, fract(-texCoord)) * texture(TEX_NORMAL, fract(-texCoord)); \n"
+      "	vec4 albedo = texture(TEX, fract(-texCoord)) * color; \n"
       "	fragColor = vec4(e*albedo.rgb, albedo.a);\n"
       "}\n");
   // As you can see above, adjacent strings in C/C++ are concatenated.
@@ -175,6 +179,9 @@ LitColorTextureProgram::LitColorTextureProgram() {
   // look up the locations of vertex attributes:
   Position_vec4 = glGetAttribLocation(program, "Position");
   Normal_vec3 = glGetAttribLocation(program, "Normal");
+  Tangent_vec3 = glGetAttribLocation(program, "Tangent");
+  
+  Bitangent_vec3 = glGetAttribLocation(program, "Bitangent");
   Color_vec4 = glGetAttribLocation(program, "Color");
   TexCoord_vec2 = glGetAttribLocation(program, "TexCoord");
 
