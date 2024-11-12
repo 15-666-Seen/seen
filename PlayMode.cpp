@@ -2,6 +2,7 @@
 
 #include "LitColorTextureProgram.hpp"
 
+#include "Ghost.hpp"
 #include "Load.hpp"
 #include "Mesh.hpp"
 #include "Scene.hpp"
@@ -92,6 +93,9 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
   storyManager = new StoryManager();
   // set up game. TODO: Move this to after the title screen when applicable.
   storyManager->SetUpManager(gameplayUI, &interactableManager);
+
+  // ghosts setup
+  setupGhosts();
 }
 
 PlayMode::~PlayMode() {}
@@ -406,10 +410,20 @@ void PlayMode::checkPhaseUpdates() {
     walkmesh = &phonebank_walkmeshes->lookup("phase1");
     player.at = walkmesh->nearest_walk_point(player.transform->position);
   }
+
+  else if (storyManager->getCurrentPhase() == 2) {
+    walkmesh = &phonebank_walkmeshes->lookup("phase2");
+    player.at = walkmesh->nearest_walk_point(player.transform->position);
+  }
+
+  else if (storyManager->getCurrentPhase() == 3) {
+    walkmesh = &phonebank_walkmeshes->lookup("phase1");
+    player.at = walkmesh->nearest_walk_point(player.transform->position);
+  }
 }
 
 glm::vec3 PlayMode::cameraShake(float elapsed) {
-  static float R = 0.3f;
+  static float R = 0.2f;
   static float theta_max = 3.1415926f / 3.0f;
   static float angle_speed = theta_max / 0.3f;
 
@@ -426,4 +440,14 @@ glm::vec3 PlayMode::cameraShake(float elapsed) {
   float dheight = R * (1 - glm::cos(player.theta));
 
   return glm::vec3(dright, 0.0f, dheight);
+}
+
+void PlayMode::setupGhosts() {
+  for (auto &drawable : scene.drawables) {
+    if (drawable.mesh_name.find("ghost") != std::string::npos) {
+      Ghost *ghost = new Ghost(drawable.mesh_name, &drawable);
+      GhostMap[drawable.mesh_name] = ghost;
+      drawable.visible = false; // initially invisible
+    }
+  }
 }

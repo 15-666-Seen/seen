@@ -184,17 +184,11 @@ void InteractableManager::setItemPhaseAvailability(ItemType item_type,
 }
 
 int InteractableManager::interactStatusCheck(FurnitureType furniture_type) {
-  return furnituresMap[furniture_type]->interact_status;
-  wait_and_exit(
-      "Interactable Manager cpp interactStatusCheck() furniture not found.");
-  return 0;
+  return furnituresMap[furniture_type]->getInteractStatus();
 }
 
 int InteractableManager::interactStatusCheck(ItemType item_type) {
   return itemsMap[item_type]->interact_status;
-  wait_and_exit(
-      "Interactable Manager cpp interactStatusCheck() item not found.");
-  return 0;
 }
 
 void InteractableManager::closeDoor(FurnitureType furniture_type) {

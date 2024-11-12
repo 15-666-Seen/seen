@@ -3,8 +3,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include "UI.hpp"
 #include "InteractableManager.hpp"
+#include "UI.hpp"
+
 
 #include <cassert>
 
@@ -19,7 +20,7 @@ struct StoryManager {
   InteractableManager *interactableManager;
 
   /* Initial set up of the story manager */
-  void SetUpManager(GameplayUI *ui, InteractableManager* im);
+  void SetUpManager(GameplayUI *ui, InteractableManager *im);
 
   /* called per frame to test if we need to go to the next stage */
   void advanceStory();
@@ -28,4 +29,6 @@ struct StoryManager {
   void setUpPhase();
 
   int getCurrentPhase() { return current_phase; }
+
+  void enableGhost(const std::string &name);
 };

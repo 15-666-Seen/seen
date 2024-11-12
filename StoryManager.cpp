@@ -1,5 +1,6 @@
 #include "StoryManager.hpp"
 
+#include "Ghost.hpp"
 #include "Interactable.hpp"
 #include "util.hpp"
 
@@ -19,8 +20,8 @@ void StoryManager::advanceStory() {
 
   switch (current_phase) {
   case 0:
-    // if player open the bedroom door
-    if (interactableManager->interactStatusCheck(BEDROOM_DOOR) == 1) {
+    // if player open the bedroom door -> need to be in OPEN
+    if (interactableManager->interactStatusCheck(BEDROOM_DOOR) == 2) {
       current_phase++; // advance to the next phase
       set_up_next_phase = true;
     }
@@ -33,10 +34,13 @@ void StoryManager::advanceStory() {
     }
     break;
   case 2:
-    if (false) {       // this is where the prototype ends
+    // if player find the key and open the bedroom door
+    if (interactableManager->interactStatusCheck(BEDROOM_DOOR) == 1) {
       current_phase++; // advance to the next phase
       set_up_next_phase = true;
     }
+    break;
+  case 3:
     break;
   default:
     wait_and_exit("Game Over - advanced past programmed phase");
@@ -80,7 +84,6 @@ void StoryManager::setUpPhase() {
 
   case 2:
     interactableManager->setItemPhaseAvailability(FILE1, false);
-    interactableManager->setFurniturePhaseAvailability(BED, false);
     interactableManager->setItemPhaseAvailability(BEDROOM_KEY, true);
     interactableManager->setFurniturePhaseAvailability(BEDROOM_DOOR, true);
 
@@ -93,8 +96,20 @@ void StoryManager::setUpPhase() {
     gameplayUI->setMissionText("Leave Bedroom");
 
     break;
+
+  case 3:
+    interactableManager->setFurniturePhaseAvailability(BED, true);
+    enableGhost("ghost1");
+
+    break;
   default:
 
     wait_and_exit("Game Over - set up phase not programmed");
   }
+}
+
+void StoryManager::enableGhost(const std::string &name) {
+  Ghost *ghost = GhostMap[name];
+  ghost->active = true;
+  ghost->drawable->visible = true;
 }

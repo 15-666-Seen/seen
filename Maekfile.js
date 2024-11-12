@@ -143,7 +143,7 @@ const game_names = [
 	maek.CPP('UI.cpp'),
 	maek.CPP('UIShaderProgram.cpp'),
 	maek.CPP('InteractableManager.cpp'),
-	maek.CPP('Text.cpp')
+	maek.CPP('Ghost.cpp')
 ];
 
 const common_names = [
