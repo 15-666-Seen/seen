@@ -145,13 +145,13 @@ void UIShader::draw_dialogue_box(glm::mat4x3 const& mat)
 {
 	// draw cube as three edge sets:
 	//draw(mat * glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f), glm::vec2(1.f, 0.f)); // top
-	draw(mat * glm::vec4(-1.0f, 1.0f, 0.f, 1.0f), glm::vec2(0.f, 1.f)); // top left
-	draw(mat * glm::vec4(1.0f, -1.0f, 0.f, 1.0f), glm::vec2(1.f,0.f)); // btm right
-	draw(mat * glm::vec4(1.0f, 1.0f, 0.f, 1.0f), glm::vec2(1.f,1.f)); // top right
+	draw(mat * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f), glm::vec2(0.f, 1.f)); // top left
+	draw(mat * glm::vec4(1.0f, -1.0f, -1.0f, 1.0f), glm::vec2(1.f, 0.f)); // btm right
+	draw(mat * glm::vec4(1.0f, 1.0f, -1.0f, 1.0f), glm::vec2(1.f, 1.f)); // top right
 
-	draw(mat * glm::vec4(-1.0f, -1.0f, 0.f, 1.0f), glm::vec2(0.f, 0.f)); // bt, left
-	draw(mat * glm::vec4(1.0f, -1.0f, 0.f, 1.0f), glm::vec2(1.f, 0.f)); // btm right
-	draw(mat * glm::vec4(-1.0f, 1.0f, 0.f, 1.0f), glm::vec2(0.f, 1.f)); // top left
+	draw(mat * glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f), glm::vec2(0.f, 0.f)); // bt, left
+	draw(mat * glm::vec4(1.0f, -1.0f, -1.0f, 1.0f), glm::vec2(1.f, 0.f)); // btm right
+	draw(mat * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f), glm::vec2(0.f, 1.f)); // top left
 }
 
 

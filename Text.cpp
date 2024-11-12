@@ -98,7 +98,6 @@ void Text::init(std::string ttf_file)
             "{\n"
             "	vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);\n"
             "   color = vec4(textColor, 1.0) * sampled;\n"
-			"   if (color.a < 0.1) discard;\n"
             "}\n";
         draw_text_program = gl_compile_program(vertex_shader, fragment_shader);
 

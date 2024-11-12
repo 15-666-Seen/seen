@@ -64,7 +64,7 @@ struct Text {
     // using hb_codepoint_t as the codepoint type from hb_buffer_get_glyph_positions
     std::map<hb_codepoint_t, Character> chars;
 
-    glm::vec3 color = glm::vec3(0.3f, 0.f, 0.f);
+    glm::vec3 color = glm::vec3(0.3f, 0.01f, 0.01f);
 	glm::vec3 color2 = glm::vec3(0.3f, 0.f, 0.f);
     bool color2_bit_array[64] = {false};
 
