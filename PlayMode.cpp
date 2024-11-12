@@ -346,10 +346,12 @@ void PlayMode::update(float elapsed) {
   if (gameplayUI->dialogueText.size() > 0) {
     gStop = true;
   }
-  storyManager->advanceStory();
+  bool advanced = storyManager->advanceStory();
 
   // TODO: check phase updates -> update walkmesh?
-  checkPhaseUpdates();
+  if (advanced) {
+    checkPhaseUpdates();
+  }
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
@@ -406,6 +408,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 }
 
 void PlayMode::checkPhaseUpdates() {
+  std::cout << "Walkmesh Updates" << std::endl;
   if (storyManager->getCurrentPhase() == 1) {
     walkmesh = &phonebank_walkmeshes->lookup("phase1");
     player.at = walkmesh->nearest_walk_point(player.transform->position);
@@ -446,7 +449,7 @@ void PlayMode::setupGhosts() {
   for (auto &drawable : scene.drawables) {
     if (drawable.mesh_name.find("ghost") != std::string::npos) {
       Ghost *ghost = new Ghost(drawable.mesh_name, &drawable);
-      GhostMap[drawable.mesh_name] = ghost;
+      storyManager->GhostMap[drawable.mesh_name] = ghost;
       drawable.visible = false; // initially invisible
     }
   }

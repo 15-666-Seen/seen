@@ -15,7 +15,8 @@ void StoryManager::SetUpManager(GameplayUI *ui, InteractableManager *im) {
   setUpPhase(); // set up phase 0
 }
 
-void StoryManager::advanceStory() {
+// true for advancing to the next phase
+bool StoryManager::advanceStory() {
   bool set_up_next_phase = false;
 
   switch (current_phase) {
@@ -41,13 +42,20 @@ void StoryManager::advanceStory() {
     }
     break;
   case 3:
+    if (false) {
+      current_phase++; // advance to the next phase
+      set_up_next_phase = true;
+    }
     break;
   default:
     wait_and_exit("Game Over - advanced past programmed phase");
   }
 
-  if (set_up_next_phase)
+  if (set_up_next_phase) {
     setUpPhase();
+  }
+
+  return set_up_next_phase;
 }
 
 void StoryManager::setUpPhase() {
