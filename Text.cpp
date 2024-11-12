@@ -309,12 +309,9 @@ void Text::draw(float dt, const glm::vec2& drawable_size, float width, const glm
 
 		char_x += (ch.Advance >> 6) * ss_scale;
 
-		if (char_x >= right_bound || text_content[i] == '\n') {
-			char_x = pos.x;
-			char_y -= (y_size + 5.0f);
-		}
+		
 		//newline by word
-		else if (text_content[i] == ' ') {
+		if (text_content[i] == ' ') {
 			unsigned int j = i + 1;
 			for (; text_content[j] != ' ' && j < text_content.size(); j++);
 
@@ -323,6 +320,9 @@ void Text::draw(float dt, const glm::vec2& drawable_size, float width, const glm
 				char_y -= (y_size + 5.0f);
 			}
 
+		}else if (char_x >= right_bound || text_content[i] == '\n') {
+			char_x = pos.x;
+			char_y -= (y_size + 5.0f);
 		}
 
 		if (text_content[i] == ' ') {

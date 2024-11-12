@@ -7,7 +7,8 @@ GameplayUI::GameplayUI() { mission.init("BungeeHairline-Regular.ttf");
 
 void GameplayUI::setInteractionText(const std::string &text) {
   if (!text.empty()) {
-      interactionText = "Press [F] to " + text;
+      //interactionText = "Press [F] to " + text;
+      interactionText = "[F]:" + text;
   } else {
     interactionText = "";
   }
@@ -33,11 +34,14 @@ void GameplayUI::insertDialogueText(const std::string &s) {
 
 void GameplayUI::addDialogueText(const std::string &s) {
   if (dialogueText.empty() || dialogueText.back() != s) {
-    dialogueText.push_back(s);
+    dialogueText.push_back
+    (s);
     dialogue.set_text(dialogueText[0]);
   }
 }
 
+float xx = 0.01f;
+unsigned int count = 0;
 void GameplayUI::DrawUI(glm::uvec2 const &drawable_size) {
   // use DrawLines to overlay some text:
   float aspect = float(drawable_size.x) / float(drawable_size.y);
@@ -49,13 +53,13 @@ void GameplayUI::DrawUI(glm::uvec2 const &drawable_size) {
   float x = drawable_size.x * 0.6f;
   float y = drawable_size.y * 0.47f;
   float width = drawable_size.x * 1.f;
-  interaction.set_bound(drawable_size.x * 0.85f);
+  interaction.set_bound(drawable_size.x * 0.9f);
   interaction.draw(100.f, drawable_size, width, glm::vec2(x, y), 1.f);
 
   x = drawable_size.x * 0.f;
   y = drawable_size.y * 0.8f;
-  width = drawable_size.x * 0.5f;
-  mission.set_bound(drawable_size.x * 0.95f);
+  width = drawable_size.x * 0.1f;
+  mission.set_bound(drawable_size.x * 0.4f);
   mission.draw(100.f, drawable_size, width, glm::vec2(x, y), 1.f);
     
   if (dialogueText.size() > 0) {
@@ -64,10 +68,17 @@ void GameplayUI::DrawUI(glm::uvec2 const &drawable_size) {
 
     UIShader sprites(world_to_clip);
 
-    sprites.draw_dialogue_box(glm::mat4(0.9f * aspect, 0.0f, 0.0f, 0.0f,
+    sprites.draw_dialogue_box(glm::mat4(0.9f * aspect + xx, 0.0f, 0.0f, 0.0f,
                                         0.0f, 0.3f, 0.0f, 0.f, 
                                         0.0f, 0.0f, 1.0f, 0.0f,
                                         0.0f, -0.65f, 0.0f, 1.0f));
+    if (count == 3) {
+        xx *= -1.f;
+        count = 0;
+    }
+    else {
+		count++;
+    }
 
     sprites.~UIShader(); // explicitly draws any sprite
     x = drawable_size.x * 0.1f;
@@ -75,6 +86,7 @@ void GameplayUI::DrawUI(glm::uvec2 const &drawable_size) {
     width = drawable_size.x * 0.75f;
     dialogue.set_bound(drawable_size.x * 0.9f);
 	dialogue.draw(0.025f, drawable_size, width, glm::vec2(x, y), 1.3f, true);
+    std::cout << dialogue.text_content << std::endl;
   }
 }
 
