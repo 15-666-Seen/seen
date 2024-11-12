@@ -40,12 +40,26 @@ Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
     drawable.pipeline.count = mesh.count;
 
     drawable.tex = drawable.pipeline.tex_name_to_glint[mesh.tex];
-    if (auto s = drawable.pipeline.tex_name_to_glint.find(mesh.tex);
-        s == drawable.pipeline.tex_name_to_glint.end()) {
+    drawable.tex_normal = drawable.pipeline.tex_name_to_glint[mesh.tex + "_n"];
+
+    /* some asserts to ensure the shader is loaded correctly */
+    auto s = drawable.pipeline.tex_name_to_glint.find("0");
+    assert(s != drawable.pipeline.tex_name_to_glint.end());
+    s = drawable.pipeline.tex_name_to_glint.find("0_n");
+    assert(s != drawable.pipeline.tex_name_to_glint.end());
+
+    // if mesh textures are missing
+    if (drawable.tex == 0) {
       printf("Texture missing in scene loading for mesh %s \n",
              mesh_name.c_str());
-      drawable.tex = 1;
+      drawable.tex = drawable.pipeline.tex_name_to_glint["0"];
     }
+
+    if (drawable.tex_normal == 0) {
+        printf("No normal map for mesh %s \n", mesh_name.c_str());
+        drawable.tex_normal = drawable.pipeline.tex_name_to_glint["0_n"];
+    }
+
   });
 });
 

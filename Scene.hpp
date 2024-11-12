@@ -109,6 +109,7 @@ struct Scene {
 
     std::string mesh_name;
     GLint tex;
+    GLint tex_normal; // normal map material 
     bool visible = true;
   };
 

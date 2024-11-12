@@ -116,13 +116,18 @@ void Scene::draw(glm::mat4 const &world_to_clip,
     // Set attribute sources:
     glBindVertexArray(pipeline.vao);
 
-    // Set 2D texture to sample from :
+    // Set 2D texture to sample from:
     GLuint TEX_sampler2D = glGetUniformLocation(pipeline.program, "TEX");
-    // std::cout << drawable.mesh_name << " " << drawable.tex << std::endl;
+    GLuint TEX_sampler2D_normal = glGetUniformLocation(pipeline.program, "TEX_NORMAL");
+
     GLint cur_texure =
         drawable.tex - 1; // converting from 1 index to 0 indexed? (idk what is
                           // actually happening but this works)
+    GLint cur_texure_normal =
+        drawable.tex_normal - 1; 
+
     glUniform1i(TEX_sampler2D, cur_texure);
+    glUniform1i(TEX_sampler2D_normal, cur_texure_normal);
 
     // Configure program uniforms:
 
@@ -158,27 +163,33 @@ void Scene::draw(glm::mat4 const &world_to_clip,
     if (pipeline.set_uniforms)
       pipeline.set_uniforms();
 
-    // cur_texure = 0;
-    // printf("curt %d", cur_texure);
-    // set up textures:
-    // for (uint32_t i = 0; i < Drawable::Pipeline::TextureCount; ++i) {
+
     if (pipeline.textures[cur_texure].texture != 0) {
       glActiveTexture(GL_TEXTURE0 + cur_texure);
       glBindTexture(pipeline.textures[cur_texure].target,
                     pipeline.textures[cur_texure].texture);
     }
-    //}
+    if (pipeline.textures[cur_texure_normal].texture != 0) {
+        glActiveTexture(GL_TEXTURE0 + cur_texure_normal);
+        glBindTexture(pipeline.textures[cur_texure_normal].target,
+            pipeline.textures[cur_texure_normal].texture);
+    }
+
+    //printf("the two things %d %d \n", cur_texure, cur_texure_normal);
 
     // draw the object:
     glDrawArrays(pipeline.type, pipeline.start, pipeline.count);
 
     // un-bind textures:
-    // for (uint32_t i = 0; i < Drawable::Pipeline::TextureCount; ++i) {
+
     if (pipeline.textures[cur_texure].texture != 0) {
       glActiveTexture(GL_TEXTURE0 + cur_texure);
       glBindTexture(pipeline.textures[cur_texure].target, 0);
     }
-    //}
+    if (pipeline.textures[cur_texure_normal].texture != 0) {
+        glActiveTexture(GL_TEXTURE0 + cur_texure_normal);
+        glBindTexture(pipeline.textures[cur_texure_normal].target, 0);
+    }
     glActiveTexture(GL_TEXTURE0);
   }
 

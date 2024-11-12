@@ -50,6 +50,23 @@ lit_color_texture_program(LoadTagEarly, []() -> LitColorTextureProgram const * {
   lit_color_texture_program_pipeline.textures[0].target = GL_TEXTURE_2D;
   lit_color_texture_program_pipeline.tex_name_to_glint["0"] = tex;
 
+  // make 1-pixel normal map
+  GLuint texn;
+  glGenTextures(1, &texn);
+
+  glBindTexture(GL_TEXTURE_2D, texn);
+  std::vector<glm::u8vec4> tex_data_n(1, glm::u8vec4(0x7f, 0x7f, 0xff,0xff));
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+      tex_data_n.data());
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  lit_color_texture_program_pipeline.textures.push_back({ texn, GL_TEXTURE_2D });
+  lit_color_texture_program_pipeline.tex_name_to_glint["0_n"] = texn;
+
   // load all in folder
   std::string filepath = data_path("textures/lit_textures");
   std::vector<std::string> filenames;
@@ -105,6 +122,7 @@ LitColorTextureProgram::LitColorTextureProgram() {
       // fragment shader:
       "#version 330\n"
       "uniform sampler2D TEX;\n"
+      "uniform sampler2D TEX_NORMAL;\n"
       "uniform int LIGHT_TYPE;\n"
       "uniform vec3 LIGHT_LOCATION;\n"
       "uniform vec3 LIGHT_DIRECTION;\n"
@@ -148,7 +166,7 @@ LitColorTextureProgram::LitColorTextureProgram() {
       "		e.y = max(0.02, e.y);\n"
       "		e.z = max(0.02, e.z);\n"
       " }\n"
-      "	vec4 albedo = texture(TEX, fract(-texCoord)) * color;\n"
+      "	vec4 albedo = texture(TEX, fract(-texCoord)) * texture(TEX_NORMAL, fract(-texCoord)); \n"
       "	fragColor = vec4(e*albedo.rgb, albedo.a);\n"
       "}\n");
   // As you can see above, adjacent strings in C/C++ are concatenated.
@@ -172,12 +190,14 @@ LitColorTextureProgram::LitColorTextureProgram() {
   LIGHT_CUTOFF_float = glGetUniformLocation(program, "LIGHT_CUTOFF");
 
   GLuint TEX_sampler2D = glGetUniformLocation(program, "TEX");
+  GLuint TEX_sampler2D_Normal = glGetUniformLocation(program, "TEX_NORMAL");
 
   // set TEX to always refer to texture binding zero:
   glUseProgram(program);
   // bind program -- glUniform* calls refer to this program now
 
   glUniform1i(TEX_sampler2D, 0); // set TEX to sample from GL_TEXTURE0
+  glUniform1i(TEX_sampler2D_Normal, 0);
 
   glUseProgram(0); // unbind program -- glUniform* calls refer to ??? now
 }
