@@ -58,13 +58,28 @@ bool Item::interactable(Scene::Transform *player_transform,
 /* FURNITURE */
 Furniture::Furniture() {}
 
-bool Furniture::interact(float elapsed) { return true; }
+bool Furniture::interact(float elapsed) {
+  if (type == BED) {
+    interact_status = 1;
+  }
+
+  return true;
+}
 
 bool Furniture::interactable(Scene::Transform *player_transform,
                              Scene::Camera *camera) {
   // should be phase_allow_interact
   if (!phase_allow_interact) {
     return false;
+  }
+
+  if (type == BED) {
+    if (interact_status == 0) {
+      return iteractCheck(player_transform, getCenterPos(), camera,
+                          FURNITURE_INTERACT_DISTANCE);
+    } else {
+      return true;
+    }
   }
 
   return iteractCheck(player_transform, getCenterPos(), camera,

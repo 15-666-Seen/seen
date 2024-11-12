@@ -138,7 +138,15 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
           }
         }
       } else if (furniture->type == BED) {
-        furniture->interact_status = 1;
+        if (furniture->interact_status == 0) {
+          furniture->interact_status = 1;
+          // TODO: modify player's view
+          isHiding = true;
+        } else {
+          furniture->interact_status = 0;
+          // here we modify player pos
+          isHiding = false;
+        }
         return true;
       } else if (furniture->type == DOOR1) {
         if (!inventory.hasItem(DOOR1_KEY)) {

@@ -26,7 +26,7 @@ static std::map<ItemType, std::string> ItemTypeToInteractText = {
 /* Type of interactable object that cannot be picked up */
 enum FurnitureType { NONE, BED, CLOSET, BEDROOM_DOOR, DOOR1, FRONT_DOOR, DESK };
 static std::map<FurnitureType, std::vector<std::string>>
-    FurnitureTypeToInteractText = {{BED, {"sleep", "exit hiding"}},
+    FurnitureTypeToInteractText = {{BED, {"hide under bed", "exit hiding"}},
                                    {BEDROOM_DOOR, {"open door"}},
                                    {DOOR1, {"open door"}}};
 static std::map<std::string, FurnitureType> MeshNameToFurnitureType = {
