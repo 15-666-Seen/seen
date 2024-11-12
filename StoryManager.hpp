@@ -3,11 +3,12 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include "Ghost.hpp"
 #include "InteractableManager.hpp"
 #include "UI.hpp"
 
-
 #include <cassert>
+#include <map>
 
 struct StoryManager {
 
@@ -19,11 +20,13 @@ struct StoryManager {
   GameplayUI *gameplayUI;
   InteractableManager *interactableManager;
 
+  std::map<std::string, Ghost *> GhostMap;
+
   /* Initial set up of the story manager */
   void SetUpManager(GameplayUI *ui, InteractableManager *im);
 
   /* called per frame to test if we need to go to the next stage */
-  void advanceStory();
+  bool advanceStory();
 
   /* set up phase[current_phase] */
   void setUpPhase();
