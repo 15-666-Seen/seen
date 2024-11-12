@@ -2,4 +2,4 @@ https://ambientcg.com/
 
 
 Roof = RoofingTiles013A
-white_wall_blood
+white_wall_blood = bricks008
