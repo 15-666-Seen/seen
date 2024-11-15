@@ -423,9 +423,9 @@ void PlayMode::checkPhaseUpdates() {
 }
 
 glm::vec3 PlayMode::cameraShake(float elapsed) {
-  static float R = 0.2f;
+  static float R = 0.1f;
   static float theta_max = 3.1415926f / 3.0f;
-  static float angle_speed = theta_max / 0.3f;
+  static float angle_speed = theta_max / 0.25f;
 
   player.theta += angle_speed * elapsed;
   if (player.theta > theta_max) {
@@ -437,7 +437,8 @@ glm::vec3 PlayMode::cameraShake(float elapsed) {
   }
 
   float dright = R * glm::sin(player.theta);
-  float dheight = R * (1 - glm::cos(player.theta));
+  //float dheight = R * (1 - glm::cos(player.theta));
+  float dheight = (R) * glm::cos(player.theta * 2);
 
   return glm::vec3(dright, 0.0f, dheight);
 }

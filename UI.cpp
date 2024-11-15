@@ -40,7 +40,7 @@ void GameplayUI::addDialogueText(const std::string &s) {
   }
 }
 
-float xx = 0.01f;
+float xx = 0.001f;
 unsigned int count = 0;
 void GameplayUI::DrawUI(glm::uvec2 const &drawable_size) {
   // use DrawLines to overlay some text:
