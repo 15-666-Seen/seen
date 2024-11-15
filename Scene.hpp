@@ -109,6 +109,7 @@ struct Scene {
 
     std::string mesh_name;
     GLint tex;
+    GLint tex_normal; // normal map material 
     bool visible = true;
   };
 
@@ -127,6 +128,11 @@ struct Scene {
 
     float yaw = 0.0f;
     float pitch = 0.0f;
+
+    glm::vec3 getLookAt() {
+      return glm::vec3(sin(yaw) * cos(pitch), cos(yaw) * cos(pitch),
+                       sin(pitch));
+    }
   };
 
   struct Light {

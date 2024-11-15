@@ -42,6 +42,7 @@ SpriteProgram::SpriteProgram() {
 	//look up the locations of uniforms:
 	OBJECT_TO_CLIP_mat4 = glGetUniformLocation(program, "OBJECT_TO_CLIP");
 
+	//std::cout << "UI program" << (int)program << std::endl;
 
 	//set TEX to always refer to texture binding zero:
 	glUseProgram(program); //bind program -- glUniform* calls refer to this program now
@@ -145,8 +146,8 @@ void UIShader::draw_dialogue_box(glm::mat4x3 const& mat)
 	// draw cube as three edge sets:
 	//draw(mat * glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f), glm::vec2(1.f, 0.f)); // top
 	draw(mat * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f), glm::vec2(0.f, 1.f)); // top left
-	draw(mat * glm::vec4(1.0f, -1.0f, -1.0f, 1.0f), glm::vec2(1.f,0.f)); // btm right
-	draw(mat * glm::vec4(1.0f, 1.0f, -1.0f, 1.0f), glm::vec2(1.f,1.f)); // top right
+	draw(mat * glm::vec4(1.0f, -1.0f, -1.0f, 1.0f), glm::vec2(1.f, 0.f)); // btm right
+	draw(mat * glm::vec4(1.0f, 1.0f, -1.0f, 1.0f), glm::vec2(1.f, 1.f)); // top right
 
 	draw(mat * glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f), glm::vec2(0.f, 0.f)); // bt, left
 	draw(mat * glm::vec4(1.0f, -1.0f, -1.0f, 1.0f), glm::vec2(1.f, 0.f)); // btm right
@@ -159,6 +160,7 @@ UIShader::~UIShader()
 	if (attribs.empty())
 		return;
 
+	//glDisable(GL_DEPTH_TEST);
 	// upload vertices to vertex_buffer:
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);														// set vertex_buffer as current
 	glBufferData(GL_ARRAY_BUFFER, attribs.size() * sizeof(attribs[0]), attribs.data(), GL_STREAM_DRAW); // upload attribs array
@@ -193,6 +195,8 @@ UIShader::~UIShader()
 
 	// reset current program to none:
 	glUseProgram(0);
+	//glEnable(GL_DEPTH_TEST);
+	GL_ERRORS(); // PARANOIA: make sure nothing strange happened during draw
 }
 
 

@@ -8,9 +8,13 @@
 
 #include "UIShaderProgram.hpp"
 
+#include "Text.hpp"
+
 /* On screen UI during game play */
 struct GameplayUI {
   GameplayUI();
+
+  Text interaction, mission, dialogue;
 
   // upper left corner: interaction (press [F] to interact)
   std::string interactionText = "Interaction Text Holder";
@@ -24,7 +28,7 @@ struct GameplayUI {
   std::deque<std::string> dialogueText;
   // TODO: add background image for the dialogue
   void setDialogueTexts(const std::deque<std::string> &v);
-  void insertDialogueText(const std::string& s);
+  void insertDialogueText(const std::string &s);
   void addDialogueText(const std::string &s);
 
   /* Draw UI for each frame */

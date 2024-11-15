@@ -5,29 +5,32 @@
 
 #include <iostream>
 #include <map>
+#include <memory>
 #include <utility>
 
 #include "Scene.hpp"
+#include "Sound.hpp"
 
-static constexpr float ITEM_INTERACT_DISTANCE = 5.0f;
-static constexpr float FURNITURE_INTERACT_DISTANCE = 5.0f;
+static constexpr float ITEM_INTERACT_DISTANCE = 2.0f;
+static constexpr float FURNITURE_INTERACT_DISTANCE = 2.0f;
 static constexpr float INTERACT_ANGLE = 2.2f;
 
 /* interactable object that can be picked up */
 // =========================  mesh name must match =========================
-enum ItemType { BEDROOM_KEY };
+enum ItemType { BEDROOM_KEY, DOOR1_KEY, FILE1 };
 static std::map<std::string, ItemType> MeshNameToItemType = {
-    {"BedroomKey", BEDROOM_KEY}};
+    {"BedroomKey", BEDROOM_KEY}, {"Folder", FILE1}};
 static std::map<ItemType, std::string> ItemTypeToInteractText = {
-    {BEDROOM_KEY, "grab key"}};
+    {BEDROOM_KEY, "grab key"}, {FILE1, "read confidential file"}};
 
 /* Type of interactable object that cannot be picked up */
-enum FurnitureType { NONE, BED, CLOSET, BEDROOM_DOOR, FRONT_DOOR, DESK };
-static std::map<FurnitureType, std::pair<std::string, std::string>>
-    FurnitureTypeToInteractText = {{BED, {"sleep", "exit hiding"}},
-                                   {BEDROOM_DOOR, {"open door", "close door"}}};
+enum FurnitureType { NONE, BED, CLOSET, BEDROOM_DOOR, DOOR1, FRONT_DOOR, DESK };
+static std::map<FurnitureType, std::vector<std::string>>
+    FurnitureTypeToInteractText = {{BED, {"hide under bed", "exit hiding"}},
+                                   {BEDROOM_DOOR, {"open door"}},
+                                   {DOOR1, {"open door"}}};
 static std::map<std::string, FurnitureType> MeshNameToFurnitureType = {
-    {"Bed", BED}, {"BedroomDoor", BEDROOM_DOOR}};
+    {"Bed", BED}, {"BedroomDoor", BEDROOM_DOOR}, {"Door1", DOOR1}};
 
 /* A single furniture */
 struct Furniture {
@@ -40,7 +43,7 @@ struct Furniture {
   // if the furniture is allowed to be interact in this phase
   bool phase_allow_interact = false;
   // is the player currently interacting with it?
-  bool interact_status = false;
+  int interact_status = 0;
   // TODO: TBD
   bool can_interact = false;
 
@@ -54,9 +57,16 @@ struct Furniture {
   virtual glm::vec3 getCenterPos() { return drawable->transform->position; }
 
   virtual std::string interactText() {
-    return interact_status ? FurnitureTypeToInteractText[type].second
-                           : FurnitureTypeToInteractText[type].first;
+    if (interact_status >= FurnitureTypeToInteractText[type].size()) {
+      return "No interaction available";
+    }
+    return FurnitureTypeToInteractText[type][interact_status];
   }
+
+  virtual int getInteractStatus() { return interact_status; }
+  virtual bool isInteracting() { return interact_status > 0; }
+
+  std::shared_ptr<Sound::PlayingSample> interact_sound;
 };
 
 struct Door : Furniture {
@@ -67,6 +77,17 @@ struct Door : Furniture {
 
   virtual bool interact(float elapsed) override;
   float animation_time = 0.0f;
+
+  enum struct DoorState {
+    CLOSED,
+    OPENING,
+    OPEN,
+    CLOSING
+  } state = DoorState::CLOSED;
+  virtual int getInteractStatus() override { return static_cast<int>(state); }
+  virtual bool isInteracting() override {
+    return state == DoorState::OPENING || state == DoorState::CLOSING;
+  }
 };
 
 /* A single item */
@@ -80,6 +101,8 @@ struct Item {
   bool visible;
   bool phase_allow_interact;
   bool can_interact = false;
+
+  int interact_status = 0;
 
   virtual bool interact(float elapsed);
 

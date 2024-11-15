@@ -6,6 +6,7 @@
 
 # Note: Script meant to be executed within blender 4.2.1, as per:
 # blender --background --python export-meshes.py -- [...see below...]
+# blender --background --python export-meshes.py -- house.blend house.pnct
 
 import struct
 import bpy
@@ -137,6 +138,7 @@ for obj in bpy.data.objects:
     texture2d = "0"  # 0 = no texture
     # Check if the object has materials
     if obj.type == 'MESH' and obj.data.materials:
+
         # Iterate through each material
         for mat in obj.data.materials:
             if mat and mat.use_nodes:
@@ -167,6 +169,9 @@ for obj in bpy.data.objects:
     bpy.ops.mesh.quads_convert_to_tris(
         quad_method='BEAUTY', ngon_method='BEAUTY')
     bpy.ops.object.mode_set(mode='OBJECT')
+
+    if len(mesh.uv_layers) > 0:
+        mesh.calc_tangents()
 
     # record mesh name, start position and vertex count in the index:
     name_begin = len(strings)
@@ -221,6 +226,16 @@ for obj in bpy.data.objects:
             for x in loop.normal:
                 local_data += struct.pack('f', x)
 
+            # Export tangent (tx, ty, tz):
+            for x in loop.tangent:
+                local_data += struct.pack('f', x)
+
+            # Calculate and export bitangent (bx, by, bz):
+            # Bitangent = cross(normal, tangent) * loop.tangent_sign
+            bitangent = loop.normal.cross(loop.tangent) * loop.bitangent_sign
+            for x in bitangent:
+                local_data += struct.pack('f', x)
+
             col = None
             if colors != None and colors.domain == 'POINT':
                 col = colors.data[poly.vertices[i]].color
@@ -248,7 +263,7 @@ for obj in bpy.data.objects:
 data = b''.join(data)
 
 # check that code created as much data as anticipated:
-assert (vertex_count * (4*3+4*3+1*4+4*2) == len(data))
+assert (vertex_count * (4*3+4*3+4*3+4*3+1*4+4*2) == len(data))
 
 # write the data chunk and index chunk to an output blob:
 blob = open(outfile, 'wb')

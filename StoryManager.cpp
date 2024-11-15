@@ -1,5 +1,7 @@
 #include "StoryManager.hpp"
 
+#include "Ghost.hpp"
+#include "Interactable.hpp"
 #include "util.hpp"
 
 #include <iostream>
@@ -13,27 +15,34 @@ void StoryManager::SetUpManager(GameplayUI *ui, InteractableManager *im) {
   setUpPhase(); // set up phase 0
 }
 
-void StoryManager::advanceStory() {
+// true for advancing to the next phase
+bool StoryManager::advanceStory() {
   bool set_up_next_phase = false;
-
-  return;
 
   switch (current_phase) {
   case 0:
-    if (interactableManager->interactStatusCheck(BED)) { // if player is in bed
+    // if player open the bedroom door -> need to be in OPEN
+    if (interactableManager->interactStatusCheck(BEDROOM_DOOR) == 2) {
       current_phase++; // advance to the next phase
       set_up_next_phase = true;
     }
     break;
   case 1:
-    if (interactableManager->interactStatusCheck(
-            BEDROOM_DOOR)) { // if player unlocks the door
-      current_phase++;       // advance to the next phase
+    // if player read the file
+    if (interactableManager->interactStatusCheck(FILE1) == 1) {
+      current_phase++; // advance to the next phase
       set_up_next_phase = true;
     }
     break;
   case 2:
-    if (false) {       // this is where the prototype ends
+    // if player find the key and open the bedroom door
+    if (interactableManager->interactStatusCheck(BEDROOM_DOOR) == 1) {
+      current_phase++; // advance to the next phase
+      set_up_next_phase = true;
+    }
+    break;
+  case 3:
+    if (false) {
       current_phase++; // advance to the next phase
       set_up_next_phase = true;
     }
@@ -42,8 +51,11 @@ void StoryManager::advanceStory() {
     wait_and_exit("Game Over - advanced past programmed phase");
   }
 
-  if (set_up_next_phase)
+  if (set_up_next_phase) {
     setUpPhase();
+  }
+
+  return set_up_next_phase;
 }
 
 void StoryManager::setUpPhase() {
@@ -56,32 +68,56 @@ void StoryManager::setUpPhase() {
   switch (current_phase) {
   case 0:
 
-    v.push_back("I should go to bed.");
+    v.push_back("I should check bedroom first.");
     gameplayUI->setDialogueTexts(v);
-    gameplayUI->setMissionText("Go to bed.");
+    gameplayUI->setMissionText("Find Bedroom");
 
-    interactableManager->setFurniturePhaseAvailability(BED, true);
+    interactableManager->setFurniturePhaseAvailability(BEDROOM_DOOR, true);
+    interactableManager->setFurniturePhaseAvailability(DOOR1, true);
+    interactableManager->setItemPhaseAvailability(FILE1, false);
 
     break;
   case 1:
     // bed no longer interactable, key interactable
     interactableManager->setFurniturePhaseAvailability(BED, false);
-    interactableManager->setItemPhaseAvailability(BEDROOM_KEY, true);
+    interactableManager->setItemPhaseAvailability(BEDROOM_KEY, false);
+    interactableManager->setItemPhaseAvailability(FILE1, true);
 
-    v.push_back("I should leave this room.");
-    gameplayUI->setDialogueTexts(v);
+    gameplayUI->addDialogueText("This must be their bedroom.");
+    gameplayUI->addDialogueText("That thing must be here somewhere...");
 
-    gameplayUI->setMissionText("Leave this room.");
+    gameplayUI->setMissionText("Find Secret File");
 
     break;
 
   case 2:
-    v.push_back("Prototype end!");
-    gameplayUI->setDialogueTexts(v);
+    interactableManager->setItemPhaseAvailability(FILE1, false);
+    interactableManager->setItemPhaseAvailability(BEDROOM_KEY, true);
+    interactableManager->setFurniturePhaseAvailability(BEDROOM_DOOR, true);
+
+    gameplayUI->addDialogueText(
+        "[XXXXXXXXXXXXXXX   Something Secret  XXXXXXXXXXXXXXX]");
+    gameplayUI->addDialogueText("...");
+    gameplayUI->addDialogueText(
+        "Wait, the door is closed? I need to find a way out.");
+
+    gameplayUI->setMissionText("Leave Bedroom");
+
+    break;
+
+  case 3:
+    interactableManager->setFurniturePhaseAvailability(BED, true);
+    enableGhost("ghost1");
 
     break;
   default:
 
     wait_and_exit("Game Over - set up phase not programmed");
   }
+}
+
+void StoryManager::enableGhost(const std::string &name) {
+  Ghost *ghost = GhostMap[name];
+  ghost->active = true;
+  ghost->drawable->visible = true;
 }
