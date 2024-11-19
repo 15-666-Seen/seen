@@ -141,10 +141,18 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
         if (furniture->interact_status == 0) {
           furniture->interact_status = 1;
           // TODO: modify player's view
+          camera->transform->position =
+              glm::vec3(-8.9071f, -4.72332f, 3.21787f);
+          camera->yaw = -1.54317f;
+          camera->pitch = 0.327246f;
           isHiding = true;
         } else {
           furniture->interact_status = 0;
           // here we modify player pos
+          camera->transform->position = player_transform->position;
+          camera->transform->position.z += PLAYER_HEIGHT;
+          camera->yaw = -1.54317f;
+          camera->pitch = 0.327246f;
           isHiding = false;
         }
         return true;
