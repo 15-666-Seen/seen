@@ -25,6 +25,7 @@
 #include <stdexcept>
 #include <memory>
 #include <algorithm>
+#include <thread>
 
 #ifdef _WIN32
 extern "C" { uint32_t GetACP(); }
@@ -64,11 +65,20 @@ int main(int argc, char **argv) {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
+	
+	//------------ init sound --------------
+	Sound::init();
+
+
+	Sound::Sample cassette_insert(data_path("/sounds/cassette-ffww-cassetera-96765.wav"));
+	std::shared_ptr< Sound::PlayingSample > some_loop = Sound::play(cassette_insert, 1.5f);
+	std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+
 	//create window:
 	SDL_Window *window = SDL_CreateWindow(
-		"gp23 game5: walking simulator", //TODO: remember to set a title for your game!
+		"I didn't see it, I didn't see it, I didn't...", //TODO: remember to set a title for your game!
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-		1280, 720, //TODO: modify window size if you'd like
+		1920, 1080, //TODO: modify window size if you'd like
 		SDL_WINDOW_OPENGL
 		| SDL_WINDOW_RESIZABLE //uncomment to allow resizing
 		| SDL_WINDOW_ALLOW_HIGHDPI //uncomment for full resolution on high-DPI screens
@@ -108,8 +118,9 @@ int main(int argc, char **argv) {
 	//Hide mouse cursor (note: showing can be useful for debugging):
 	//SDL_ShowCursor(SDL_DISABLE);
 
-	//------------ init sound --------------
-	Sound::init();
+	// Print disclaimer
+	std::cout << "Disclaimer: This game is a work of fiction. Names, characters, businesses, places, events, locales, and incidents are either the products of the author¡¦s imagination or used in a fictitious manner. Any resemblance to actual persons, living or dead, or actual events is purely coincidental." << std::endl;
+	
 
 	//------------ load assets --------------
 	call_load_functions();
