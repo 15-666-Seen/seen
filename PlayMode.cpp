@@ -451,6 +451,21 @@ void PlayMode::checkPhaseUpdates() {
     walkmesh = &phonebank_walkmeshes->lookup("phase1");
     player.at = walkmesh->nearest_walk_point(player.transform->position);
   }
+
+  else if (storyManager->getCurrentPhase() == 4) {
+    walkmesh = &phonebank_walkmeshes->lookup("phase3");
+    player.at = walkmesh->nearest_walk_point(player.transform->position);
+  }
+
+  else if (storyManager->getCurrentPhase() == 5) { // just door close
+    walkmesh = &phonebank_walkmeshes->lookup("phase4");
+    player.at = walkmesh->nearest_walk_point(player.transform->position);
+  }
+
+  else if (storyManager->getCurrentPhase() == 6) { // book shelf open
+    walkmesh = &phonebank_walkmeshes->lookup("phase5");
+    player.at = walkmesh->nearest_walk_point(player.transform->position);
+  }
 }
 
 glm::vec3 PlayMode::cameraShake(float elapsed) {

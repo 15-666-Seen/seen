@@ -117,16 +117,13 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
 
       // TODO: set different notification
       if (furniture->type == BEDROOM_DOOR) {
-
         // phase 0 can directly open the door
         if (current_phase == 0) {
           Door *door = dynamic_cast<Door *>(furniture);
           door->state = Door::DoorState::OPENING;
           furniture->phase_allow_interact = false;
           return true;
-        }
-
-        else if (current_phase == 2) {
+        } else if (current_phase == 2) {
           Door *door = dynamic_cast<Door *>(furniture);
           if (!inventory.hasItem(BEDROOM_KEY)) {
             interaction_notification = "This door is locked.";
@@ -137,7 +134,9 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
             return true;
           }
         }
-      } else if (furniture->type == BED) {
+      }
+
+      else if (furniture->type == BED) {
         if (furniture->interact_status == 0) {
           furniture->interact_status = 1;
           // TODO: modify player's view
@@ -156,11 +155,18 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
           isHiding = false;
         }
         return true;
-      } else if (furniture->type == DOOR1) {
-        if (!inventory.hasItem(DOOR1_KEY)) {
-          interaction_notification = "This door is locked.";
+      }
+
+      else if (furniture->type == DOOR1) {
+        // TODO: currently directly open door1
+        if (current_phase == 3) {
+          Door *door = dynamic_cast<Door *>(furniture);
+          door->state = Door::DoorState::OPENING;
+          furniture->phase_allow_interact = false;
           return true;
         }
+        interaction_notification = "This door is locked.";
+        return true;
       }
     }
 
