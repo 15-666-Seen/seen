@@ -42,6 +42,13 @@ bool StoryManager::advanceStory() {
     }
     break;
   case 3:
+    if (interactableManager->interactStatusCheck(DOOR1) == 1) {
+      current_phase++; // advance to the next phase
+      set_up_next_phase = true;
+    }
+    break;
+  case 4:
+    // if player move the shelf
     if (false) {
       current_phase++; // advance to the next phase
       set_up_next_phase = true;
@@ -110,6 +117,10 @@ void StoryManager::setUpPhase() {
     enableGhost("ghost1");
 
     break;
+
+  case 4:
+    break;
+
   default:
 
     wait_and_exit("Game Over - set up phase not programmed");
