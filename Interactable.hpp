@@ -25,20 +25,29 @@ static std::map<std::string, ItemType> MeshNameToItemType = {
 static std::map<ItemType, std::string> ItemTypeToInteractText = {
     {BEDROOM_KEY, "grab key"}, {FILE1, "read confidential file"}
     ,{FILE2, "read \"Countermeasures to Police Inspection\""}
-    ,{DEN_KEY, "grab key"},{REDROOM_KEY, "grab key"},{CLIP_L, "grad chain cutter (left)"}
-    ,{CLIP_R, "grad chain cutter (right)"} ,{CLIP_M, "grad chain cutter (center)"}};
+    ,{DEN_KEY, "grab key"},{REDROOM_KEY, "grab key"},{CLIP_L, "grab chain cutter (left)"}
+    ,{CLIP_R, "grab chain cutter (right)"} ,{CLIP_M, "grab chain cutter (center)"}};
 
 /* Type of interactable object that cannot be picked up */
 enum FurnitureType {
     NONE, BED, CLOSET, BEDROOM_DOOR, DOOR1, FRONT_DOOR, DESK,
     REDROOM_DOOR, CHAIN, CHAIN_CUT1, CHAIN_CUT2, CORPSE, DOORBLOCK,
     TINY_SCULPTURE, TINY_SCULPTURE_TENTACLES, BOOKSHELF, SOFA,
-    FRIDGE0, FRIDGE1, FRIDGE2, FRIDGE3, FRIDGE4, FRIDGE5
+    FRIDGE1, FRIDGE2, FRIDGE3, FRIDGE4, FRIDGE5, LADDER
 };
 static std::map<FurnitureType, std::vector<std::string>>
     FurnitureTypeToInteractText = {{BED, {"hide under bed", "exit hiding"}},
                                    {BEDROOM_DOOR, {"open door"}},
-                                   {DOOR1, {"open door"}}};
+                                   {DOOR1, {"open door"}},
+                                    {SOFA, {"push sofa away"}},
+                                    {LADDER, {"use ladder","use ladder","use ladder"}},
+                                    {FRIDGE1, {"open fridge"}},
+                                    {FRIDGE2, {"open fridge"}},
+                                    {FRIDGE3, {"open fridge"}},
+                                    {FRIDGE4, {"open fridge"}},
+                                    {FRIDGE5, {"open fridge"}},
+    };
+
 static std::map<std::string, FurnitureType> MeshNameToFurnitureType = {
     {"Bed", BED}, {"BedroomDoor", BEDROOM_DOOR}, {"DenDoor", DOOR1},
     {"ClosetDoor", CLOSET}, {"front_door1", FRONT_DOOR},
@@ -46,10 +55,9 @@ static std::map<std::string, FurnitureType> MeshNameToFurnitureType = {
     {"Chaincut1",CHAIN_CUT1}, {"Chaincut2",CHAIN_CUT2},
     {"CorpseDen", CORPSE}, {"DoorBlock", DOORBLOCK},
     {"DenSculpture", TINY_SCULPTURE}, {"DenSculpture2", TINY_SCULPTURE_TENTACLES}, 
-    {"DenBookshelf", BOOKSHELF}, {"Sofa",SOFA},
-    {"FridgeDoorStatic", FRIDGE0}, {"FridgeDoor1", FRIDGE1},
-    {"FridgeDoor2",FRIDGE2}, {"FridgeDoor3",FRIDGE3}, {"FridgeDoor4",FRIDGE4}, 
-    {"FridgeDoor5",FRIDGE5}
+    {"DenBookshelf", BOOKSHELF}, {"Sofa",SOFA}, {"FridgeDoor1", FRIDGE1},
+    {"FridgeDoor2", FRIDGE2}, {"FridgeDoor3", FRIDGE3}, {"FridgeDoor4", FRIDGE4}, 
+    {"FridgeDoor5", FRIDGE5}, {"ladder", LADDER}
 };
 
 /* A single furniture */

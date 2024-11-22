@@ -40,6 +40,10 @@ bool Item::interact(float elapsed) {
   } else if (type == FILE1) {
     interact_status = 1;
     return true;
+  } if (type == CLIP_R) {
+      visible = false;
+      this->drawable->visible = false;
+      return true;
   }
   return true;
 }
