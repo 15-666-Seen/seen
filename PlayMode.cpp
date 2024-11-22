@@ -34,7 +34,7 @@ std::string getNormalMapName(const std::string& filename) {
     return new_filename;
 }
 
-Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
+Load<Scene> house_scene(LoadTagDefault, []() -> Scene const * {
   return new Scene(data_path("house.scene"), [&](Scene &scene,
                                                  Scene::Transform *transform,
                                                  std::string const &mesh_name) {
@@ -83,7 +83,7 @@ phonebank_walkmeshes(LoadTagDefault, []() -> WalkMeshes const * {
   return ret;
 });
 
-PlayMode::PlayMode() : scene(*phonebank_scene) {
+PlayMode::PlayMode() : scene(*house_scene) {
   // create a player transform:
   scene.transforms.emplace_back();
   player.transform = &scene.transforms.back();
