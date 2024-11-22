@@ -36,14 +36,18 @@ bool Item::interact(float elapsed) {
   if (type == BEDROOM_KEY) {
     visible = false;
     this->drawable->visible = false;
-    return true;
   } else if (type == FILE1) {
     interact_status = 1;
-    return true;
-  } if (type == CLIP_R) {
-      visible = false;
-      this->drawable->visible = false;
-      return true;
+  } else if (type == EYEBALL) {
+    visible = false;
+    this->drawable->visible = false;
+    interact_sound = Sound::play_3D(*eyeball_sample, 2.0f,
+                                    drawable->transform->position, 10.0f);
+  } else if (type == REDROOM_KEY) {
+    visible = false;
+    this->drawable->visible = false;
+    interact_sound = Sound::play_3D(*breath_trigger_sample, 2.0f,
+                                    drawable->transform->position, 10.0f);
   }
   return true;
 }
@@ -97,14 +101,14 @@ bool Door::interact(float elapsed) {
                                     drawable->transform->position, 10.0f);
   }
   animation_time += elapsed;
-  if (animation_time > 0.5f) {
+  if (animation_time > 0.6f) {
     state = Door::DoorState::OPEN;
     interact_status = 1;
     return false;
   }
   // rotate the door along z axis
   drawable->transform->rotation =
-      glm::angleAxis(glm::radians(-90.0f) * (animation_time / 0.5f),
+      glm::angleAxis(glm::radians(-90.0f) * (animation_time / 0.6f),
                      glm::vec3(0.0f, 0.0f, 1.0f));
   return true;
 }

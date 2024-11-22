@@ -8,6 +8,21 @@ door_open_sample(LoadTagDefault, []() -> Sound::Sample const * {
 });
 
 Load<Sound::Sample>
+door_close_sample(LoadTagDefault, []() -> Sound::Sample const * {
+  return new Sound::Sample(data_path("sounds/door-close.wav"));
+});
+
+Load<Sound::Sample>
 footstep_sample(LoadTagDefault, []() -> Sound::Sample const * {
   return new Sound::Sample(data_path("sounds/footstep.wav"));
+});
+
+Load<Sound::Sample>
+eyeball_sample(LoadTagDefault, []() -> Sound::Sample const * {
+  return new Sound::Sample(data_path("sounds/eyeball.wav"));
+});
+
+Load<Sound::Sample>
+breath_trigger_sample(LoadTagDefault, []() -> Sound::Sample const * {
+  return new Sound::Sample(data_path("sounds/breath-trigger.wav"));
 });
