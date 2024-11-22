@@ -21,28 +21,28 @@ bool StoryManager::advanceStory() {
 
   switch (current_phase) {
   case 0:
-    // if player open the bedroom door -> need to be in OPEN
-    if (interactableManager->interactStatusCheck(BEDROOM_DOOR) == 2) {
+    // forward if player open the blue door -> need to be in OPEN
+    if (interactableManager->interactStatusCheck(DOOR1) == 2) {
       current_phase++; // advance to the next phase
       set_up_next_phase = true;
     }
     break;
   case 1:
-    // if player read the file
-    if (interactableManager->interactStatusCheck(FILE1) == 1) {
+    // forward if tiny sculpture is interacted, red key is shown
+    if (interactableManager->interactStatusCheck(TINY_SCULPTURE) == 1) {
       current_phase++; // advance to the next phase
       set_up_next_phase = true;
     }
     break;
   case 2:
-    // if player find the key and open the bedroom door
-    if (interactableManager->interactStatusCheck(BEDROOM_DOOR) == 1) {
+    // forward if bookshelf is moved
+    if (interactableManager->interactStatusCheck(BOOKSHELF) == 1) {
       current_phase++; // advance to the next phase
       set_up_next_phase = true;
     }
     break;
   case 3:
-    if (interactableManager->interactStatusCheck(DOOR1) == 1) {
+    if (interactableManager->interactStatusCheck(BEDROOM_DOOR) == 1) {
       current_phase++; // advance to the next phase
       set_up_next_phase = true;
     }
@@ -79,36 +79,30 @@ void StoryManager::setUpPhase() {
     gameplayUI->setDialogueTexts(v);
     gameplayUI->setMissionText("Find Bedroom");
 
+    // door block is invisible for phase 0
+    interactableManager->setFurniturePhaseVisability(DOORBLOCK, false);
     interactableManager->setFurniturePhaseAvailability(BEDROOM_DOOR, true);
     interactableManager->setFurniturePhaseAvailability(DOOR1, true);
-    interactableManager->setItemPhaseAvailability(FILE1, false);
 
     break;
+
   case 1:
-    // bed no longer interactable, key interactable
-    interactableManager->setFurniturePhaseAvailability(BED, false);
-    interactableManager->setItemPhaseAvailability(BEDROOM_KEY, false);
-    interactableManager->setItemPhaseAvailability(FILE1, true);
 
-    gameplayUI->addDialogueText("This must be their bedroom.");
-    gameplayUI->addDialogueText("That thing must be here somewhere...");
-
-    gameplayUI->setMissionText("Find Secret File");
+    // user get in blue room, tiny sculpture is available
+    interactableManager->setFurniturePhaseVisability(SCULPTURE_EYE_R, false);
+    interactableManager->setFurniturePhaseAvailability(TINY_SCULPTURE, true);
+    interactableManager->setItemPhaseAvailability(EYEBALL, true);
 
     break;
 
   case 2:
-    interactableManager->setItemPhaseAvailability(FILE1, false);
-    interactableManager->setItemPhaseAvailability(BEDROOM_KEY, true);
-    interactableManager->setFurniturePhaseAvailability(BEDROOM_DOOR, true);
 
-    gameplayUI->addDialogueText(
-        "[XXXXXXXXXXXXXXX   Something Secret  XXXXXXXXXXXXXXX]");
-    gameplayUI->addDialogueText("...");
-    gameplayUI->addDialogueText(
-        "Wait, the door is closed? I need to find a way out.");
-
-    gameplayUI->setMissionText("Leave Bedroom");
+    // blue door is closed, shelf is avaible
+    interactableManager->closeDoor(DOOR1);
+    interactableManager->setItemPhaseAvailability(REDROOM_KEY, true);
+    interactableManager->setFurniturePhaseAvailability(TINY_SCULPTURE, false);
+    interactableManager->setFurniturePhaseAvailability(BOOKSHELF, true);
+    interactableManager->setFurniturePhaseVisability(DOORBLOCK, true);
 
     break;
 

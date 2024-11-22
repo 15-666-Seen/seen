@@ -17,40 +17,91 @@ static constexpr float INTERACT_ANGLE = 2.2f;
 
 /* interactable object that can be picked up */
 // =========================  mesh name must match =========================
-enum ItemType { BEDROOM_KEY, DOOR1_KEY, FILE1, FILE2, DEN_KEY, REDROOM_KEY, CLIP_L, CLIP_R, CLIP_M};
+enum ItemType {
+  BEDROOM_KEY,
+  DOOR1_KEY,
+  FILE1,
+  FILE2,
+  DEN_KEY,
+  REDROOM_KEY,
+  CLIP_L,
+  CLIP_R,
+  CLIP_M,
+  EYEBALL
+};
 static std::map<std::string, ItemType> MeshNameToItemType = {
-    {"BedroomKey", BEDROOM_KEY}, {"Folder", FILE1},{"Folder_Police", FILE2}
-    ,{"DenKey", DEN_KEY},{"RedroomKey", REDROOM_KEY},{"ClipL", CLIP_L}
-    ,{"ClipR", CLIP_R} ,{"ClipM", CLIP_M} };
+    {"BedroomKey", BEDROOM_KEY}, {"Folder", FILE1},
+    {"Folder_Police", FILE2},    {"DenKey", DEN_KEY},
+    {"RedroomKey", REDROOM_KEY}, {"ClipL", CLIP_L},
+    {"ClipR", CLIP_R},           {"ClipM", CLIP_M},
+    {"Eyeball", EYEBALL}};
 static std::map<ItemType, std::string> ItemTypeToInteractText = {
-    {BEDROOM_KEY, "grab key"}, {FILE1, "read confidential file"}
-    ,{FILE2, "read \"Countermeasures to Police Inspection\""}
-    ,{DEN_KEY, "grab key"},{REDROOM_KEY, "grab key"},{CLIP_L, "grad chain cutter (left)"}
-    ,{CLIP_R, "grad chain cutter (right)"} ,{CLIP_M, "grad chain cutter (center)"}};
+    {BEDROOM_KEY, "grab key"},
+    {FILE1, "read confidential file"},
+    {FILE2, "read \"Countermeasures to Police Inspection\""},
+    {DEN_KEY, "grab key"},
+    {REDROOM_KEY, "grab key"},
+    {CLIP_L, "grad chain cutter (left)"},
+    {CLIP_R, "grad chain cutter (right)"},
+    {CLIP_M, "grad chain cutter (center)"},
+    {EYEBALL, "grab eyeball"}};
 
 /* Type of interactable object that cannot be picked up */
 enum FurnitureType {
-    NONE, BED, CLOSET, BEDROOM_DOOR, DOOR1, FRONT_DOOR, DESK,
-    REDROOM_DOOR, CHAIN, CHAIN_CUT1, CHAIN_CUT2, CORPSE, DOORBLOCK,
-    TINY_SCULPTURE, TINY_SCULPTURE_TENTACLES, BOOKSHELF, SOFA,
-    FRIDGE0, FRIDGE1, FRIDGE2, FRIDGE3, FRIDGE4, FRIDGE5
+  NONE,
+  BED,
+  CLOSET,
+  BEDROOM_DOOR,
+  DOOR1,
+  FRONT_DOOR,
+  DESK,
+  REDROOM_DOOR,
+  CHAIN,
+  CHAIN_CUT1,
+  CHAIN_CUT2,
+  CORPSE,
+  DOORBLOCK,
+  TINY_SCULPTURE,
+  SCULPTURE_EYE_R,
+  TINY_SCULPTURE_TENTACLES,
+  BOOKSHELF,
+  SOFA,
+  FRIDGE0,
+  FRIDGE1,
+  FRIDGE2,
+  FRIDGE3,
+  FRIDGE4,
+  FRIDGE5,
 };
 static std::map<FurnitureType, std::vector<std::string>>
     FurnitureTypeToInteractText = {{BED, {"hide under bed", "exit hiding"}},
                                    {BEDROOM_DOOR, {"open door"}},
-                                   {DOOR1, {"open door"}}};
+                                   {DOOR1, {"open door"}},
+                                   {TINY_SCULPTURE, {"interact"}},
+                                   {BOOKSHELF, {"move shelf"}}};
 static std::map<std::string, FurnitureType> MeshNameToFurnitureType = {
-    {"Bed", BED}, {"BedroomDoor", BEDROOM_DOOR}, {"DenDoor", DOOR1},
-    {"ClosetDoor", CLOSET}, {"front_door1", FRONT_DOOR},
-    {"RedroomDoor", REDROOM_DOOR}, {"Chain",CHAIN},
-    {"Chaincut1",CHAIN_CUT1}, {"Chaincut2",CHAIN_CUT2},
-    {"CorpseDen", CORPSE}, {"DoorBlock", DOORBLOCK},
-    {"DenSculpture", TINY_SCULPTURE}, {"DenSculpture2", TINY_SCULPTURE_TENTACLES}, 
-    {"DenBookshelf", BOOKSHELF}, {"Sofa",SOFA},
-    {"FridgeDoorStatic", FRIDGE0}, {"FridgeDoor1", FRIDGE1},
-    {"FridgeDoor2",FRIDGE2}, {"FridgeDoor3",FRIDGE3}, {"FridgeDoor4",FRIDGE4}, 
-    {"FridgeDoor5",FRIDGE5}
-};
+    {"Bed", BED},
+    {"BedroomDoor", BEDROOM_DOOR},
+    {"DenDoor", DOOR1},
+    {"ClosetDoor", CLOSET},
+    {"front_door1", FRONT_DOOR},
+    {"RedroomDoor", REDROOM_DOOR},
+    {"Chain", CHAIN},
+    {"Chaincut1", CHAIN_CUT1},
+    {"Chaincut2", CHAIN_CUT2},
+    {"CorpseDen", CORPSE},
+    {"DoorBlock", DOORBLOCK},
+    {"DenSculpture", TINY_SCULPTURE},
+    {"DenEyeballR", SCULPTURE_EYE_R},
+    {"DenSculpture2", TINY_SCULPTURE_TENTACLES},
+    {"DenBookshelf", BOOKSHELF},
+    {"Sofa", SOFA},
+    {"FridgeDoorStatic", FRIDGE0},
+    {"FridgeDoor1", FRIDGE1},
+    {"FridgeDoor2", FRIDGE2},
+    {"FridgeDoor3", FRIDGE3},
+    {"FridgeDoor4", FRIDGE4},
+    {"FridgeDoor5", FRIDGE5}};
 
 /* A single furniture */
 struct Furniture {
@@ -86,7 +137,7 @@ struct Furniture {
   virtual int getInteractStatus() { return interact_status; }
   virtual bool isInteracting() { return interact_status > 0; }
 
-  std::shared_ptr<Sound::PlayingSample> interact_sound;
+  std::shared_ptr<Sound::PlayingSample> interact_sound = nullptr;
 };
 
 struct Door : Furniture {
@@ -131,4 +182,6 @@ struct Item {
                             Scene::Camera *camera);
 
   virtual std::string interactText() { return ItemTypeToInteractText[type]; }
+
+  std::shared_ptr<Sound::PlayingSample> interact_sound;
 };

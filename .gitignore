@@ -21,3 +21,5 @@ scenes/show-scene*
 maek-cache.json
 
 .clangd
+
+*.pnct
