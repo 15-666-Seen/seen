@@ -47,6 +47,8 @@ struct InteractableManager {
   void setFurniturePhaseAvailability(FurnitureType furniture_type, bool allow);
   void setItemPhaseAvailability(ItemType item_type, bool allow);
 
+  void setFurnitureVisibility(FurnitureType furniture_type, bool visible);
+
   // all interactable objects valid check
   bool interactValidCheck(FurnitureType furniture_type);
 

@@ -12,6 +12,11 @@ void StoryManager::SetUpManager(GameplayUI *ui, InteractableManager *im) {
   gameplayUI = ui;
   interactableManager = im;
 
+  // hide some things
+  interactableManager->setFurnitureVisibility(CHAIN_CUT2, false);
+  interactableManager->setFurnitureVisibility(CHAIN_CUT1, false);
+  interactableManager->setFurnitureVisibility(CHAIN, false);
+
   setUpPhase(); // set up phase 0
 }
 
@@ -54,6 +59,36 @@ bool StoryManager::advanceStory() {
       set_up_next_phase = true;
     }
     break;
+  case 10:
+      // player uses the ladder
+      if (interactableManager->interactStatusCheck(LADDER) == 1) {
+          current_phase++; // advance to the next phase
+          set_up_next_phase = true;
+      }
+      break;
+  case 11: 
+      // player is in the basement searching for clip
+      // if player pushes sofa away
+      if (interactableManager->interactStatusCheck(LADDER) == 2) {
+          current_phase++; // advance to the next phase
+          set_up_next_phase = true;
+      }
+      break;
+  case 12:
+      // if the player finds the clip
+      // the player climbs up
+      if (false) {
+          current_phase++; // advance to the next phase
+          set_up_next_phase = true;
+      }
+      break;
+  case 13: 
+      // ghost jumpscare
+      if (false) {
+          current_phase++; // advance to the next phase
+          set_up_next_phase = true;
+      }
+      break;
   default:
     wait_and_exit("Game Over - advanced past programmed phase");
   }
@@ -67,7 +102,7 @@ bool StoryManager::advanceStory() {
 
 void StoryManager::setUpPhase() {
 
-  // update phrase in interactable manaer
+  // update phrase in interactable manager
   interactableManager->current_phase = current_phase;
   std::deque<std::string> v;
   std::cout << "Setting up for phase " << current_phase << std::endl;
@@ -83,6 +118,9 @@ void StoryManager::setUpPhase() {
     interactableManager->setFurniturePhaseAvailability(DOOR1, true);
     interactableManager->setItemPhaseAvailability(FILE1, false);
 
+    // we let the user explore a bit.
+    interactableManager->setFurniturePhaseAvailability(SOFA, true);
+
     break;
   case 1:
     // bed no longer interactable, key interactable
@@ -94,6 +132,7 @@ void StoryManager::setUpPhase() {
     gameplayUI->addDialogueText("That thing must be here somewhere...");
 
     gameplayUI->setMissionText("Find Secret File");
+
 
     break;
 
@@ -120,6 +159,31 @@ void StoryManager::setUpPhase() {
 
   case 4:
     break;
+
+  case 10:
+      // player is currently hiding, need to push sofa away
+      // sofa can now be pushed away
+      interactableManager->setFurniturePhaseAvailability(SOFA, true);
+      //we set ladder to usable once we interact with the sofa
+      break;
+  case 11:
+      // move player to the basement
+
+      interactableManager->setFurniturePhaseAvailability(FRIDGE1, true);
+      interactableManager->setFurniturePhaseAvailability(FRIDGE2, true);
+      interactableManager->setFurniturePhaseAvailability(FRIDGE3, true);
+      interactableManager->setFurniturePhaseAvailability(FRIDGE4, true);
+      interactableManager->setFurniturePhaseAvailability(FRIDGE5, true);
+      
+      break;
+  case 12:
+      // the player climbs up
+      
+      break;
+  case 13:
+      // ghost jumpscare
+      
+      break;
 
   default:
 
