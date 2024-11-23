@@ -15,7 +15,7 @@ struct StoryManager {
   StoryManager();
 
   const int total_phase = 15;
-  int current_phase = 10;
+  int current_phase = 0;
 
   GameplayUI *gameplayUI;
   InteractableManager *interactableManager;
