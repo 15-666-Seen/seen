@@ -180,7 +180,23 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
           interaction_notification = "This is a sofa. The pillows have a nice color scheme.";
           return true;
       }
+      else if (furniture->type == LADDER) {
+          if (current_phase == 10) {
+              // go down
+              furniture->interact_status = 1;
+              return true;
+          }
+          else if (current_phase == 11 && inventory.hasItem(CLIP_R)) {
+              // can only use when clip r is found
+              // go up
+              furniture->interact_status = 2;
+              furniture->phase_allow_interact = false;
+              return true;
+          }
 
+          interaction_notification = "Not yet. I haven't found what I'm looking for.";
+          return true;
+      }
       else if (furniture->type == FRIDGE1) {
           // Push sofa aside
           if (current_phase == 11) {
@@ -238,24 +254,6 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
           return true;
           }
 
-
-      else if (furniture->type == LADDER) {
-          if (current_phase == 10) {
-              // go down
-              furniture->interact_status = 1;
-              return true;
-          }
-          else if (current_phase == 11 && inventory.hasItem(CLIP_R)) {
-              // can only use when clip r is found
-              // go up
-              furniture->interact_status = 2;
-              furniture->phase_allow_interact = false;
-              return true;
-          }
-
-          interaction_notification = "Not yet. I haven't found what I'm looking for.";
-          return true;
-      }
     }
 
     return true;
