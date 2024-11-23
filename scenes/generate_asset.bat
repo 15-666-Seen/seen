@@ -9,3 +9,6 @@
 
 ::Walkmesh
 "E:\SteamLibrary\steamapps\common\Blender\blender.exe" --background --python export-walkmeshes.py -- walkmesh.blend:Collection ../dist/walkmesh.w
+
+
+

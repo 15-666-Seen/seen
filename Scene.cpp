@@ -127,10 +127,11 @@ void Scene::draw(glm::mat4 const &world_to_clip,
         drawable.tex_normal - 1; 
 
     glUniform1i(TEX_sampler2D, cur_texure);
+    GL_ERRORS();
     glUniform1i(TEX_sampler2D_normal, cur_texure_normal);
 
     // Configure program uniforms:
-
+    GL_ERRORS();
     // the object-to-world matrix is used in all three of these uniforms:
     assert(drawable.transform); // drawables *must* have a transform
     glm::mat4x3 object_to_world = drawable.transform->make_local_to_world();
@@ -141,7 +142,7 @@ void Scene::draw(glm::mat4 const &world_to_clip,
       glUniformMatrix4fv(pipeline.OBJECT_TO_CLIP_mat4, 1, GL_FALSE,
                          glm::value_ptr(object_to_clip));
     }
-
+    GL_ERRORS();
     // the object-to-light matrix is used in the next two uniforms:
     glm::mat4x3 object_to_light = world_to_light * glm::mat4(object_to_world);
 
@@ -163,7 +164,7 @@ void Scene::draw(glm::mat4 const &world_to_clip,
     if (pipeline.set_uniforms)
       pipeline.set_uniforms();
 
-
+    GL_ERRORS();
     if (pipeline.textures[cur_texure].texture != 0) {
       glActiveTexture(GL_TEXTURE0 + cur_texure);
       glBindTexture(pipeline.textures[cur_texure].target,

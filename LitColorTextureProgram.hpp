@@ -42,7 +42,7 @@ struct LitColorTextureProgram {
 	GLuint LoadTexture(const std::string filepath, const std::string filename);
 	
 	//Match filenames to texture indices:
-	std::unordered_map<std::string, GLint> tex_name_to_glint;
+	std::unordered_map<std::string, GLint> tex_file_to_glint;
 };
 
 extern Load< LitColorTextureProgram > lit_color_texture_program;

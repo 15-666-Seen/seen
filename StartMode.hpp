@@ -27,6 +27,9 @@ struct StartMode : Mode {
 
   // local copy of the game scene (so code can change it during gameplay):
   Scene scene;
+  Scene::Drawable* background = nullptr;
+
+  Scene::Camera* camera = nullptr;
 
   // In game UI
   GameplayUI *gameplayUI;

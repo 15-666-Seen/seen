@@ -14,80 +14,89 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-GLuint phonebank_meshes_for_lit_color_texture_program = 0;
-Load<MeshBuffer> phonebank_meshes(LoadTagDefault, []() -> MeshBuffer const * {
-  MeshBuffer const *ret = new MeshBuffer(data_path("house.pnct"));
-  phonebank_meshes_for_lit_color_texture_program =
+GLuint bg_meshes_for_lit_color_texture_program = 0;
+Load<MeshBuffer> bg_meshes(LoadTagDefault, []() -> MeshBuffer const * {
+  MeshBuffer const *ret = new MeshBuffer(data_path("bg.pnct"));
+  bg_meshes_for_lit_color_texture_program =
       ret->make_vao_for_program(lit_color_texture_program->program);
   return ret;
 });
 
-Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
-  return new Scene(data_path("house.scene"), [&](Scene &scene,
-                                                 Scene::Transform *transform,
-                                                 std::string const &mesh_name) {
-    Mesh const &mesh = phonebank_meshes->lookup(mesh_name);
+//Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
+//  return new Scene(data_path("house.scene"), [&](Scene &scene,
+//                                                 Scene::Transform *transform,
+//                                                 std::string const &mesh_name) {
+//    Mesh const &mesh = phonebank_meshes->lookup(mesh_name);
+//
+//    scene.drawables.emplace_back(transform, mesh_name);
+//    Scene::Drawable &drawable = scene.drawables.back();
+//
+//    drawable.pipeline = lit_color_texture_program_pipeline;
+//
+//    drawable.pipeline.vao = phonebank_meshes_for_lit_color_texture_program;
+//    drawable.pipeline.type = mesh.type;
+//    drawable.pipeline.start = mesh.start;
+//    drawable.pipeline.count = mesh.count;
+//
+//
+//    drawable.tex = drawable.pipeline.tex_name_to_glint[mesh.tex];
+//    drawable.tex_normal = drawable.pipeline.tex_name_to_glint[getNormalMapName(mesh.tex)];
+//
+//    /* some asserts to ensure the shader is loaded correctly */
+//    auto s = drawable.pipeline.tex_name_to_glint.find("0");
+//    assert(s != drawable.pipeline.tex_name_to_glint.end());
+//    s = drawable.pipeline.tex_name_to_glint.find("0_n");
+//    assert(s != drawable.pipeline.tex_name_to_glint.end());
+//
+//    // if mesh textures are missing
+//    if (drawable.tex == 0) {
+//      printf("Texture missing in scene loading for mesh %s named %s\n",
+//             mesh_name.c_str(), mesh.tex.c_str());
+//      drawable.tex = drawable.pipeline.tex_name_to_glint["0"];
+//    }
+//
+//    //if (drawable.tex_normal == 0) {
+//    //    printf("No normal map for mesh %s named %s\n", mesh_name.c_str(), getNormalMapName(mesh.tex).c_str());
+//    //    drawable.tex_normal = drawable.pipeline.tex_name_to_glint["0_n"];
+//    //}
+//
+//  });
+//});
+Load< Scene > bg_scene(LoadTagDefault, []() -> Scene const* {
+    return new Scene(data_path("empty.scene"), [&](Scene& scene, Scene::Transform* transform, std::string const& mesh_name) {
+        });
+    });
 
-    scene.drawables.emplace_back(transform, mesh_name);
-    Scene::Drawable &drawable = scene.drawables.back();
+StartMode::StartMode() : scene(*bg_scene) {
 
-    drawable.pipeline = lit_color_texture_program_pipeline;
+    Mesh mesh1 = bg_meshes->lookup("Plane");
 
-    drawable.pipeline.vao = phonebank_meshes_for_lit_color_texture_program;
-    drawable.pipeline.type = mesh.type;
-    drawable.pipeline.start = mesh.start;
-    drawable.pipeline.count = mesh.count;
+    auto newTrans1 = new Scene::Transform();
+    scene.drawables.emplace_back(newTrans1);
+    background = &scene.drawables.back();
 
+    background->pipeline = lit_color_texture_program_pipeline;
+    background->pipeline.vao = bg_meshes_for_lit_color_texture_program;
+    background->pipeline.type = mesh1.type;
+    background->pipeline.start = mesh1.start;
+    background->pipeline.count = mesh1.count;
 
-    drawable.tex = drawable.pipeline.tex_name_to_glint[mesh.tex];
-    drawable.tex_normal = drawable.pipeline.tex_name_to_glint[getNormalMapName(mesh.tex)];
+	if (lit_color_texture_program->tex_file_to_glint.find("IMG_3075.png") == lit_color_texture_program->tex_file_to_glint.end()) {
+		throw std::runtime_error("Texture not found");
+	}
+	background->tex = lit_color_texture_program->tex_file_to_glint.find("fabric.png")->second;
+	std::cout << "Texture: " << background->tex << std::endl;
+    background->tex_normal = background->pipeline.tex_name_to_glint["0_n"];
+	background->transform->rotation = glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.f));
 
-    /* some asserts to ensure the shader is loaded correctly */
-    auto s = drawable.pipeline.tex_name_to_glint.find("0");
-    assert(s != drawable.pipeline.tex_name_to_glint.end());
-    s = drawable.pipeline.tex_name_to_glint.find("0_n");
-    assert(s != drawable.pipeline.tex_name_to_glint.end());
+	background->transform->scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
-    // if mesh textures are missing
-    if (drawable.tex == 0) {
-      printf("Texture missing in scene loading for mesh %s named %s\n",
-             mesh_name.c_str(), mesh.tex.c_str());
-      drawable.tex = drawable.pipeline.tex_name_to_glint["0"];
-    }
-
-    //if (drawable.tex_normal == 0) {
-    //    printf("No normal map for mesh %s named %s\n", mesh_name.c_str(), getNormalMapName(mesh.tex).c_str());
-    //    drawable.tex_normal = drawable.pipeline.tex_name_to_glint["0_n"];
-    //}
-
-  });
-});
-
-StartMode::StartMode() : scene(*phonebank_scene) {
-  // create a player transform:
-  scene.transforms.emplace_back();
-  player.transform = &scene.transforms.back();
-
-  // create a player camera attached to a child of the player transform:
-  scene.transforms.emplace_back();
-  scene.cameras.emplace_back(&scene.transforms.back());
-
-  player.camera = &scene.cameras.back();
-  player.camera->fovy = glm::radians(60.0f);
-  player.camera->near = 0.01f;
-  player.camera->transform->parent = nullptr;
-
-  // rotate camera facing direction (-z) to player facing direction (+y):
-  player.camera->transform->rotation =
-      glm::angleAxis(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
-  // start player walking at nearest walk point:
-  player.at = walkmesh->nearest_walk_point(player.transform->position);
-
-  // player's eyes are 1.8 units above the ground:
-  player.camera->transform->position =
-      glm::vec3(player.transform->position.x, player.transform->position.y,
-                player.transform->position.z + PLAYER_HEIGHT);
+    if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
+    camera = &scene.cameras.front();
+    camera->transform->position = glm::vec3(10.0f, 0.f, 0.0f);
+    /*camera->transform->rotation *= glm::angleAxis(
+        glm::radians(-15.0f),
+        glm::vec3(1.0f, 0.0f, 0.0f));*/
 
   // UI
   gameplayUI = new GameplayUI();
@@ -142,8 +151,7 @@ bool StartMode::handle_event(SDL_Event const &evt,
       F.pressed = false;
       return true;
     }
-  }
-  else if (evt.type == SDL_MOUSEBUTTONDOWN) {
+  } else if (evt.type == SDL_MOUSEBUTTONDOWN) {
       int x, y;
       SDL_GetMouseState(&x, &y);
       gameplayUI->InteractOnClick(x, y);
@@ -155,7 +163,23 @@ bool StartMode::handle_event(SDL_Event const &evt,
           SDL_SetRelativeMouseMode(SDL_TRUE);
           return true;
       }
+  } else if (evt.type == SDL_MOUSEMOTION) {
+      if (SDL_GetRelativeMouseMode() == SDL_TRUE) {
+          glm::vec2 motion = glm::vec2(
+              evt.motion.xrel / float(window_size.y),
+              -evt.motion.yrel / float(window_size.y)
+          );
+          camera->transform->rotation = glm::normalize(
+              camera->transform->rotation
+              * glm::angleAxis(-motion.x * camera->fovy, glm::vec3(0.0f, 1.0f, 0.0f))
+              * glm::angleAxis(motion.y * camera->fovy, glm::vec3(1.0f, 0.0f, 0.0f))
+          );
+          //std::cout << "\r" << camera->transform->rotation[0] << ", " << camera->transform->rotation[1] << ", " << camera->transform->rotation[2] << std::endl;
+          return true;
+      }
   }
+
+  
   //} else if (evt.type == SDL_MOUSEMOTION) {
   //  if (SDL_GetRelativeMouseMode() == SDL_TRUE) {
   //    if (gStop) {
@@ -190,11 +214,17 @@ bool StartMode::handle_event(SDL_Event const &evt,
   return false;
 }
 
+float angle = 0.0f;
 void StartMode::update(float elapsed) {
   if (gStop || gamePause) {
     return;
   }
-
+  angle += 1.f;
+  background->transform->rotation = glm::angleAxis(glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.f));
+  if (angle > 360.0f) {
+    angle = 0.0f;
+  }
+  std::cout << "\rAngle: " << angle << std::endl;
   //// player should not walk while hiding
   //if (!interactableManager.isHiding) {
   //  // player walking:
@@ -304,6 +334,7 @@ void StartMode::update(float elapsed) {
   //  }
   //}
 
+
   // reset button press counters:
   left.downs = 0;
   right.downs = 0;
@@ -316,7 +347,7 @@ void StartMode::update(float elapsed) {
   if (gameplayUI->dialogueText.size() > 0) {
     gStop = true;
   }
-  bool advanced = storyManager->advanceStory();
+  //bool advanced = storyManager->advanceStory();
 
 }
 
@@ -324,7 +355,7 @@ void StartMode::draw(glm::uvec2 const &drawable_size) {
   if (gamePause)
     return;
   // update camera aspect ratio for drawable:
-  player.camera->aspect = float(drawable_size.x) / float(drawable_size.y);
+  camera->aspect = float(drawable_size.x) / float(drawable_size.y);
 
   // set up light type and position for lit_color_texture_program:
   // TODO: consider using the Light(s) in the scene to do this
@@ -346,7 +377,7 @@ void StartMode::draw(glm::uvec2 const &drawable_size) {
   glDepthFunc(GL_LESS); // this is the default depth comparison function, but
                         // FYI you can change it.
 
-  scene.draw(*player.camera);
+  scene.draw(*camera);
 
   /* In case you are wondering if your walkmesh is lining up with your scene,
   try:
