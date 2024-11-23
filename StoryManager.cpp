@@ -16,6 +16,7 @@ void StoryManager::SetUpManager(GameplayUI *ui, InteractableManager *im) {
   interactableManager->setFurnitureVisibility(CHAIN_CUT2, false);
   interactableManager->setFurnitureVisibility(CHAIN_CUT1, false);
   interactableManager->setFurnitureVisibility(CHAIN, false);
+  interactableManager->setFurnitureVisibility(DOORBLOCK, false);
 
   setUpPhase(); // set up phase 0
 }
@@ -118,8 +119,6 @@ void StoryManager::setUpPhase() {
     interactableManager->setFurniturePhaseAvailability(DOOR1, true);
     interactableManager->setItemPhaseAvailability(FILE1, false);
 
-    // we let the user explore a bit.
-    interactableManager->setFurniturePhaseAvailability(SOFA, true);
 
     break;
   case 1:

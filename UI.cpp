@@ -60,7 +60,7 @@ void GameplayUI::DrawUI(glm::uvec2 const &drawable_size) {
   mission.draw(100.f, drawable_size, width, glm::vec2(x, y), 1.f);
 
   if (dialogueText.size() > 0) {
-
+      
     // dialogue box
 
     UIShader sprites(world_to_clip);
@@ -83,8 +83,11 @@ void GameplayUI::InteractOnClick(int const x, int const y) {
 
   // if no more dialogue, hide the dialogue box and clicking can no longer
   // interact with this
-  if (dialogueText.size() > 0) {
+  if (dialogueText.size() > 1) {
     dialogueText.pop_front();
     dialogue.set_text(dialogueText[0]);
+  } else if (dialogueText.size() == 1) {
+      dialogueText.pop_front();
+      dialogue.set_text("");
   }
 }

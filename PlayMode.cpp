@@ -219,6 +219,7 @@ bool PlayMode::handle_event(SDL_Event const &evt,
 }
 
 void PlayMode::update(float elapsed) {
+   
   if (gStop || gamePause) {
     return;
   }
