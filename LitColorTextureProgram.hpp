@@ -9,6 +9,8 @@
 
 #include <filesystem>
 
+#include <unordered_map>
+
 //Shader program that draws transformed, lit, textured vertices tinted with vertex colors:
 struct LitColorTextureProgram {
 	LitColorTextureProgram();
@@ -39,6 +41,8 @@ struct LitColorTextureProgram {
 	//--------
 	GLuint LoadTexture(const std::string filepath, const std::string filename);
 	
+	//Match filenames to texture indices:
+	std::unordered_map<std::string, GLint> tex_name_to_glint;
 };
 
 extern Load< LitColorTextureProgram > lit_color_texture_program;

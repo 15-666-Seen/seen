@@ -89,6 +89,7 @@ lit_color_texture_program(LoadTagEarly, []() -> LitColorTextureProgram const * {
     GLuint gli = ret->LoadTexture(filepath, f);
     lit_color_texture_program_pipeline.textures.push_back({gli, GL_TEXTURE_2D});
     lit_color_texture_program_pipeline.tex_name_to_glint[f] = gli;
+	ret->tex_name_to_glint.emplace(f, gli);
   }
 
   return ret;

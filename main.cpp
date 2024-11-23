@@ -64,12 +64,12 @@ int main(int argc, char **argv) {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-
+	
 	
 	//------------ init sound --------------
 	Sound::init();
 
-
+	//-------------------- load cassette sounds --------------------
 	Sound::Sample cassette_insert(data_path("/sounds/cassette-ffww-cassetera-96765.wav"));
 	std::shared_ptr< Sound::PlayingSample > some_loop = Sound::play(cassette_insert, 1.5f);
 	std::this_thread::sleep_for(std::chrono::milliseconds(2500));
