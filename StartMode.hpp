@@ -39,7 +39,7 @@ struct StartMode : Mode {
 
   Text text;
   uint8_t current_section = 0;
-  Section texts[12] = { 
+  Section texts[13] = { 
       {"Six days ago, I found a letter on my windshield, tucked under the wiper like a parking ticket. ", "IMG_3075.png"},
 	  {"It was from my parents. They... they've been gone for years.", "IMG_3076.png"},
 	  {"The letter talked about inheriting a mansion, a huge place, in some town called Ravenshade. The postmark was from three years ago, strangely close to the third anniversary of their death.", "IMG_3077.png"},
@@ -51,7 +51,8 @@ struct StartMode : Mode {
 	  {"I even bought this cross for a bit of protection. Call me superstitious, but something feels... off.", "pure_black.png"},
 	  {"I'm recording this now. I have no idea what's waiting for me. But if you're hearing this, and I didn't make it back, don't come looking for me. Stay away from Holyhill Road.", "pure_black.png"},
 	  {"This place... it's unreal. Like it's been frozen in time.", "pure_black.png"},
-	  {"I need to record this. Tapes aren't cheap, but... something tells me I'll need this. It's like I'm being watched already, like the house itself is... waiting.", "IMG_3083.png"}
+	  {"I need to record this. Tapes aren't cheap, but... something tells me I'll need this. It's like I'm being watched already, like the house itself is... waiting.", "IMG_3083.png"},
+	  {"Load tape", "pure_black.png"}
   };
 
   // In game UI

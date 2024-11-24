@@ -145,7 +145,7 @@ void StartMode::update(float elapsed) {
 
   if (space.pressed || click.pressed) {
 	  current_section++;
-	  if (current_section >= 12) {
+	  if (current_section >= 13) {
 		  finished = true;
 		  return;
 	  }
