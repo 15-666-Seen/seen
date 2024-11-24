@@ -161,6 +161,7 @@ int main(int argc, char **argv) {
 				//handle input:
 				if (Mode::current && Mode::current->handle_event(evt, window_size)) {
 					// mode handled it; great
+					
 				} else if (evt.type == SDL_QUIT) {
 					Mode::set_current(nullptr);
 					break;
@@ -195,6 +196,9 @@ int main(int argc, char **argv) {
 
 			Mode::current->update(elapsed);
 			if (!Mode::current) break;
+			if (Mode::current->finished) {
+				Mode::set_current(std::make_shared< PlayMode >());
+			}
 		}
 
 		{ //(3) call the current mode's "draw" function to produce output:
