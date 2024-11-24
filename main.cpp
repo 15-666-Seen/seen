@@ -73,16 +73,17 @@ int main(int argc, char **argv) {
 	//-------------------- load cassette sounds --------------------
 	Sound::Sample cassette_insert(data_path("/sounds/cassette-ffww-cassetera-96765.wav"));
 	std::shared_ptr< Sound::PlayingSample > some_loop = Sound::play(cassette_insert, 1.5f);
-	std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+	std::this_thread::sleep_for(std::chrono::milliseconds(2200));
 
 	//create window:
 	SDL_Window *window = SDL_CreateWindow(
 		"I didn't see it, I didn't see it, I didn't...", //TODO: remember to set a title for your game!
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-		1920, 1080, //TODO: modify window size if you'd like
+		1280, 720, //TODO: modify window size if you'd like
 		SDL_WINDOW_OPENGL
 		| SDL_WINDOW_RESIZABLE //uncomment to allow resizing
 		| SDL_WINDOW_ALLOW_HIGHDPI //uncomment for full resolution on high-DPI screens
+		| SDL_WINDOW_INPUT_FOCUS //uncomment to disable mouse capture
 	);
 
 	//prevent exceedingly tiny windows when resizing:
