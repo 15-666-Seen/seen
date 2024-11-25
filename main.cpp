@@ -129,6 +129,7 @@ int main(int argc, char **argv) {
 
 	//------------ create game mode + make current --------------
 	Mode::set_current(std::make_shared< StartMode >());
+	uint8_t scene_count = 0;	// scene count, 0 is StartMode, 1 is PlayMode, 2 is EndMode
 
 	//------------ main loop ------------
 
@@ -197,8 +198,12 @@ int main(int argc, char **argv) {
 
 			Mode::current->update(elapsed);
 			if (!Mode::current) break;
-			if (Mode::current->finished) {
+			if (Mode::current->finished && scene_count == 0) {
 				Mode::set_current(std::make_shared< PlayMode >());
+				scene_count++;
+			}
+			else if (Mode::current->finished && scene_count == 1) {
+				Mode::set_current(nullptr);
 			}
 		}
 
