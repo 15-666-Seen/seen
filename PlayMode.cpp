@@ -492,7 +492,7 @@ glm::vec3 PlayMode::cameraShake(float elapsed) {
 void PlayMode::setupGhosts() {
   for (auto &drawable : scene.drawables) {
     if (drawable.mesh_name.find("ghost") != std::string::npos) {
-      Ghost *ghost = new Ghost(drawable.mesh_name, &drawable);
+      Ghost *ghost = new Ghost(drawable.mesh_name, &drawable, player.transform, player.camera->transform);
       storyManager->GhostMap[drawable.mesh_name] = ghost;
       drawable.visible = false; // initially invisible
     }
