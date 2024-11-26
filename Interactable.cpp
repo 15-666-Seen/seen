@@ -36,6 +36,9 @@ bool Item::interact(float elapsed) {
   if (type == BEDROOM_KEY) {
     visible = false;
     this->drawable->visible = false;
+  } else if (type == DEN_KEY) {
+    visible = false;
+    this->drawable->visible = false;
   } else if (type == FILE1) {
     // interact_status = 1;
     return true;
@@ -78,6 +81,8 @@ Furniture::Furniture() {}
 bool Furniture::interact(float elapsed) {
   if (type == BED) {
     interact_status = 1;
+  } else if (type == CLOSET2) {
+    interact_status = 1;
   }
 
   return true;
@@ -91,6 +96,15 @@ bool Furniture::interactable(Scene::Transform *player_transform,
   }
 
   if (type == BED) {
+    if (interact_status == 0) {
+      return iteractCheck(player_transform, getCenterPos(), camera,
+                          FURNITURE_INTERACT_DISTANCE);
+    } else {
+      return true;
+    }
+  }
+
+  else if (type == CLOSET2) {
     if (interact_status == 0) {
       return iteractCheck(player_transform, getCenterPos(), camera,
                           FURNITURE_INTERACT_DISTANCE);

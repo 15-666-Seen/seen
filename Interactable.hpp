@@ -27,14 +27,15 @@ enum ItemType {
   CLIP_L,
   CLIP_R,
   CLIP_M,
-  EYEBALL
+  EYEBALL,
 };
 static std::map<std::string, ItemType> MeshNameToItemType = {
     {"BedroomKey", BEDROOM_KEY}, {"Folder", FILE1},
     {"Folder_Police", FILE2},    {"DenKey", DEN_KEY},
     {"RedroomKey", REDROOM_KEY}, {"ClipL", CLIP_L},
     {"ClipR", CLIP_R},           {"ClipM", CLIP_M},
-    {"Eyeball", EYEBALL}};
+    {"Eyeball", EYEBALL},
+};
 static std::map<ItemType, std::string> ItemTypeToInteractText = {
     {BEDROOM_KEY, "grab key"},
     {FILE1, "read confidential file"},
@@ -44,13 +45,13 @@ static std::map<ItemType, std::string> ItemTypeToInteractText = {
     {CLIP_L, "grab chain cutter (left)"},
     {CLIP_R, "grab chain cutter (right)"},
     {CLIP_M, "grab chain cutter (center)"},
-    {EYEBALL, "grab eyeball"}};
+    {EYEBALL, "grab eyeball"},
+};
 
 /* Type of interactable object that cannot be picked up */
 enum FurnitureType {
   NONE,
   BED,
-  CLOSET,
   BEDROOM_DOOR,
   DOOR1,
   FRONT_DOOR,
@@ -72,6 +73,9 @@ enum FurnitureType {
   FRIDGE3,
   FRIDGE4,
   FRIDGE5,
+  CLOSET0,
+  CLOSET1,
+  CLOSET2
 };
 static std::map<FurnitureType, std::vector<std::string>>
     FurnitureTypeToInteractText = {
@@ -87,13 +91,15 @@ static std::map<FurnitureType, std::vector<std::string>>
         {FRIDGE3, {"open fridge"}},
         {FRIDGE4, {"open fridge"}},
         {FRIDGE5, {"open fridge"}},
+        {CLOSET0, {"hide", "exit hiding"}},
+        {CLOSET1, {"hide", "exit hiding"}},
+        {CLOSET2, {"hide", "exit hiding"}},
 };
 
 static std::map<std::string, FurnitureType> MeshNameToFurnitureType = {
     {"Bed", BED},
     {"BedroomDoor", BEDROOM_DOOR},
     {"DenDoor", DOOR1},
-    {"ClosetDoor", CLOSET},
     {"front_door1", FRONT_DOOR},
     {"RedroomDoor", REDROOM_DOOR},
     {"Chain", CHAIN},
@@ -111,7 +117,11 @@ static std::map<std::string, FurnitureType> MeshNameToFurnitureType = {
     {"FridgeDoor2", FRIDGE2},
     {"FridgeDoor3", FRIDGE3},
     {"FridgeDoor4", FRIDGE4},
-    {"FridgeDoor5", FRIDGE5}};
+    {"FridgeDoor5", FRIDGE5},
+    {"Closet0", CLOSET0},
+    {"Closet1", CLOSET1},
+    {"Closet2", CLOSET2},
+};
 
 /* A single furniture */
 struct Furniture {

@@ -16,6 +16,7 @@ struct StoryManager {
 
   const int total_phase = 15;
   int current_phase = 0;
+  int bgm_status = 0;
 
   GameplayUI *gameplayUI;
   InteractableManager *interactableManager;
@@ -33,5 +34,9 @@ struct StoryManager {
 
   int getCurrentPhase() { return current_phase; }
 
-  void enableGhost(const std::string &name);
+  void enableGhost(const std::string &name, bool enable);
+
+  void bgmCheck();
+
+  std::shared_ptr<Sound::PlayingSample> bgm_sound;
 };

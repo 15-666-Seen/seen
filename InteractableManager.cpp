@@ -118,36 +118,28 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
       // TODO: set different notification
       if (furniture->type == BEDROOM_DOOR) {
         if (current_phase == 3) {
-          Door *door = dynamic_cast<Door *>(furniture);
-          door->state = Door::DoorState::OPENING;
-          furniture->phase_allow_interact = false;
+          if (inventory.hasItem(BEDROOM_KEY)) {
+            Door *door = dynamic_cast<Door *>(furniture);
+            door->state = Door::DoorState::OPENING;
+            furniture->phase_allow_interact = false;
+            return true;
+          }
+          interaction_notification = "Seems like I need a key to open this.";
           return true;
         }
         interaction_notification = "This door is locked from inside.";
-        // if (current_phase == 0) {
-        //   Door *door = dynamic_cast<Door *>(furniture);
-        //   door->state = Door::DoorState::OPENING;
-        //   furniture->phase_allow_interact = false;
-        //   return true;
-        // } else if (current_phase == 2) {
-        //   Door *door = dynamic_cast<Door *>(furniture);
-        //   if (!inventory.hasItem(BEDROOM_KEY)) {
-        //     interaction_notification = "This door is locked.";
-        //     return true;
-        //   } else {
-        //     door->state = Door::DoorState::OPENING;
-        //     furniture->phase_allow_interact = false;
-        //     return true;
-        //   }
-        // }
       }
 
       else if (furniture->type == DOOR1) {
         // TODO: currently directly open door1
         if (current_phase == 0) {
-          Door *door = dynamic_cast<Door *>(furniture);
-          door->state = Door::DoorState::OPENING;
-          furniture->phase_allow_interact = false;
+          if (inventory.hasItem(DEN_KEY)) {
+            Door *door = dynamic_cast<Door *>(furniture);
+            door->state = Door::DoorState::OPENING;
+            furniture->phase_allow_interact = false;
+            return true;
+          }
+          interaction_notification = "Seems like I need a key to open this.";
         }
       }
 
@@ -182,6 +174,25 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
           camera->transform->position = player_transform->position;
           camera->transform->position.z += PLAYER_HEIGHT;
           camera->yaw = -1.54317f;
+          camera->pitch = 0.327246f;
+          isHiding = false;
+        }
+      }
+
+      else if (furniture->type == CLOSET2) {
+        if (furniture->interact_status == 0) {
+          furniture->interact_status = 1;
+          // modify player's view
+          camera->transform->position = glm::vec3(
+              6.85f, 4.65f, player_transform->position.z + PLAYER_HEIGHT);
+          camera->yaw = 0.0f;
+          camera->pitch = 0.0f;
+          isHiding = true;
+        } else {
+          furniture->interact_status = 0;
+          camera->transform->position = player_transform->position;
+          camera->transform->position.z += PLAYER_HEIGHT;
+          camera->yaw = -3.14159f;
           camera->pitch = 0.327246f;
           isHiding = false;
         }
@@ -289,8 +300,21 @@ bool InteractableManager::updateItem(Scene::Transform *player_transform,
     gameplayUI->setInteractionText(item->interactText());
     if (interact_pressed) {
       inventory.addItem(item->type);
-      if (item->type == CLIP_R)
-        printf("added clipr");
+      if (item->type == CLIP_R) {
+        interaction_notification =
+            "Part of a clip. I should find the other half. (1/3)";
+      } else if (item->type == FILE1) {
+        interaction_notification = "\"(stained...) should never find "
+                                   "(stained...) basement in this house.\"";
+      } else if (item->type == BEDROOM_KEY) {
+        interaction_notification = "A Green Key.";
+      } else if (item->type == DEN_KEY) {
+        interaction_notification = "A Blue Key.";
+      } else if (item->type == REDROOM_KEY) {
+        interaction_notification = "A Red Key.";
+      } else if (item->type == EYEBALL) {
+        interaction_notification = "A stinky slimy eyeball.";
+      }
       item->interact(elapsed);
     }
     return true;
@@ -309,6 +333,10 @@ void InteractableManager::setItemPhaseAvailability(ItemType item_type,
 void InteractableManager::setFurniturePhaseVisibility(
     FurnitureType furniture_type, bool visible) {
   furnituresMap[furniture_type]->drawable->visible = visible;
+}
+void InteractableManager::setItemPhaseVisibility(ItemType item_type,
+                                                 bool visible) {
+  itemsMap[item_type]->drawable->visible = visible;
 }
 
 int InteractableManager::interactStatusCheck(FurnitureType furniture_type) {

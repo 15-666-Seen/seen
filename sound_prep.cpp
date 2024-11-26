@@ -3,6 +3,15 @@
 #include "data_path.hpp"
 
 Load<Sound::Sample>
+default_bgm_sample(LoadTagDefault, []() -> Sound::Sample const * {
+  return new Sound::Sample(data_path("sounds/default-bgm.wav"));
+});
+Load<Sound::Sample>
+chase_bgm_sample(LoadTagDefault, []() -> Sound::Sample const * {
+  return new Sound::Sample(data_path("sounds/chase.wav"));
+});
+
+Load<Sound::Sample>
 door_open_sample(LoadTagDefault, []() -> Sound::Sample const * {
   return new Sound::Sample(data_path("sounds/door-open.wav"));
 });

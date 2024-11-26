@@ -2,6 +2,7 @@
 
 #include "Ghost.hpp"
 #include "Interactable.hpp"
+#include "sound_prep.hpp"
 #include "util.hpp"
 
 #include <iostream>
@@ -24,6 +25,8 @@ void StoryManager::SetUpManager(GameplayUI *ui, InteractableManager *im) {
 // true for advancing to the next phase
 bool StoryManager::advanceStory() {
   bool set_up_next_phase = false;
+
+  bgmCheck();
 
   switch (current_phase) {
   case 0:
@@ -55,11 +58,17 @@ bool StoryManager::advanceStory() {
     break;
   case 4:
     // if player move the shelf
-    if (false) {
+    if (interactableManager->isHiding) {
       current_phase++; // advance to the next phase
       set_up_next_phase = true;
     }
     break;
+  case 5:
+    // TODO: break here
+    if (false) {
+      current_phase++; // advance to the next phase
+      set_up_next_phase = true;
+    }
   case 10:
     // player uses the ladder
     if (interactableManager->interactStatusCheck(LADDER) == 1) {
@@ -111,18 +120,25 @@ void StoryManager::setUpPhase() {
   switch (current_phase) {
   case 0:
 
-    v.push_back("I should check bedroom first.");
-    gameplayUI->setDialogueTexts(v);
-    gameplayUI->setMissionText("Find Bedroom");
-
     // door block is invisible for phase 0
+    if (!bgm_sound) {
+      bgm_sound = Sound::loop_3D(*default_bgm_sample, 0.8f,
+                                 glm::vec3(0.0f, 0.0f, 10.0f), 1.0f);
+    }
+    interactableManager->setItemPhaseAvailability(DEN_KEY, true);
     interactableManager->setFurniturePhaseVisibility(DOORBLOCK, false);
     interactableManager->setFurniturePhaseAvailability(BEDROOM_DOOR, true);
+    interactableManager->setFurniturePhaseAvailability(CLOSET2, true);
     interactableManager->setFurniturePhaseAvailability(DOOR1, true);
+    interactableManager->setItemPhaseVisibility(REDROOM_KEY, false);
 
     break;
 
   case 1:
+
+    interactableManager->setFurniturePhaseVisibility(CHAIN_CUT2, true);
+    interactableManager->setFurniturePhaseVisibility(CHAIN_CUT1, true);
+    interactableManager->setFurniturePhaseVisibility(CHAIN, true);
 
     // user get in blue room, tiny sculpture is available
     interactableManager->setFurniturePhaseVisibility(SCULPTURE_EYE_R, false);
@@ -135,6 +151,7 @@ void StoryManager::setUpPhase() {
 
     // blue door is closed, shelf is avaible
     interactableManager->closeDoor(DOOR1);
+    interactableManager->setItemPhaseVisibility(REDROOM_KEY, true);
     interactableManager->setItemPhaseAvailability(REDROOM_KEY, true);
     interactableManager->setFurniturePhaseAvailability(TINY_SCULPTURE, false);
     interactableManager->setFurniturePhaseAvailability(BOOKSHELF, true);
@@ -143,12 +160,20 @@ void StoryManager::setUpPhase() {
     break;
 
   case 3:
+    interactableManager->setFurniturePhaseAvailability(BOOKSHELF, false);
     interactableManager->setFurniturePhaseAvailability(BED, true);
+    interactableManager->setItemPhaseAvailability(BEDROOM_KEY, true);
+    interactableManager->setItemPhaseAvailability(FILE1, true);
+    interactableManager->setItemPhaseAvailability(CLIP_L, true);
 
     break;
 
   case 4:
-    enableGhost("ghost1");
+    enableGhost("ghost1", true);
+    break;
+
+  case 5:
+    enableGhost("ghost1", false);
     break;
 
   case 10:
@@ -182,8 +207,36 @@ void StoryManager::setUpPhase() {
   }
 }
 
-void StoryManager::enableGhost(const std::string &name) {
+void StoryManager::enableGhost(const std::string &name, bool enable) {
   Ghost *ghost = GhostMap[name];
-  ghost->active = true;
-  ghost->drawable->visible = true;
+  ghost->active = enable;
+  ghost->drawable->visible = enable;
+}
+
+void StoryManager::bgmCheck() {
+  // if any of ghost is active, play ghost bgm
+  bool one_active = false;
+  for (auto &ghost : GhostMap) {
+    if (ghost.second->active) {
+      one_active = true;
+      if (bgm_status == 0) {
+        bgm_sound->stop(1.0f / 60.0f);
+        bgm_sound.reset();
+        bgm_sound =
+            Sound::loop_3D(*chase_bgm_sample, 8.0f,
+                           ghost.second->drawable->transform->position, 6.0f);
+        bgm_status = 1;
+      }
+      return;
+    }
+  }
+
+  // if no ghost is active, play default bgm
+  if (!one_active && bgm_status == 1) {
+    bgm_sound->stop(1.0f / 60.0f);
+    bgm_sound.reset();
+    bgm_sound = Sound::loop_3D(*default_bgm_sample, 0.8f,
+                               glm::vec3(0.0f, 0.0f, 10.0f), 1.0f);
+    bgm_status = 0;
+  }
 }

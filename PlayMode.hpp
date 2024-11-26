@@ -2,6 +2,7 @@
 
 #include "InteractableManager.hpp"
 #include "Scene.hpp"
+#include "Sound.hpp"
 #include "StoryManager.hpp"
 #include "UI.hpp"
 #include "WalkMesh.hpp"
