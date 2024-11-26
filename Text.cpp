@@ -125,8 +125,8 @@ void Text::init(std::string ttf_file) {
   // initialize openGL for rendering
   {
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glBindVertexArray(VAO);
@@ -136,7 +136,7 @@ void Text::init(std::string ttf_file) {
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    glDisable(GL_BLEND);
+    //glDisable(GL_BLEND);
     GL_ERRORS();
   }
 
@@ -240,7 +240,7 @@ void Text::draw(float dt, const glm::vec2 &drawable_size, float width,
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   // Use member variable color2 for the secondary color
   glUniformMatrix4fv(glGetUniformLocation(draw_text_program, "projection"), 1,
-                     GL_FALSE, &projection[0][0]);
+                     GL_FALSE, glm::value_ptr(projection) );    //&projection[0][0]
   glActiveTexture(GL_TEXTURE0);
   glBindVertexArray(VAO);
 
