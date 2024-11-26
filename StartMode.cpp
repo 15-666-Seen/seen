@@ -110,42 +110,19 @@ bool StartMode::handle_event(SDL_Event const &evt,
 	return true;
   }
 
-/*else if (evt.type == SDL_MOUSEBUTTONDOWN) {
-      click
-      int x, y;
-      SDL_GetMouseState(&x, &y);
-
-      if (SDL_GetRelativeMouseMode() == SDL_FALSE) {
-          SDL_SetRelativeMouseMode(SDL_TRUE);
-          return true;
-      }
-  } else if (evt.type == SDL_MOUSEMOTION) {
-      if (SDL_GetRelativeMouseMode() == SDL_TRUE) {
-          glm::vec2 motion = glm::vec2(
-              evt.motion.xrel / float(window_size.y),
-              -evt.motion.yrel / float(window_size.y)
-          );
-          camera->transform->rotation = glm::normalize(
-              camera->transform->rotation
-              * glm::angleAxis(-motion.x * camera->fovy, glm::vec3(0.0f, 1.0f, 0.0f))
-              * glm::angleAxis(motion.y * camera->fovy, glm::vec3(1.0f, 0.0f, 0.0f))
-          );
-          return true;
-      }
-  }*/
-
   return false;
 }
 
-float text_elapsed = 0.0f;
+float text_elapsed = 0.0f;  // time for text animation
+float time_elapsed = 0.0f;  // time count for the last ... dots
 void StartMode::update(float elapsed) {
   if (gStop || gamePause) {
     return;
   }
 
-  if (space.pressed || click.pressed) {
+  if (space.pressed || click.pressed || (current_section >= 12 && time_elapsed > 1.0f)) {
 	  current_section++;
-	  if (current_section >= 13) {
+	  if (current_section >= 16) {
 		  finished = true;
 		  return;
 	  }
@@ -155,7 +132,13 @@ void StartMode::update(float elapsed) {
           throw std::runtime_error("Texture not found");
       }
       background->tex = lit_color_texture_program->tex_file_to_glint.find(texts[current_section].text_file)->second;
+
+	  time_elapsed = 0.0f;
   }
+  if (current_section >= 12 && time_elapsed < 1.0f) {
+	  time_elapsed += elapsed;
+  }
+
 
     // reset button press counters:
   space.downs = 0;
@@ -214,7 +197,7 @@ void StartMode::draw(glm::uvec2 const &drawable_size) {
   float y = drawable_size.y * 0.22f;
   float width = drawable_size.x * 0.8f;
   text.set_bound(drawable_size.x * 0.9f);
-  text.draw(text_elapsed, drawable_size, width, glm::vec2(x, y), 1.1f, true);
+  text.draw(text_elapsed, drawable_size, width, glm::vec2(x, y), 1.1f, current_section < 13);
 
   GL_ERRORS();
 }
