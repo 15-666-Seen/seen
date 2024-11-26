@@ -377,6 +377,10 @@ void PlayMode::update(float elapsed) {
   }
   bool advanced = storyManager->advanceStory();
 
+  for (auto& ghost : storyManager->GhostMap) {
+      ghost.second->getPosition(elapsed);
+  }
+
   // TODO: check phase updates -> update walkmesh?
   if (advanced) {
     checkPhaseUpdates();

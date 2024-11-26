@@ -162,6 +162,8 @@ LitColorTextureProgram::LitColorTextureProgram() {
       "		e = nl * LIGHT_ENERGY;\n"
       "	} else if (LIGHT_TYPE == 3) { //(LIGHT_TYPE == 3) //directional light\n"
       "		e = max(0.0, dot(n,-LIGHT_DIRECTION)) * LIGHT_ENERGY;\n"
+	  " } else if (LIGHT_TYPE == 5) { //no light\n"
+	  "		e = vec3(1.0);\n"
       "	} else { // LIGHT_TYPE == 4 shadow light\n"
       "   float distance = pow(length(position), 2.0) + 0.01f;\n"
       "	  vec3 l = normalize(LIGHT_LOCATION - position);\n"

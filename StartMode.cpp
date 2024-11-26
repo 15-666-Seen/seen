@@ -51,7 +51,7 @@ StartMode::StartMode() : scene(*bg_scene) {
 	background->transform->rotation = glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.f));
 	background->transform->rotation *= glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 0.f, 1.f));
 	background->transform->position = glm::vec3(0.0f, 0.0f, 0.5f);
-	background->transform->scale = glm::vec3(0.8f, 0.4f, 0.5f);
+	background->transform->scale = glm::vec3(0.7f, 0.3f, 0.5f);
 	//background->transform->scale = glm::vec3(0.1f, 0.1f, 0.1f);
 
     if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
@@ -176,7 +176,7 @@ void StartMode::draw(glm::uvec2 const &drawable_size) {
   // set up light type and position for lit_color_texture_program:
   // TODO: consider using the Light(s) in the scene to do this
   glUseProgram(lit_color_texture_program->program);
-  glUniform1i(lit_color_texture_program->LIGHT_TYPE_int, 4);
+  glUniform1i(lit_color_texture_program->LIGHT_TYPE_int, 5);
   glUniform3fv(lit_color_texture_program->LIGHT_DIRECTION_vec3, 1,
                glm::value_ptr(glm::vec3(0.0f, 0.0f, -1.0f)));
   glUniform3fv(lit_color_texture_program->LIGHT_ENERGY_vec3, 1,

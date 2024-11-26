@@ -25,6 +25,7 @@ glm::vec3 Ghost::getPosition(float e) {
 		// if ghost is closed to player, and/or if the player is looking at the ghost
 		if (Ghost::distance() < dis_thresh) {
 			std::cout << "\rWatching YOU!!";
+			close_to_player = true;
 			glm::vec3 player_look_dir = camera->make_local_to_world()[2];
 			glm::vec3 fur_to_player = drawable->transform->position - player->position;
 			float look_angle = glm::acos(
@@ -33,8 +34,12 @@ glm::vec3 Ghost::getPosition(float e) {
 				active = false;
 				valid_last_known = false;
 				std::cout << "GOT YOU" << std::endl;
+				got_player = true;
 			}
 			return drawable->transform->position;
+		}
+		else {
+			close_to_player = false;
 		}
 
 		//update player path
