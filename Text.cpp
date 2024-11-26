@@ -30,7 +30,7 @@
 Character Character::Load(hb_codepoint_t request, FT_Face typeface) {
   // taken almost verbatim from
   // https://learnopengl.com/In-Practice/Text-Rendering
-  if (FT_Load_Glyph(typeface, request, FT_LOAD_RENDER))
+  if (FT_Load_Glyph(typeface, static_cast<FT_UInt>(request), FT_LOAD_RENDER))
     throw std::runtime_error("Failed to load glyph: " +
                              std::to_string(request));
   GLuint tex;
