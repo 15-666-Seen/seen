@@ -148,7 +148,6 @@ struct Furniture {
   virtual bool isInteracting() { return interact_status > 0; }
 
   std::shared_ptr<Sound::PlayingSample> interact_sound = nullptr;
-  float animation_time = 0.0f;
 };
 
 struct Door : Furniture {
@@ -158,6 +157,7 @@ struct Door : Furniture {
   }
 
   virtual bool interact(float elapsed) override;
+  float animation_time = 0.0f;
 
   enum struct DoorState {
     CLOSED,

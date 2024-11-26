@@ -378,6 +378,10 @@ void PlayMode::update(float elapsed) {
   }
   bool advanced = storyManager->advanceStory();
 
+  for (auto &ghost : storyManager->GhostMap) {
+    ghost.second->getPosition(elapsed);
+  }
+
   // TODO: check phase updates -> update walkmesh?
   if (advanced) {
     checkPhaseUpdates();
@@ -473,6 +477,16 @@ void PlayMode::checkPhaseUpdates() {
     walkmesh = &phonebank_walkmeshes->lookup("phase0");
     player.at = walkmesh->nearest_walk_point(player.transform->position);
   }
+
+  // else if (storyManager->getCurrentPhase() == 5) { // just door close
+  //   walkmesh = &phonebank_walkmeshes->lookup("phase4");
+  //   player.at = walkmesh->nearest_walk_point(player.transform->position);
+  // }
+
+  // else if (storyManager->getCurrentPhase() == 6) { // book shelf open
+  //   walkmesh = &phonebank_walkmeshes->lookup("phase5");
+  //   player.at = walkmesh->nearest_walk_point(player.transform->position);
+  // }
 }
 
 glm::vec3 PlayMode::cameraShake(float elapsed) {
@@ -498,7 +512,8 @@ glm::vec3 PlayMode::cameraShake(float elapsed) {
 void PlayMode::setupGhosts() {
   for (auto &drawable : scene.drawables) {
     if (drawable.mesh_name.find("ghost") != std::string::npos) {
-      Ghost *ghost = new Ghost(drawable.mesh_name, &drawable);
+      Ghost *ghost = new Ghost(drawable.mesh_name, &drawable, player.transform,
+                               player.camera->transform);
       storyManager->GhostMap[drawable.mesh_name] = ghost;
       drawable.visible = false; // initially invisible
     }

@@ -116,7 +116,6 @@ void StoryManager::setUpPhase() {
     gameplayUI->setMissionText("Find Bedroom");
 
     // door block is invisible for phase 0
-    interactableManager->setItemPhaseVisibility(REDROOM_KEY, false);
     interactableManager->setFurniturePhaseVisibility(DOORBLOCK, false);
     interactableManager->setFurniturePhaseAvailability(BEDROOM_DOOR, true);
     interactableManager->setFurniturePhaseAvailability(DOOR1, true);
@@ -144,8 +143,6 @@ void StoryManager::setUpPhase() {
     break;
 
   case 3:
-    interactableManager->setItemPhaseAvailability(CLIP_L, true);
-    interactableManager->setItemPhaseAvailability(BEDROOM_KEY, true);
     interactableManager->setFurniturePhaseAvailability(BED, true);
 
     break;

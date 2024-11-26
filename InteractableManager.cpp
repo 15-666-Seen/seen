@@ -124,6 +124,22 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
           return true;
         }
         interaction_notification = "This door is locked from inside.";
+        // if (current_phase == 0) {
+        //   Door *door = dynamic_cast<Door *>(furniture);
+        //   door->state = Door::DoorState::OPENING;
+        //   furniture->phase_allow_interact = false;
+        //   return true;
+        // } else if (current_phase == 2) {
+        //   Door *door = dynamic_cast<Door *>(furniture);
+        //   if (!inventory.hasItem(BEDROOM_KEY)) {
+        //     interaction_notification = "This door is locked.";
+        //     return true;
+        //   } else {
+        //     door->state = Door::DoorState::OPENING;
+        //     furniture->phase_allow_interact = false;
+        //     return true;
+        //   }
+        // }
       }
 
       else if (furniture->type == DOOR1) {
@@ -139,9 +155,10 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
         if (!inventory.hasItem(EYEBALL)) {
           interaction_notification = "Hmm... Seems something is missing here.";
         } else {
+          // TODO@Isa: animation?
+          furniture->interact_status = 1;
           // also change visablity of furniture eyeball
           furnituresMap[SCULPTURE_EYE_R]->drawable->visible = true;
-          itemsMap[REDROOM_KEY]->visible = true;
         }
       }
 
@@ -272,6 +289,8 @@ bool InteractableManager::updateItem(Scene::Transform *player_transform,
     gameplayUI->setInteractionText(item->interactText());
     if (interact_pressed) {
       inventory.addItem(item->type);
+      if (item->type == CLIP_R)
+        printf("added clipr");
       item->interact(elapsed);
     }
     return true;
@@ -291,10 +310,6 @@ void InteractableManager::setFurniturePhaseVisibility(
     FurnitureType furniture_type, bool visible) {
   furnituresMap[furniture_type]->drawable->visible = visible;
 }
-void InteractableManager::setItemPhaseVisibility(ItemType item_type,
-                                                 bool visible) {
-  itemsMap[item_type]->drawable->visible = visible;
-}
 
 int InteractableManager::interactStatusCheck(FurnitureType furniture_type) {
   return furnituresMap[furniture_type]->getInteractStatus();
@@ -313,9 +328,4 @@ void InteractableManager::closeDoor(FurnitureType furniture_type) {
   door->drawable->transform->rotation =
       glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
   door->animation_time = 0.0f;
-}
-
-void InteractableManager::moveFurniture(FurnitureType furniture_type,
-                                        glm::vec3 move) {
-  furnituresMap[furniture_type]->drawable->transform->position += move;
 }

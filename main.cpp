@@ -3,6 +3,7 @@
 
 //The 'PlayMode' mode plays the game:
 #include "PlayMode.hpp"
+#include "StartMode.hpp"
 
 //For asset loading:
 #include "Load.hpp"
@@ -25,6 +26,7 @@
 #include <stdexcept>
 #include <memory>
 #include <algorithm>
+#include <thread>
 
 #ifdef _WIN32
 extern "C" { uint32_t GetACP(); }
@@ -63,15 +65,25 @@ int main(int argc, char **argv) {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	
+	
+	//------------ init sound --------------
+	Sound::init();
+
+	//-------------------- load cassette sounds --------------------
+	Sound::Sample cassette_insert(data_path("/sounds/cassette-ffww-cassetera-96765.wav"));
+	std::shared_ptr< Sound::PlayingSample > some_loop = Sound::play(cassette_insert, 1.5f);
+	std::this_thread::sleep_for(std::chrono::milliseconds(2200));
 
 	//create window:
 	SDL_Window *window = SDL_CreateWindow(
-		"gp23 game5: walking simulator", //TODO: remember to set a title for your game!
+		"I didn't see it, I didn't see it, I didn't...", //TODO: remember to set a title for your game!
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 		1280, 720, //TODO: modify window size if you'd like
 		SDL_WINDOW_OPENGL
 		| SDL_WINDOW_RESIZABLE //uncomment to allow resizing
 		| SDL_WINDOW_ALLOW_HIGHDPI //uncomment for full resolution on high-DPI screens
+		| SDL_WINDOW_INPUT_FOCUS //uncomment to disable mouse capture
 	);
 
 	//prevent exceedingly tiny windows when resizing:
@@ -108,14 +120,16 @@ int main(int argc, char **argv) {
 	//Hide mouse cursor (note: showing can be useful for debugging):
 	//SDL_ShowCursor(SDL_DISABLE);
 
-	//------------ init sound --------------
-	Sound::init();
+	// Print disclaimer
+	std::cout << "Disclaimer: This game is a work of fiction. Names, characters, businesses, places, events, locales, and incidents are either the products of the author¡¦s imagination or used in a fictitious manner. Any resemblance to actual persons, living or dead, or actual events is purely coincidental." << std::endl;
+	
 
 	//------------ load assets --------------
 	call_load_functions();
 
 	//------------ create game mode + make current --------------
-	Mode::set_current(std::make_shared< PlayMode >());
+	Mode::set_current(std::make_shared< StartMode >());
+	uint8_t scene_count = 0;	// scene count, 0 is StartMode, 1 is PlayMode, 2 is EndMode
 
 	//------------ main loop ------------
 
@@ -149,6 +163,7 @@ int main(int argc, char **argv) {
 				//handle input:
 				if (Mode::current && Mode::current->handle_event(evt, window_size)) {
 					// mode handled it; great
+					
 				} else if (evt.type == SDL_QUIT) {
 					Mode::set_current(nullptr);
 					break;
@@ -183,6 +198,13 @@ int main(int argc, char **argv) {
 
 			Mode::current->update(elapsed);
 			if (!Mode::current) break;
+			if (Mode::current->finished && scene_count == 0) {
+				Mode::set_current(std::make_shared< PlayMode >());
+				scene_count++;
+			}
+			else if (Mode::current->finished && scene_count == 1) {
+				Mode::set_current(nullptr);
+			}
 		}
 
 		{ //(3) call the current mode's "draw" function to produce output:
