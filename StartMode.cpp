@@ -71,7 +71,8 @@ StartMode::StartMode() : scene(*bg_scene) {
 	
     // initialize text 
     text.init();
-    text.set_color(glm::vec3(0.8f, 0.8f, 0.8f));
+    text.set_color(glm::vec3(0.8f, 0.7f, 0.7f));
+	text.set_color2(glm::vec3(0.55f, 0.1f, 0.1f));
     text.set_text(texts[current_section].text);
 
 	// set the background image
@@ -112,7 +113,7 @@ void StartMode::update(float elapsed) {
     return;
   }
 
-  if (space.pressed || click.pressed || (current_section >= 12 && time_elapsed > 1.0f)) {
+  if (space.pressed || click.pressed || (current_section >= 12 && time_elapsed > 0.5f)) {
 	  current_section++;
 	  if (current_section >= 16) {
 		  finished = true;
@@ -126,6 +127,10 @@ void StartMode::update(float elapsed) {
       background->tex = lit_color_texture_program->tex_file_to_glint.find(texts[current_section].text_file)->second;
 
 	  time_elapsed = 0.0f;
+
+      if (current_section == 2) {
+          text.set_color2_index(14);
+      }
   }
   if (current_section >= 12 && time_elapsed < 1.0f) {
 	  time_elapsed += elapsed;

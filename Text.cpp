@@ -167,9 +167,9 @@ void Text::set_text(const std::string &new_text) {
   update_buffer(text_content);
   anim_time = text_content.size() / 40.f; // reset animation time
 
-  // for (int i = 0; i < 64; i++) {
-  //	color2_bit_array[i] = false;
-  //}
+   for (int i = 0; i < 64; i++) {
+  	color2_bit_array[i] = false;
+  }
 }
 
 void Text::set_bound(float new_bound) { right_bound = new_bound; }

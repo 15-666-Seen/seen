@@ -41,7 +41,7 @@ struct GOverMode : Mode {
   Text text;
   uint8_t current_section = 0;
   Section texts[4] = { 
-      {"Ah, there you are. I told you Ravenshade always leaves its mark. Don¡¦t worry-you'll belong here soon enough.", "pure_black.png"},
+      {"Ah, there you are. I told you Ravenshade always leaves its mark. Don't worry-you'll belong here soon enough.", "pure_black.png"},
   };
 
   // In game UI

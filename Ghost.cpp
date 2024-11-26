@@ -35,7 +35,7 @@ glm::vec3 Ghost::getPosition(float e) {
 			glm::vec3 fur_to_player = drawable->transform->position - player->position;
 			float look_angle = glm::acos( 
 				glm::dot(glm::normalize(player_look_dir), glm::normalize(fur_to_player)));
-			if (look_angle >= INTERACT_ANGLE) {
+			if (look_angle >= INTERACT_ANGLE || true) {
 				active = false;
 				valid_last_known = false;
 				std::cout << "GOT YOU" << std::endl;
