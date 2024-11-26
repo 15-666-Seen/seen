@@ -1,4 +1,4 @@
-#include "StartMode.hpp"
+#include "EndMode.hpp"
 
 #include "LitColorTextureProgram.hpp"
 
@@ -14,96 +14,85 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-GLuint bg_meshes_for_lit_color_texture_program = 0;
-Load<MeshBuffer> bg_meshes(LoadTagDefault, []() -> MeshBuffer const * {
-  MeshBuffer const *ret = new MeshBuffer(data_path("bg.pnct"));
-  bg_meshes_for_lit_color_texture_program =
-      ret->make_vao_for_program(lit_color_texture_program->program);
-  return ret;
-});
+//GLuint bg_meshes_for_lit_color_texture_program = 0;
+//Load<MeshBuffer> bg_meshes(LoadTagDefault, []() -> MeshBuffer const * {
+//  MeshBuffer const *ret = new MeshBuffer(data_path("bg.pnct"));
+//  bg_meshes_for_lit_color_texture_program =
+//      ret->make_vao_for_program(lit_color_texture_program->program);
+//  return ret;
+//});
 
-Load<Scene> bg_scene(LoadTagDefault, []() -> Scene const * {
-  return new Scene(data_path("empty.scene"),
-                   [&](Scene &scene, Scene::Transform *transform,
-                       std::string const &mesh_name) {});
-});
 
-StartMode::StartMode() : scene(*bg_scene) {
+Load< Scene > bg_scene(LoadTagDefault, []() -> Scene const* {
+    return new Scene(data_path("empty.scene"), [&](Scene& scene, Scene::Transform* transform, std::string const& mesh_name) {
+        });
+    });
 
-  Mesh mesh1 = bg_meshes->lookup("Plane");
+EndMode::EndMode() : scene(*ebg_scene) {
 
-  auto newTrans1 = new Scene::Transform();
-  scene.drawables.emplace_back(newTrans1);
-  background = &scene.drawables.back();
+    //Mesh mesh1 = bg_meshes->lookup("Plane");
 
-  background->pipeline = lit_color_texture_program_pipeline;
-  background->pipeline.vao = bg_meshes_for_lit_color_texture_program;
-  background->pipeline.type = mesh1.type;
-  background->pipeline.start = mesh1.start;
-  background->pipeline.count = mesh1.count;
+    //auto newTrans1 = new Scene::Transform();
+    //scene.drawables.emplace_back(newTrans1);
+    //background = &scene.drawables.back();
 
-  /*if (lit_color_texture_program->tex_file_to_glint.find("IMG_3075.png") ==
-  lit_color_texture_program->tex_file_to_glint.end()) { throw
-  std::runtime_error("Texture not found");
-  }
-  background->tex =
-  lit_color_texture_program->tex_file_to_glint.find("IMG_3075.png")->second;
-  std::cout << "Texture: " << background->tex << std::endl;*/
-  background->tex_normal = 0; // background->pipeline.tex_name_to_glint["0_n"];
-  background->transform->rotation =
-      glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.f));
-  background->transform->rotation *=
-      glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 0.f, 1.f));
-  background->transform->position = glm::vec3(0.0f, 0.0f, 0.5f);
-  background->transform->scale = glm::vec3(0.7f, 0.3f, 0.5f);
-  // background->transform->scale = glm::vec3(0.1f, 0.1f, 0.1f);
+    //background->pipeline = lit_color_texture_program_pipeline;
+    //background->pipeline.vao = bg_meshes_for_lit_color_texture_program;
+    //background->pipeline.type = mesh1.type;
+    //background->pipeline.start = mesh1.start;
+    //background->pipeline.count = mesh1.count;
 
-  if (scene.cameras.size() != 1)
-    throw std::runtime_error(
-        "Expecting scene to have exactly one camera, but it has " +
-        std::to_string(scene.cameras.size()));
-  camera = &scene.cameras.front();
-  camera->transform->position = glm::vec3(10.0f, 0.f, 0.0f);
+	/*if (lit_color_texture_program->tex_file_to_glint.find("IMG_3075.png") == lit_color_texture_program->tex_file_to_glint.end()) {
+		throw std::runtime_error("Texture not found");
+	}
+	background->tex = lit_color_texture_program->tex_file_to_glint.find("IMG_3075.png")->second;
+	std::cout << "Texture: " << background->tex << std::endl;*/
+ //   background->tex_normal = 0;// background->pipeline.tex_name_to_glint["0_n"];
+	//background->transform->rotation = glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.f));
+	//background->transform->rotation *= glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 0.f, 1.f));
+	//background->transform->position = glm::vec3(0.0f, 0.0f, 0.5f);
+	//background->transform->scale = glm::vec3(0.7f, 0.3f, 0.5f);
+	//background->transform->scale = glm::vec3(0.1f, 0.1f, 0.1f);
 
-  // add a background (black background behind the images)
-  auto newTrans2 = new Scene::Transform();
-  scene.drawables.emplace_back(newTrans2);
-  Scene::Drawable &d = scene.drawables.back();
+ //   if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
+ //   camera = &scene.cameras.front();
+ //   camera->transform->position = glm::vec3(10.0f, 0.f, 0.0f);
 
-  d.pipeline = lit_color_texture_program_pipeline;
-  d.pipeline.vao = bg_meshes_for_lit_color_texture_program;
-  d.pipeline.type = mesh1.type;
-  d.pipeline.start = mesh1.start;
-  d.pipeline.count = mesh1.count;
-  d.tex = lit_color_texture_program->tex_file_to_glint.find("pure_black.png")
-              ->second;
-  d.tex_normal = 0;
-  d.transform->position = glm::vec3(0.0f, 0.0f, 0.0f);
-  d.transform->rotation =
-      glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.f));
-  d.transform->rotation *=
-      glm::angleAxis(glm::radians(90.f), glm::vec3(0.0f, 0.f, 1.f));
 
-  // d.transform->scale = glm::vec3(2.f, 1.f, 1.f);
+	//// add a background (black background behind the images)
+ //   auto newTrans2 = new Scene::Transform();
+ //   scene.drawables.emplace_back(newTrans2);
+ //   Scene::Drawable& d = scene.drawables.back();
 
-  text.init();
-  text.set_color(glm::vec3(0.8f, 0.8f, 0.8f));
-  // text.set_text("interactionText");
+ //   d.pipeline = lit_color_texture_program_pipeline;
+ //   d.pipeline.vao = bg_meshes_for_lit_color_texture_program;
+ //   d.pipeline.type = mesh1.type;
+ //   d.pipeline.start = mesh1.start;
+ //   d.pipeline.count = mesh1.count;
+ //   d.tex = lit_color_texture_program->tex_file_to_glint.find("pure_black.png")->second;
+	//d.tex_normal = 0;
+	//d.transform->position = glm::vec3(0.0f, 0.0f, 0.0f);
+ //   d.transform->rotation = glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.f));
+ //   d.transform->rotation *= glm::angleAxis(glm::radians(90.f), glm::vec3(0.0f, 0.f, 1.f));
+	//
 
-  text.set_text(texts[current_section].text);
-  if (lit_color_texture_program->tex_file_to_glint.find(texts[0].text_file) ==
-      lit_color_texture_program->tex_file_to_glint.end()) {
-    throw std::runtime_error("Texture not found");
-  }
-  background->tex =
-      lit_color_texture_program->tex_file_to_glint.find(texts[0].text_file)
-          ->second;
+ //   //d.transform->scale = glm::vec3(2.f, 1.f, 1.f);
+
+ //   text.init();
+ //   text.set_color(glm::vec3(0.8f, 0.8f, 0.8f));
+ //   //text.set_text("interactionText");
+
+ //   text.set_text(texts[current_section].text);
+ //   if (lit_color_texture_program->tex_file_to_glint.find(texts[0].text_file) == lit_color_texture_program->tex_file_to_glint.end()) {
+ //       throw std::runtime_error("Texture not found");
+ //   }
+ //   background->tex = lit_color_texture_program->tex_file_to_glint.find(texts[0].text_file)->second;
 }
 
-StartMode::~StartMode() {}
+EndMode::~EndMode() {}
 
-bool StartMode::handle_event(SDL_Event const &evt,
-                             glm::uvec2 const &window_size) {
+bool EndMode::handle_event(SDL_Event const &evt,
+                            glm::uvec2 const &window_size) {
 
   if (evt.type == SDL_KEYDOWN) {
     if (evt.key.keysym.sym == SDLK_ESCAPE) {
@@ -124,48 +113,37 @@ bool StartMode::handle_event(SDL_Event const &evt,
   return false;
 }
 
-float text_elapsed = 0.0f; // time for text animation
-float time_elapsed = 0.0f; // time count for the last ... dots
-void StartMode::update(float elapsed) {
+
+void EndMode::update(float elapsed) {
   if (gStop || gamePause) {
     return;
   }
 
-  if (space.pressed || click.pressed ||
-      (current_section >= 12 && time_elapsed > 1.0f)) {
-    current_section++;
-    if (current_section >= 16) {
-      finished = true;
-      return;
-    }
-    text.set_text(texts[current_section].text);
-    text.reset_time();
-    if (lit_color_texture_program->tex_file_to_glint.find(
-            texts[current_section].text_file) ==
-        lit_color_texture_program->tex_file_to_glint.end()) {
-      throw std::runtime_error("Texture not found");
-    }
-    background->tex = lit_color_texture_program->tex_file_to_glint
-                          .find(texts[current_section].text_file)
-                          ->second;
+  if (space.pressed || click.pressed) {
+	  current_section++;
+	  if (current_section >= 4) {
+		  finished = true;
+		  return;
+	  }
+	  text.set_text(texts[current_section].text);
+	  text.reset_time();
+      if (lit_color_texture_program->tex_file_to_glint.find(texts[current_section].text_file) == lit_color_texture_program->tex_file_to_glint.end()) {
+          throw std::runtime_error("Texture not found");
+      }
+      //background->tex = lit_color_texture_program->tex_file_to_glint.find(texts[current_section].text_file)->second;
 
-    time_elapsed = 0.0f;
   }
-  if (current_section >= 12 && time_elapsed < 1.0f) {
-    time_elapsed += elapsed;
-  }
-
-  // reset button press counters:
+    // reset button press counters:
   space.downs = 0;
   space.pressed = false;
   click.downs = 0;
   click.pressed = false;
 
-  // bool advanced = storyManager->advanceStory();
-  text_elapsed = elapsed;
+  //bool advanced = storyManager->advanceStory();
+  EndMode::text_elapsed = elapsed;
 }
 
-void StartMode::draw(glm::uvec2 const &drawable_size) {
+void EndMode::draw(glm::uvec2 const &drawable_size) {
   if (gamePause)
     return;
   // update camera aspect ratio for drawable:
@@ -190,7 +168,6 @@ void StartMode::draw(glm::uvec2 const &drawable_size) {
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS); // this is the default depth comparison function, but
                         // FYI you can change it.
-
   scene.draw(*camera);
 
   glDisable(GL_DEPTH_TEST);
@@ -211,8 +188,7 @@ void StartMode::draw(glm::uvec2 const &drawable_size) {
   float y = drawable_size.y * 0.22f;
   float width = drawable_size.x * 0.8f;
   text.set_bound(drawable_size.x * 0.9f);
-  text.draw(text_elapsed, drawable_size, width, glm::vec2(x, y), 1.1f,
-            current_section < 13);
+  text.draw(EndMode::text_elapsed, drawable_size, width, glm::vec2(x, y), 1.1f, true);
 
   GL_ERRORS();
 }

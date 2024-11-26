@@ -8,15 +8,16 @@
 
 #include <glm/glm.hpp>
 
-struct Section {
-	std::string text;
-	std::string text_file;
 
-};
 
 struct StartMode : Mode {
     StartMode();
   virtual ~StartMode();
+
+  struct Section {
+	  std::string text;
+	  std::string text_file;
+  };
 
   // functions called by main loop:
   virtual bool handle_event(SDL_Event const &,

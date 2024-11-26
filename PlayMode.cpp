@@ -222,7 +222,13 @@ bool PlayMode::handle_event(SDL_Event const &evt,
   return false;
 }
 
+bool ending = false;    // if the game is ending, move to EndMode
 void PlayMode::update(float elapsed) {
+	if (ending) {
+        next = "EndMode";
+        finished = true;
+	}
+
   if (gStop || gamePause) {
     return;
   }
@@ -380,8 +386,12 @@ void PlayMode::update(float elapsed) {
   }
   bool advanced = storyManager->advanceStory();
 
-  for (auto &ghost : storyManager->GhostMap) {
-    ghost.second->getPosition(elapsed);
+  for (auto& ghost : storyManager->GhostMap) {
+      ghost.second->getPosition(elapsed);
+	  if (ghost.second->got_player) {
+          next = "GOverMode";
+		  finished = true;
+	  }
   }
 
   // TODO: check phase updates -> update walkmesh?

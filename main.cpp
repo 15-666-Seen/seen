@@ -4,6 +4,8 @@
 //The 'PlayMode' mode plays the game:
 #include "PlayMode.hpp"
 #include "StartMode.hpp"
+#include "EndMode.hpp"
+#include "GOverMode.hpp"
 
 //For asset loading:
 #include "Load.hpp"
@@ -27,6 +29,7 @@
 #include <memory>
 #include <algorithm>
 #include <thread>
+#include <string>
 
 #ifdef _WIN32
 extern "C" { uint32_t GetACP(); }
@@ -129,7 +132,7 @@ int main(int argc, char **argv) {
 
 	//------------ create game mode + make current --------------
 	Mode::set_current(std::make_shared< StartMode >());
-	uint8_t scene_count = 0;	// scene count, 0 is StartMode, 1 is PlayMode, 2 is EndMode
+	//uint8_t scene_count = 0;	// scene count, 0 is StartMode, 1 is PlayMode, 2 is EndMode
 
 	//------------ main loop ------------
 
@@ -198,11 +201,16 @@ int main(int argc, char **argv) {
 
 			Mode::current->update(elapsed);
 			if (!Mode::current) break;
-			if (Mode::current->finished && scene_count == 0) {
+			if (Mode::current->finished && Mode::current->next == "PlayMode") {
 				Mode::set_current(std::make_shared< PlayMode >());
-				scene_count++;
 			}
-			else if (Mode::current->finished && scene_count == 1) {
+			else if (Mode::current->finished && Mode::current->next == "EndMode") {
+				Mode::set_current(std::make_shared< EndMode >());
+			}
+			else if (Mode::current->finished && Mode::current->next == "GOverMode") {
+				Mode::set_current(std::make_shared< GOverMode >());
+			}
+			else if (Mode::current->finished && Mode::current->next == "") {
 				Mode::set_current(nullptr);
 			}
 		}

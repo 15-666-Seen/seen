@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include <memory>
+#include <string>
 
 struct Mode : std::enable_shared_from_this< Mode > {
 	virtual ~Mode() { }
@@ -21,6 +22,7 @@ struct Mode : std::enable_shared_from_this< Mode > {
 	virtual void draw(glm::uvec2 const &drawable_size) = 0;
 
 	bool finished = false;
+	std::string next = "";	//indicate the next Mode to switch to
 
 	//Mode::current is the Mode to which events are dispatched.
 	// use 'set_current' to change the current Mode (e.g., to switch to a menu)
