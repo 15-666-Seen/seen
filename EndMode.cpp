@@ -31,32 +31,39 @@ Load< Scene > bg_scene(LoadTagDefault, []() -> Scene const* {
 StartMode::StartMode() : scene(*bg_scene) {
 
     Mesh mesh1 = bg_meshes->lookup("Plane");
-    {   // add image-containing plane to scene
-        auto newTrans1 = new Scene::Transform();
-        scene.drawables.emplace_back(newTrans1);
-        background = &scene.drawables.back();
 
-        background->pipeline = lit_color_texture_program_pipeline;
-        background->pipeline.vao = bg_meshes_for_lit_color_texture_program;
-        background->pipeline.type = mesh1.type;
-        background->pipeline.start = mesh1.start;
-        background->pipeline.count = mesh1.count;
-    }
-    // adjust positions
+    auto newTrans1 = new Scene::Transform();
+    scene.drawables.emplace_back(newTrans1);
+    background = &scene.drawables.back();
+
+    background->pipeline = lit_color_texture_program_pipeline;
+    background->pipeline.vao = bg_meshes_for_lit_color_texture_program;
+    background->pipeline.type = mesh1.type;
+    background->pipeline.start = mesh1.start;
+    background->pipeline.count = mesh1.count;
+
+	/*if (lit_color_texture_program->tex_file_to_glint.find("IMG_3075.png") == lit_color_texture_program->tex_file_to_glint.end()) {
+		throw std::runtime_error("Texture not found");
+	}
+	background->tex = lit_color_texture_program->tex_file_to_glint.find("IMG_3075.png")->second;
+	std::cout << "Texture: " << background->tex << std::endl;*/
     background->tex_normal = 0;// background->pipeline.tex_name_to_glint["0_n"];
 	background->transform->rotation = glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.f));
 	background->transform->rotation *= glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 0.f, 1.f));
 	background->transform->position = glm::vec3(0.0f, 0.0f, 0.5f);
 	background->transform->scale = glm::vec3(0.7f, 0.3f, 0.5f);
+	//background->transform->scale = glm::vec3(0.1f, 0.1f, 0.1f);
 
     if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
     camera = &scene.cameras.front();
     camera->transform->position = glm::vec3(10.0f, 0.f, 0.0f);
 
-    // add a background
+
+	// add a background (black background behind the images)
     auto newTrans2 = new Scene::Transform();
     scene.drawables.emplace_back(newTrans2);
     Scene::Drawable& d = scene.drawables.back();
+
     d.pipeline = lit_color_texture_program_pipeline;
     d.pipeline.vao = bg_meshes_for_lit_color_texture_program;
     d.pipeline.type = mesh1.type;
@@ -68,12 +75,14 @@ StartMode::StartMode() : scene(*bg_scene) {
     d.transform->rotation = glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.f));
     d.transform->rotation *= glm::angleAxis(glm::radians(90.f), glm::vec3(0.0f, 0.f, 1.f));
 	
-    // initialize text 
+
+    //d.transform->scale = glm::vec3(2.f, 1.f, 1.f);
+
     text.init();
     text.set_color(glm::vec3(0.8f, 0.8f, 0.8f));
-    text.set_text(texts[current_section].text);
+    //text.set_text("interactionText");
 
-	// set the background image
+    text.set_text(texts[current_section].text);
     if (lit_color_texture_program->tex_file_to_glint.find(texts[0].text_file) == lit_color_texture_program->tex_file_to_glint.end()) {
         throw std::runtime_error("Texture not found");
     }
@@ -130,6 +139,7 @@ void StartMode::update(float elapsed) {
 	  time_elapsed += elapsed;
   }
 
+
     // reset button press counters:
   space.downs = 0;
   space.pressed = false;
@@ -168,7 +178,8 @@ void StartMode::draw(glm::uvec2 const &drawable_size) {
 
   scene.draw(*camera);
 
-    glDisable(GL_DEPTH_TEST);
+
+  glDisable(GL_DEPTH_TEST);
     // render UI and text
   glm::mat4 world_to_clip =
       glm::mat4(1.0f / camera->aspect, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
