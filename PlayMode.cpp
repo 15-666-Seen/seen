@@ -220,7 +220,7 @@ bool PlayMode::handle_event(SDL_Event const &evt,
 }
 
 void PlayMode::update(float elapsed) {
-   
+
   if (gStop || gamePause) {
     return;
   }
@@ -393,7 +393,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
   // set up light type and position for lit_color_texture_program:
   // TODO: consider using the Light(s) in the scene to do this
   glUseProgram(lit_color_texture_program->program);
-  glUniform1i(lit_color_texture_program->LIGHT_TYPE_int, 1);//4
+  glUniform1i(lit_color_texture_program->LIGHT_TYPE_int, 1); // 4
   glUniform3fv(lit_color_texture_program->LIGHT_DIRECTION_vec3, 1,
                glm::value_ptr(glm::vec3(0.0f, 0.0f, -1.0f)));
   glUniform3fv(lit_color_texture_program->LIGHT_ENERGY_vec3, 1,
@@ -459,21 +459,20 @@ void PlayMode::checkPhaseUpdates() {
     player.at = walkmesh->nearest_walk_point(player.transform->position);
   }
 
-  else if (storyManager->getCurrentPhase() == 8) { // 
+  else if (storyManager->getCurrentPhase() == 8) { //
     walkmesh = &phonebank_walkmeshes->lookup("phase5");
     player.at = walkmesh->nearest_walk_point(player.transform->position);
   }
 
   else if (storyManager->getCurrentPhase() == 11) { // basement
-      walkmesh = &phonebank_walkmeshes->lookup("phase6");
-      player.at = walkmesh->nearest_walk_point(player.transform->position);
+    walkmesh = &phonebank_walkmeshes->lookup("phase6");
+    player.at = walkmesh->nearest_walk_point(player.transform->position);
   }
 
   else if (storyManager->getCurrentPhase() == 12) {
-      walkmesh = &phonebank_walkmeshes->lookup("phase0");
-      player.at = walkmesh->nearest_walk_point(player.transform->position);
+    walkmesh = &phonebank_walkmeshes->lookup("phase0");
+    player.at = walkmesh->nearest_walk_point(player.transform->position);
   }
-
 }
 
 glm::vec3 PlayMode::cameraShake(float elapsed) {

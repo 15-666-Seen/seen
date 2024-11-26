@@ -74,19 +74,20 @@ enum FurnitureType {
   FRIDGE5,
 };
 static std::map<FurnitureType, std::vector<std::string>>
-    FurnitureTypeToInteractText = {{BED, {"hide under bed", "exit hiding"}},
-                                   {BEDROOM_DOOR, {"open door"}},
-                                   {DOOR1, {"open door"}},
-                                   {TINY_SCULPTURE, {"interact"}},
-                                   {BOOKSHELF, {"move shelf"}},
-                                    {SOFA, {"push sofa away"}},
-                                    {LADDER, {"use ladder","use ladder","use ladder"}},
-                                    {FRIDGE1, {"open fridge"}},
-                                    {FRIDGE2, {"open fridge"}},
-                                    {FRIDGE3, {"open fridge"}},
-                                    {FRIDGE4, {"open fridge"}},
-                                    {FRIDGE5, {"open fridge"}},
-    };
+    FurnitureTypeToInteractText = {
+        {BED, {"hide under bed", "exit hiding"}},
+        {BEDROOM_DOOR, {"open door"}},
+        {DOOR1, {"open door"}},
+        {TINY_SCULPTURE, {"interact"}},
+        {BOOKSHELF, {"move shelf"}},
+        {SOFA, {"push sofa away"}},
+        {LADDER, {"use ladder", "use ladder", "use ladder"}},
+        {FRIDGE1, {"open fridge"}},
+        {FRIDGE2, {"open fridge"}},
+        {FRIDGE3, {"open fridge"}},
+        {FRIDGE4, {"open fridge"}},
+        {FRIDGE5, {"open fridge"}},
+};
 
 static std::map<std::string, FurnitureType> MeshNameToFurnitureType = {
     {"Bed", BED},
@@ -147,6 +148,7 @@ struct Furniture {
   virtual bool isInteracting() { return interact_status > 0; }
 
   std::shared_ptr<Sound::PlayingSample> interact_sound = nullptr;
+  float animation_time = 0.0f;
 };
 
 struct Door : Furniture {
@@ -156,7 +158,6 @@ struct Door : Furniture {
   }
 
   virtual bool interact(float elapsed) override;
-  float animation_time = 0.0f;
 
   enum struct DoorState {
     CLOSED,

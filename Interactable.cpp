@@ -37,12 +37,16 @@ bool Item::interact(float elapsed) {
     visible = false;
     this->drawable->visible = false;
   } else if (type == FILE1) {
-    interact_status = 1;
+    // interact_status = 1;
+    return true;
+  } else if (type == CLIP_L) {
+    visible = false;
+    this->drawable->visible = false;
     return true;
   } else if (type == CLIP_R) {
-      visible = false;
-      this->drawable->visible = false;
-      return true;
+    visible = false;
+    this->drawable->visible = false;
+    return true;
   } else if (type == EYEBALL) {
     visible = false;
     this->drawable->visible = false;

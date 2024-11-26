@@ -61,35 +61,35 @@ bool StoryManager::advanceStory() {
     }
     break;
   case 10:
-      // player uses the ladder
-      if (interactableManager->interactStatusCheck(LADDER) == 1) {
-          current_phase++; // advance to the next phase
-          set_up_next_phase = true;
-      }
-      break;
-  case 11: 
-      // player is in the basement searching for clip
-      // if player pushes sofa away
-      if (interactableManager->interactStatusCheck(LADDER) == 2) {
-          current_phase++; // advance to the next phase
-          set_up_next_phase = true;
-      }
-      break;
+    // player uses the ladder
+    if (interactableManager->interactStatusCheck(LADDER) == 1) {
+      current_phase++; // advance to the next phase
+      set_up_next_phase = true;
+    }
+    break;
+  case 11:
+    // player is in the basement searching for clip
+    // if player pushes sofa away
+    if (interactableManager->interactStatusCheck(LADDER) == 2) {
+      current_phase++; // advance to the next phase
+      set_up_next_phase = true;
+    }
+    break;
   case 12:
-      // if the player finds the clip
-      // the player climbs up
-      if (false) {
-          current_phase++; // advance to the next phase
-          set_up_next_phase = true;
-      }
-      break;
-  case 13: 
-      // ghost jumpscare
-      if (false) {
-          current_phase++; // advance to the next phase
-          set_up_next_phase = true;
-      }
-      break;
+    // if the player finds the clip
+    // the player climbs up
+    if (false) {
+      current_phase++; // advance to the next phase
+      set_up_next_phase = true;
+    }
+    break;
+  case 13:
+    // ghost jumpscare
+    if (false) {
+      current_phase++; // advance to the next phase
+      set_up_next_phase = true;
+    }
+    break;
   default:
     wait_and_exit("Game Over - advanced past programmed phase");
   }
@@ -116,10 +116,10 @@ void StoryManager::setUpPhase() {
     gameplayUI->setMissionText("Find Bedroom");
 
     // door block is invisible for phase 0
+    interactableManager->setItemPhaseVisibility(REDROOM_KEY, false);
     interactableManager->setFurniturePhaseVisibility(DOORBLOCK, false);
     interactableManager->setFurniturePhaseAvailability(BEDROOM_DOOR, true);
     interactableManager->setFurniturePhaseAvailability(DOOR1, true);
-
 
     break;
 
@@ -129,7 +129,6 @@ void StoryManager::setUpPhase() {
     interactableManager->setFurniturePhaseVisibility(SCULPTURE_EYE_R, false);
     interactableManager->setFurniturePhaseAvailability(TINY_SCULPTURE, true);
     interactableManager->setItemPhaseAvailability(EYEBALL, true);
-
 
     break;
 
@@ -145,38 +144,40 @@ void StoryManager::setUpPhase() {
     break;
 
   case 3:
+    interactableManager->setItemPhaseAvailability(CLIP_L, true);
+    interactableManager->setItemPhaseAvailability(BEDROOM_KEY, true);
     interactableManager->setFurniturePhaseAvailability(BED, true);
-    enableGhost("ghost1");
 
     break;
 
   case 4:
+    enableGhost("ghost1");
     break;
 
   case 10:
-      // player is currently hiding, need to push sofa away
-      // sofa can now be pushed away
-      interactableManager->setFurniturePhaseAvailability(SOFA, true);
-      //we set ladder to usable once we interact with the sofa
-      break;
+    // player is currently hiding, need to push sofa away
+    // sofa can now be pushed away
+    interactableManager->setFurniturePhaseAvailability(SOFA, true);
+    // we set ladder to usable once we interact with the sofa
+    break;
   case 11:
-      // move player to the basement
+    // move player to the basement
 
-      interactableManager->setFurniturePhaseAvailability(FRIDGE1, true);
-      interactableManager->setFurniturePhaseAvailability(FRIDGE2, true);
-      interactableManager->setFurniturePhaseAvailability(FRIDGE3, true);
-      interactableManager->setFurniturePhaseAvailability(FRIDGE4, true);
-      interactableManager->setFurniturePhaseAvailability(FRIDGE5, true);
-      
-      break;
+    interactableManager->setFurniturePhaseAvailability(FRIDGE1, true);
+    interactableManager->setFurniturePhaseAvailability(FRIDGE2, true);
+    interactableManager->setFurniturePhaseAvailability(FRIDGE3, true);
+    interactableManager->setFurniturePhaseAvailability(FRIDGE4, true);
+    interactableManager->setFurniturePhaseAvailability(FRIDGE5, true);
+
+    break;
   case 12:
-      // the player climbs up
-      
-      break;
+    // the player climbs up
+
+    break;
   case 13:
-      // ghost jumpscare
-      
-      break;
+    // ghost jumpscare
+
+    break;
 
   default:
 
