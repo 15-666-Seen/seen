@@ -41,7 +41,7 @@ struct EndMode : Mode {
   Section texts[4] = { 
       {"So, what do you think? Ravenshade Manor,charming, isn't it? It's not every day you find a place with so much character.", "pure_black.png"},
 	  {"You really should come back sometime. The fireplace will be crackling, the rooms full of stories, and there's always tea on the stove. It's everything a home should be,warm, cozy, alive.", "pure_black.png"},
-	  {"Come on, I'll walk you back inside. Trust me, it's an experience you won't forget¡Xand neither will I.", "pure_black.png"},
+	  {"Come on, I'll walk you back inside. Trust me, it's an experience you won't forget, and neither will I.", "pure_black.png"},
 	  {"The END", "pure_black.png"}
   };
 
