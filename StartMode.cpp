@@ -44,7 +44,7 @@ StartMode::StartMode() : scene(*bg_scene) {
         background->pipeline.count = mesh1.count;
     }
     // adjust positions
-    background->tex_normal = 0;// background->pipeline.tex_name_to_glint["0_n"];
+    background->tex_normal = background->pipeline.tex_name_to_glint["0_n"];
 	background->transform->rotation = glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.f));
 	background->transform->rotation *= glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 0.f, 1.f));
 	background->transform->position = glm::vec3(0.0f, 0.0f, 0.5f);
@@ -64,7 +64,7 @@ StartMode::StartMode() : scene(*bg_scene) {
     d.pipeline.start = mesh1.start;
     d.pipeline.count = mesh1.count;
     d.tex = lit_color_texture_program->tex_file_to_glint.find("pure_black.png")->second;
-	d.tex_normal = 0;
+	d.tex_normal = d.pipeline.tex_name_to_glint["0_n"];
 	d.transform->position = glm::vec3(0.0f, 0.0f, 0.0f);
     d.transform->rotation = glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.f));
     d.transform->rotation *= glm::angleAxis(glm::radians(90.f), glm::vec3(0.0f, 0.f, 1.f));
