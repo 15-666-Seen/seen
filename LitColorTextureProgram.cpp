@@ -85,7 +85,7 @@ lit_color_texture_program(LoadTagEarly, []() -> LitColorTextureProgram const * {
     std::cerr << "Filepath doesn't exist: " << e.what() << std::endl;
   }
 
-  for (const auto f : filenames) {
+  for (const auto &f : filenames) {
     GLuint gli = ret->LoadTexture(filepath, f);
     lit_color_texture_program_pipeline.textures.push_back({gli, GL_TEXTURE_2D});
     lit_color_texture_program_pipeline.tex_name_to_glint[f] = gli;
