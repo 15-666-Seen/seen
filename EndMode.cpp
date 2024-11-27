@@ -23,7 +23,7 @@
 //});
 
 
-Load< Scene > bg_scene(LoadTagDefault, []() -> Scene const* {
+Load< Scene > ebg_scene(LoadTagDefault, []() -> Scene const* {
     return new Scene(data_path("empty.scene"), [&](Scene& scene, Scene::Transform* transform, std::string const& mesh_name) {
         });
     });
