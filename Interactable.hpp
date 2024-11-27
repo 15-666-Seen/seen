@@ -148,7 +148,7 @@ struct Furniture {
   virtual glm::vec3 getCenterPos() { return drawable->transform->position; }
 
   virtual std::string interactText() {
-    if (interact_status >= FurnitureTypeToInteractText[type].size()) {
+    if (interact_status >= static_cast<int>(FurnitureTypeToInteractText[type].size())) {
       return "No interaction available";
     }
     return FurnitureTypeToInteractText[type][interact_status];
