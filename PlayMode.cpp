@@ -6,6 +6,7 @@
 #include "Load.hpp"
 #include "Mesh.hpp"
 #include "Scene.hpp"
+#include "glm/ext/vector_float3.hpp"
 #include "sound_prep.hpp"
 #include "util.hpp"
 
@@ -97,6 +98,8 @@ PlayMode::PlayMode() : scene(*house_scene) {
   player.camera->fovy = glm::radians(60.0f);
   player.camera->near = 0.01f;
   player.camera->transform->parent = nullptr;
+
+  player.transform->position = glm::vec3(0.0f, -11.0f, 0.0f);
 
   // rotate camera facing direction (-z) to player facing direction (+y):
   player.camera->transform->rotation =
@@ -220,7 +223,6 @@ bool PlayMode::handle_event(SDL_Event const &evt,
 }
 
 void PlayMode::update(float elapsed) {
-
   if (gStop || gamePause) {
     return;
   }
