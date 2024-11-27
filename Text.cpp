@@ -1,4 +1,3 @@
-#pragma once
 #include "Text.hpp"
 
 #include <glm/glm.hpp>

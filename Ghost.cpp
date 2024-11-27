@@ -20,7 +20,7 @@ glm::vec3 Ghost::getPosition(float e) {
 		//static std::vector<glm::vec3> path(size);
 		static std::deque< glm::vec3 > path;
 
-		static uint8_t player_count = 0, ghost_count = 0;
+		static uint8_t player_count = 0;
 
 		// if ghost is closed to player, and/or if the player is looking at the ghost
 		if (Ghost::distance() < dis_thresh) {

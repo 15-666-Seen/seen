@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
 	//SDL_ShowCursor(SDL_DISABLE);
 
 	// Print disclaimer
-	std::cout << "Disclaimer: This game is a work of fiction. Names, characters, businesses, places, events, locales, and incidents are either the products of the author¡¦s imagination or used in a fictitious manner. Any resemblance to actual persons, living or dead, or actual events is purely coincidental." << std::endl;
+	std::cout << "Disclaimer: This game is a work of fiction. Names, characters, businesses, places, events, locales, and incidents are either the products of the author's imagination or used in a fictitious manner. Any resemblance to actual persons, living or dead, or actual events is purely coincidental." << std::endl;
 	
 
 	//------------ load assets --------------
