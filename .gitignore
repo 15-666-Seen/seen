@@ -22,4 +22,5 @@ maek-cache.json
 
 .clangd
 
-*.pnct
+#*.pnct
+dist/house.pnct
