@@ -179,20 +179,20 @@ void StartMode::draw(glm::uvec2 const &drawable_size) {
   glm::mat4 world_to_clip =
       glm::mat4(1.0f / camera->aspect, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
           0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f); // world to clip
+  {
+      UIShader sprites(world_to_clip);
 
-  UIShader sprites(world_to_clip);
-
-  sprites.draw_dialogue_box(glm::mat4(0.9f * camera->aspect, 0.0f, 0.0f, 0.0f, 0.0f,
-      0.3f, 0.0f, 0.f, 0.0f, 0.0f, 1.0f, 0.0f,
-      0.0f, -0.65f, 0.0f, 1.0f));
-
-  sprites.~UIShader(); // explicitly draws any sprite
+      sprites.draw_dialogue_box(glm::mat4(0.9f * camera->aspect, 0.0f, 0.0f, 0.0f, 0.0f,
+          0.3f, 0.0f, 0.f, 0.0f, 0.0f, 1.0f, 0.0f,
+          0.0f, -0.65f, 0.0f, 1.0f));
+  }
+  //sprites.~UIShader(); // explicitly draws any sprite
 
   float x = drawable_size.x * 0.1f;
   float y = drawable_size.y * 0.22f;
-  float width = drawable_size.x * 0.8f;
+  //float width = drawable_size.x * 0.8f;
   text.set_bound(drawable_size.x * 0.9f);
-  text.draw(text_elapsed, drawable_size, width, glm::vec2(x, y), 1.1f, current_section < 13);
+  text.draw(text_elapsed, drawable_size, glm::vec2(x, y), 1.1f, current_section < 13);
 
   GL_ERRORS();
 }

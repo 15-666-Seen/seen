@@ -212,8 +212,12 @@ void Text::set_font_size(FT_F26Dot6 new_font_size, FT_F26Dot6 new_font_scale,
   }
 }
 
-void Text::draw(float dt, const glm::vec2 &drawable_size, float width,
-                const glm::vec2 &pos, float ss_scale, bool animate) {
+void Text::draw(float dt, const glm::vec2& drawable_size, float width,
+    const glm::vec2& pos, float ss_scale, bool animate) {
+    return;
+}
+
+void Text::draw(float dt, const glm::vec2 &drawable_size, const glm::vec2 &pos, float ss_scale, bool animate) {
   // drawable_size - window size
   // width - how wide the displayed string gets to be
   // pos - position in screenspace where the text gets rendered
@@ -303,24 +307,29 @@ void Text::draw(float dt, const glm::vec2 &drawable_size, float width,
 
     // glDepthMask(GL_TRUE);
 
-    char_x += (ch.Advance >> 6) * ss_scale;
+    //char_x += (ch.Advance >> 6) * ss_scale;
 
-    if (char_x >= right_bound || text_content[i] == '\n') {
+    /*if (char_x >= right_bound || text_content[i] == '\n') {
       char_x = pos.x;
       char_y -= (y_size + 5.0f);
     }
     // newline by word
-    else if (text_content[i] == ' ') {
+    else */
+    if (text_content[i] == ' ') { 
       unsigned int j = i + 1;
-      for (; text_content[j] != ' ' && j < text_content.size(); j++)
-        ;
+      for (; text_content[j] != ' ' && j < text_content.size(); j++);
+	  j--;
+	  j--;
 
-      if ((char_x + ((ch.Advance >> 6) * ss_scale * (j - i + 10))) >=
-          right_bound) {
+      if ((char_x + ((ch.Advance >> 6) * ss_scale * (j - i + 5))) >= right_bound) {
         char_x = pos.x;
         char_y -= (y_size + 5.0f);
-      }
+		i++;    // Skip the space
+	  }
+	  else
+		  char_x += (ch.Advance >> 6) * ss_scale;
     }
+    else char_x += (ch.Advance >> 6) * ss_scale;
 
     if (text_content[i] == ' ') {
       // Move to the next word

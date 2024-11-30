@@ -97,4 +97,6 @@ struct Text {
 
   void draw(float dt, const glm::vec2 &drawable_size, float width,
             const glm::vec2 &pos, float ss_scale, bool animate = false);
+
+  void Text::draw(float dt, const glm::vec2& drawable_size, const glm::vec2& pos, float ss_scale, bool animate = false);
 };
