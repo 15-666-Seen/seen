@@ -212,10 +212,10 @@ void Text::set_font_size(FT_F26Dot6 new_font_size, FT_F26Dot6 new_font_scale,
   }
 }
 
-void Text::draw(float dt, const glm::vec2& drawable_size, float width,
-    const glm::vec2& pos, float ss_scale, bool animate) {
-    return;
-}
+//void Text::draw(float dt, const glm::vec2& drawable_size, float width,
+//    const glm::vec2& pos, float ss_scale, bool animate) {
+//    return;
+//}
 
 void Text::draw(float dt, const glm::vec2 &drawable_size, const glm::vec2 &pos, float ss_scale, bool animate) {
   // drawable_size - window size

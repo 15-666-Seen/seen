@@ -169,9 +169,9 @@ void GOverMode::draw(glm::uvec2 const &drawable_size) {
 
   float x = drawable_size.x * 0.1f;
   float y = drawable_size.y * 0.22f;
-  float width = drawable_size.x * 0.8f;
+  //float width = drawable_size.x * 0.8f;
   text.set_bound(drawable_size.x * 0.9f);
-  text.draw(GOverMode::text_elapsed, drawable_size, width, glm::vec2(x, y), 1.1f, true);
+  text.draw(GOverMode::text_elapsed, drawable_size, glm::vec2(x, y), 1.1f, true);
 
   GL_ERRORS();
 }

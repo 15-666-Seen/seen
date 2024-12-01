@@ -41,6 +41,9 @@ glm::vec3 Ghost::getPosition(float e) {
 				std::cout << "GOT YOU" << std::endl;
 				got_player = true;
 			}
+			// reduce memory
+			path.clear();
+			path.shrink_to_fit();
 			return drawable->transform->position;
 		}
 		else {

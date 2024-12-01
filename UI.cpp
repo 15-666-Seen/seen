@@ -49,15 +49,15 @@ void GameplayUI::DrawUI(glm::uvec2 const &drawable_size) {
 
   float x = drawable_size.x * 0.6f;
   float y = drawable_size.y * 0.47f;
-  float width = drawable_size.x * 1.f;
+  //float width = drawable_size.x * 1.f;
   interaction.set_bound(drawable_size.x * 0.85f);
-  interaction.draw(100.f, drawable_size, width, glm::vec2(x, y), 1.f);
+  interaction.draw(100.f, drawable_size, glm::vec2(x, y), 1.f);
 
   x = drawable_size.x * 0.f;
   y = drawable_size.y * 0.9f;
-  width = drawable_size.x * 0.5f;
+  //width = drawable_size.x * 0.5f;
   mission.set_bound(drawable_size.x * 0.95f);
-  mission.draw(100.f, drawable_size, width, glm::vec2(x, y), 1.f);
+  mission.draw(100.f, drawable_size, glm::vec2(x, y), 1.f);
 
   if (dialogueText.size() > 0) {
     // dialogue box
@@ -71,9 +71,9 @@ void GameplayUI::DrawUI(glm::uvec2 const &drawable_size) {
     //sprites.~UIShader(); // explicitly draws any sprite
     x = drawable_size.x * 0.1f;
     y = drawable_size.y * 0.2f;
-    width = drawable_size.x * 0.75f;
+    //width = drawable_size.x * 0.75f;
     dialogue.set_bound(drawable_size.x * 0.9f);
-    dialogue.draw(0.025f, drawable_size, width, glm::vec2(x, y), 1.3f, true);
+    dialogue.draw(0.025f, drawable_size, glm::vec2(x, y), 1.3f, true);
   }
 }
 
