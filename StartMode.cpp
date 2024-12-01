@@ -54,21 +54,6 @@ StartMode::StartMode() : scene(*bg_scene) {
     camera = &scene.cameras.front();
     camera->transform->position = glm::vec3(10.0f, 0.f, 0.0f);
 
-    // add a background
-    auto newTrans2 = new Scene::Transform();
-    scene.drawables.emplace_back(newTrans2);
-    Scene::Drawable& d = scene.drawables.back();
-    d.pipeline = lit_color_texture_program_pipeline;
-    d.pipeline.vao = bg_meshes_for_lit_color_texture_program;
-    d.pipeline.type = mesh1.type;
-    d.pipeline.start = mesh1.start;
-    d.pipeline.count = mesh1.count;
-    d.tex = lit_color_texture_program->tex_file_to_glint.find("pure_black.png")->second;
-	d.tex_normal = d.pipeline.tex_name_to_glint["0_n"];
-	d.transform->position = glm::vec3(0.0f, 0.0f, 0.0f);
-    d.transform->rotation = glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.f));
-    d.transform->rotation *= glm::angleAxis(glm::radians(90.f), glm::vec3(0.0f, 0.f, 1.f));
-	
     // initialize text 
     text.init();
     text.set_color(glm::vec3(0.8f, 0.7f, 0.7f));
@@ -163,7 +148,7 @@ void StartMode::draw(glm::uvec2 const &drawable_size) {
 
   glUseProgram(0);
 
-  glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+  glClearColor(0.f, 0.f, 0.f, 1.0f);
   glClearDepth(1.0f); // 1.0 is actually the default value to clear the depth
                       // buffer to, but FYI you can change it.
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
