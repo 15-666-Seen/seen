@@ -136,7 +136,7 @@ const game_names = [
     maek.CPP('GOverMode.cpp'),
 	maek.CPP('main.cpp'),
 	maek.CPP('LitColorTextureProgram.cpp'),
-	maek.CPP('ColorTextureProgram.cpp'),  //not used right now, but you might want it
+	//maek.CPP('ColorTextureProgram.cpp'),  //not used right now, but you might want it
 	maek.CPP('Sound.cpp'),
 	maek.CPP('load_wav.cpp'),
 	maek.CPP('load_opus.cpp'),
@@ -146,6 +146,7 @@ const game_names = [
 	maek.CPP('UI.cpp'),
 	maek.CPP('UIShaderProgram.cpp'),
 	maek.CPP('InteractableManager.cpp'),
+	maek.CPP('Text.cpp'),
 	maek.CPP('Ghost.cpp')
 ];
 
@@ -153,9 +154,9 @@ const common_names = [
 	maek.CPP('util.cpp'),
 	maek.CPP('img_loader.cpp'),
 	maek.CPP('data_path.cpp'),
-	maek.CPP('PathFont.cpp'),
-	maek.CPP('PathFont-font.cpp'),
-	maek.CPP('DrawLines.cpp'),
+	//maek.CPP('PathFont.cpp'),
+	//maek.CPP('PathFont-font.cpp'),
+	//maek.CPP('DrawLines.cpp'),
 	maek.CPP('ColorProgram.cpp'),
 	maek.CPP('Scene.cpp'),
 	maek.CPP('Mesh.cpp'),
@@ -163,32 +164,31 @@ const common_names = [
 	maek.CPP('gl_compile_program.cpp'),
 	maek.CPP('Mode.cpp'),
 	maek.CPP('GL.cpp'),
-	maek.CPP('Text.cpp'),
 	maek.CPP('Load.cpp')
 ];
 
-const show_meshes_names = [
-	maek.CPP('show-meshes.cpp'),
-	maek.CPP('ShowMeshesProgram.cpp'),
-	maek.CPP('ShowMeshesMode.cpp')
-];
+//const show_meshes_names = [
+//	maek.CPP('show-meshes.cpp'),
+//	maek.CPP('ShowMeshesProgram.cpp'),
+//	maek.CPP('ShowMeshesMode.cpp')
+//];
 
-const show_scene_names = [
-	maek.CPP('show-scene.cpp'),
-	maek.CPP('ShowSceneProgram.cpp'),
-	maek.CPP('ShowSceneMode.cpp')
-];
+//const show_scene_names = [
+//	maek.CPP('show-scene.cpp'),
+//	maek.CPP('ShowSceneProgram.cpp'),
+//	maek.CPP('ShowSceneMode.cpp')
+//];
 
 //the '[exeFile =] LINK(objFiles, exeFileBase, [, options])' links an array of objects into an executable:
 // objFiles: array of objects to link
 // exeFileBase: name of executable file to produce
 //returns exeFile: exeFileBase + a platform-dependant suffix (e.g., '.exe' on windows)
 const game_exe = maek.LINK([...game_names, ...common_names], 'dist/game');
-const show_meshes_exe = maek.LINK([...show_meshes_names, ...common_names], 'scenes/show-meshes');
-const show_scene_exe = maek.LINK([...show_scene_names, ...common_names], 'scenes/show-scene');
+//const show_meshes_exe = maek.LINK([...show_meshes_names, ...common_names], 'scenes/show-meshes');
+//const show_scene_exe = maek.LINK([...show_scene_names, ...common_names], 'scenes/show-scene');
 
 //set the default target to the game (and copy the readme files):
-maek.TARGETS = [game_exe, show_meshes_exe, show_scene_exe, ...copies];
+maek.TARGETS = [game_exe, /*show_meshes_exe, show_scene_exe,*/ ...copies];
 
 //Note that tasks that produce ':abstract targets' are never cached.
 // This is similar to how .PHONY targets behave in make.

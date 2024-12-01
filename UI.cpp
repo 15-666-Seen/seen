@@ -61,14 +61,14 @@ void GameplayUI::DrawUI(glm::uvec2 const &drawable_size) {
 
   if (dialogueText.size() > 0) {
     // dialogue box
+      {
+          UIShader sprites(world_to_clip);
 
-    UIShader sprites(world_to_clip);
-
-    sprites.draw_dialogue_box(glm::mat4(0.9f * aspect, 0.0f, 0.0f, 0.0f, 0.0f,
-                                        0.3f, 0.0f, 0.f, 0.0f, 0.0f, 1.0f, 0.0f,
-                                        0.0f, -0.65f, 0.0f, 1.0f));
-
-    sprites.~UIShader(); // explicitly draws any sprite
+          sprites.draw_dialogue_box(glm::mat4(0.9f * aspect, 0.0f, 0.0f, 0.0f, 0.0f,
+              0.3f, 0.0f, 0.f, 0.0f, 0.0f, 1.0f, 0.0f,
+              0.0f, -0.65f, 0.0f, 1.0f));
+      }
+    //sprites.~UIShader(); // explicitly draws any sprite
     x = drawable_size.x * 0.1f;
     y = drawable_size.y * 0.2f;
     width = drawable_size.x * 0.75f;
