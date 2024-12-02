@@ -41,7 +41,7 @@ struct StartMode : Mode {
 
   Text text;
   uint8_t current_section = 0;
-  Section texts[16] = { 
+  Section texts[17] = { 
       {"Six days ago, I found a letter on my windshield, tucked under the wiper like a parking ticket. ", "IMG_3075.png"},
 	  {"It was from my parents. They... they've been gone for years.", "IMG_3076.png"},
 	  {"The letter talked about inheriting a mansion, a huge place, in some town called Ravenshade. The postmark was from three years ago, strangely close to the third anniversary of their death.", "IMG_3077.png"},
@@ -50,14 +50,15 @@ struct StartMode : Mode {
 	  {"I've thought about this a lot. But with the debt piling up and no way out... I didn't have much choice. So, here I am, driving across the country.", "IMG_3080.png"},
 	  {"When I got here, I wanted to ask for directions...", "IMG_3081.png"},
 	  {"But everyone I saw, old, young, it didn't matter, they just... smiled and pointed, like some silent guide. No words, just that knowing look and a finger pointing down the road.", "IMG_3082.png"},
-	  {"I even bought this cross for a bit of protection. Call me superstitious, but something feels... off.", "pure_black.png"},
+	  {"I even bought this cross for a bit of protection. Call me superstitious, but something feels... off.", "IMG_3084.png"},
 	  {"I'm recording this now. I have no idea what's waiting for me. But if you're hearing this, and I didn't make it back, don't come looking for me. Stay away from Holyhill Road.", "pure_black.png"},
 	  {"This place... it's unreal. Like it's been frozen in time.", "IMG_3083.png"},
 	  {"I need to record this. Tapes aren't cheap, but... something tells me I'll need this. It's like I'm being watched already, like the house itself is... waiting.", "IMG_3083.png"},
 	  {"Load tape", "pure_black.png"},
       {"Load tape.", "pure_black.png"},
 	  {"Load tape..", "pure_black.png"},
-	  {"Load tape...", "pure_black.png"}
+	  {"Load tape...", "pure_black.png"},
+	  { "", "tutorial.png" }
   };
 
   // In game UI
