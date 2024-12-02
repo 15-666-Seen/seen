@@ -47,8 +47,8 @@ StartMode::StartMode() : scene(*bg_scene) {
     background->tex_normal = background->pipeline.tex_name_to_glint["0_n"];
 	background->transform->rotation = glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.f));
 	background->transform->rotation *= glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 0.f, 1.f));
-	background->transform->position = glm::vec3(0.0f, 0.0f, 0.5f);
-	background->transform->scale = glm::vec3(0.7f, 0.3f, 0.5f);
+	background->transform->position = glm::vec3(0.0f, 0.0f, 0.8f);
+	background->transform->scale = glm::vec3(0.7f, 0.4f, 0.5f);
 
     if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
     camera = &scene.cameras.front();
@@ -94,13 +94,17 @@ bool StartMode::handle_event(SDL_Event const &evt,
 float text_elapsed = 0.0f;  // time for text animation
 float time_elapsed = 0.0f;  // time count for the last ... dots
 void StartMode::update(float elapsed) {
-  if (gStop || gamePause) {
-    return;
-  }
+    if (gStop || gamePause) {
+        return;
+    }
 
-  if (space.pressed || click.pressed || (current_section >= 12 && time_elapsed > 0.5f)) {
+    if ((space.pressed && current_section != 16) || (click.pressed && current_section != 16) 
+        || (current_section >= 12 && current_section < 16 && time_elapsed > 0.5f) ||
+        (space.pressed && time_elapsed > 1.8f) || // force player to read tutorial
+        (click.pressed && time_elapsed > 1.8f)) {
 	  current_section++;
-	  if (current_section >= 16) {
+      if (current_section == 16) background->transform->position = glm::vec3(0.0f, 0.0f, 0.4f);
+	  if (current_section >= 17) {
 		  finished = true;
 		  return;
 	  }
@@ -117,7 +121,7 @@ void StartMode::update(float elapsed) {
           text.set_color2_index(14);
       }
   }
-  if (current_section >= 12 && time_elapsed < 1.0f) {
+  if (current_section >= 12 && time_elapsed < 2.0f) {
 	  time_elapsed += elapsed;
   }
 
@@ -164,7 +168,9 @@ void StartMode::draw(glm::uvec2 const &drawable_size) {
   glm::mat4 world_to_clip =
       glm::mat4(1.0f / camera->aspect, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
           0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f); // world to clip
-  {
+
+  // dont render this part on tutorial text
+  if (current_section < 16) {
       UIShader sprites(world_to_clip);
 
       sprites.draw_dialogue_box(glm::mat4(0.9f * camera->aspect, 0.0f, 0.0f, 0.0f, 0.0f,

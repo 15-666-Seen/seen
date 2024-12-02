@@ -30,7 +30,7 @@ SpriteProgram::SpriteProgram() {
       "in vec2 texCoord;\n"
       "out vec4 fragColor;\n"
       "void main() {\n"
-      "	fragColor = texture(TEX, texCoord);\n"
+      "	fragColor = texture(TEX, texCoord)/2.5;\n"// gamma decode but make it stronger
       "}\n");
   // As you can see above, adjacent strings in C/C++ are concatenated.
   // this is very useful for writing long shader programs inline.
