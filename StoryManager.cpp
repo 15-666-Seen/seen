@@ -154,8 +154,10 @@ void StoryManager::setUpPhase() {
     interactableManager->setItemPhaseVisibility(REDROOM_KEY, true);
     interactableManager->setItemPhaseAvailability(REDROOM_KEY, true);
     interactableManager->setFurniturePhaseAvailability(TINY_SCULPTURE, false);
-    interactableManager->setFurniturePhaseAvailability(BOOKSHELF, true);
+    //interactableManager->setFurniturePhaseAvailability(BOOKSHELF, true);
+
     interactableManager->setFurniturePhaseVisibility(DOORBLOCK, true);
+    interactableManager->setFurniturePhaseAvailability(DOORBLOCK, true);
 
     break;
 

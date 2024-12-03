@@ -90,6 +90,8 @@ struct Text {
 
   void reset_time();
 
+  void show_full();
+
   void highlight();
 
   void set_font_size(FT_F26Dot6 new_font_size, FT_F26Dot6 new_font_scale,

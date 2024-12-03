@@ -82,6 +82,7 @@ static std::map<FurnitureType, std::vector<std::string>>
         {BED, {"hide under bed", "exit hiding"}},
         {BEDROOM_DOOR, {"open door"}},
         {DOOR1, {"open door"}},
+        {DOORBLOCK, {"examine", "remove"}},
         {TINY_SCULPTURE, {"interact"}},
         {BOOKSHELF, {"move shelf"}},
         {SOFA, {"push sofa away"}},

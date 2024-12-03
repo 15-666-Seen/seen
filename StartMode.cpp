@@ -98,28 +98,38 @@ void StartMode::update(float elapsed) {
         return;
     }
 
-    if ((space.pressed && current_section != 16) || (click.pressed && current_section != 16) 
+    if ((space.pressed && current_section != 16) || (click.pressed && current_section != 16)
         || (current_section >= 12 && current_section < 16 && time_elapsed > 0.5f) ||
         (space.pressed && time_elapsed > 1.8f) || // force player to read tutorial
         (click.pressed && time_elapsed > 1.8f)) {
-	  current_section++;
-      if (current_section == 16) background->transform->position = glm::vec3(0.0f, 0.0f, 0.4f);
-	  if (current_section >= 17) {
-		  finished = true;
-		  return;
-	  }
-	  text.set_text(texts[current_section].text);
-	  text.reset_time();
-      if (lit_color_texture_program->tex_file_to_glint.find(texts[current_section].text_file) == lit_color_texture_program->tex_file_to_glint.end()) {
-          throw std::runtime_error("Texture not found");
-      }
-      background->tex = lit_color_texture_program->tex_file_to_glint.find(texts[current_section].text_file)->second;
 
-	  time_elapsed = 0.0f;
+        if (!showfull) {
+            showfull = true;
+            text.show_full();
+        } else {
 
-      if (current_section == 2) {
-          text.set_color2_index(14);
-      }
+            current_section++;
+            if (current_section == 16) background->transform->position = glm::vec3(0.0f, 0.0f, 0.4f);
+            if (current_section >= 17) {
+                finished = true;
+                return;
+            }
+
+            if (current_section < 12) showfull = false;
+
+            text.set_text(texts[current_section].text);
+            text.reset_time();
+            if (lit_color_texture_program->tex_file_to_glint.find(texts[current_section].text_file) == lit_color_texture_program->tex_file_to_glint.end()) {
+                throw std::runtime_error("Texture not found");
+            }
+            background->tex = lit_color_texture_program->tex_file_to_glint.find(texts[current_section].text_file)->second;
+
+            time_elapsed = 0.0f;
+
+            if (current_section == 2) {
+                text.set_color2_index(14);
+            }
+        }
   }
   if (current_section >= 12 && time_elapsed < 2.0f) {
 	  time_elapsed += elapsed;
