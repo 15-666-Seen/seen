@@ -324,7 +324,7 @@ void Text::draw(float dt, const glm::vec2 &drawable_size, const glm::vec2 &pos, 
       if ((char_x + ((ch.Advance >> 6) * ss_scale * (j - i + 5))) >= right_bound) {
         char_x = pos.x;
         char_y -= (y_size + 5.0f);
-		i++;    // Skip the space
+		//i++;    // Skip the space
 	  }
 	  else
 		  char_x += (ch.Advance >> 6) * ss_scale;
