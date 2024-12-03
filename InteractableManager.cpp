@@ -145,13 +145,13 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
 
       else if (furniture->type == DOORBLOCK) {
           if (furniture->interact_status == 0) {
-              interaction_notification = "What the?! Tentacles?! Am I losing my mind?";
+              interaction_notification = "Tentacles?? Am I losing my mind?";
               furniture->interact_status = 1;
           }
           else {
               gameplayUI->insertDialogueText("Maybe it's easier to just... stay. No! Focus, I need to find another way out!");
               gameplayUI->insertDialogueText("Something's trying to keep me in here...");
-              gameplayUI->insertDialogueText("It's like they're growing into the walls... I can't pull them off!");
+              gameplayUI->insertDialogueText("It's like they're growing into the walls... I can't pull them off.");
               setFurniturePhaseAvailability(BOOKSHELF, true);
           }
           return true;

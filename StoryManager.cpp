@@ -136,7 +136,7 @@ void StoryManager::setUpPhase() {
   case 1:
     gameplayUI->insertDialogueText("Well, that's reassuring. Definitely no death traps ahead, right?");
     gameplayUI->insertDialogueText("Is that..a corpse?");
-    gameplayUI->insertDialogueText("!!!!");
+    gameplayUI->insertDialogueText("...");
 
     interactableManager->setFurniturePhaseVisibility(CHAIN_CUT2, true);
     interactableManager->setFurniturePhaseVisibility(CHAIN_CUT1, true);
@@ -152,7 +152,7 @@ void StoryManager::setUpPhase() {
   case 2:
 
     // blue door is closed, shelf is avaible
-    gameplayUI->insertDialogueText("!!!!");
+    gameplayUI->insertDialogueText("!");
     interactableManager->closeDoor(DOOR1);
     interactableManager->setItemPhaseVisibility(REDROOM_KEY, true);
     interactableManager->setItemPhaseAvailability(REDROOM_KEY, true);
