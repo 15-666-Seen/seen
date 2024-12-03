@@ -120,7 +120,6 @@ void StoryManager::setUpPhase() {
   switch (current_phase) {
   case 0:
 
-    // door block is invisible for phase 0
     if (!bgm_sound) {
       bgm_sound = Sound::loop_3D(*default_bgm_sample, 0.8f,
                                  glm::vec3(0.0f, 0.0f, 10.0f), 1.0f);
@@ -135,6 +134,9 @@ void StoryManager::setUpPhase() {
     break;
 
   case 1:
+    gameplayUI->insertDialogueText("Well, that's reassuring. Definitely no death traps ahead, right?");
+    gameplayUI->insertDialogueText("Is that..a corpse?");
+    gameplayUI->insertDialogueText("!!!!");
 
     interactableManager->setFurniturePhaseVisibility(CHAIN_CUT2, true);
     interactableManager->setFurniturePhaseVisibility(CHAIN_CUT1, true);
@@ -150,6 +152,7 @@ void StoryManager::setUpPhase() {
   case 2:
 
     // blue door is closed, shelf is avaible
+    gameplayUI->insertDialogueText("!!!!");
     interactableManager->closeDoor(DOOR1);
     interactableManager->setItemPhaseVisibility(REDROOM_KEY, true);
     interactableManager->setItemPhaseAvailability(REDROOM_KEY, true);
