@@ -70,6 +70,7 @@ struct StartMode : Mode {
   std::shared_ptr<Sound::PlayingSample> walking_sound;
 
   std::string current_dialogue = "";
+  bool showfull = false;
 
   //bool finished = false;
 };

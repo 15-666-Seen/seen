@@ -185,6 +185,7 @@ void Text::set_color2_index(uint8_t index) {
 }
 
 void Text::reset_time() { time = 0.f; }
+void Text::show_full() { time = 100.f; }
 
 void Text::highlight() {
   // show some effect for highlighting
