@@ -419,10 +419,20 @@ bool InteractableManager::updateItem(Scene::Transform *player_transform,
           interaction_notification =
               "Part of a chain cutter. (" + std::to_string((total_pt + 1)) + "/3)";
       }
+      else if (item->type == FILE2) {
+          gameplayUI->insertDialogueText("'Deny any claims about this house being alive'..what?");
+          gameplayUI->insertDialogueText("'Deny knowing the missing clergies. Deny the smell — call it old building issues.' ");
+          gameplayUI->insertDialogueText("'Countermeasure to the police'... What are they hiding here?");
+      }
       else if (item->type == FILE1) {
-        interaction_notification = "\"(stained...) should never find "
-                                   "(stained...) basement in this house.\"";
-      } else if (item->type == BEDROOM_KEY) {
+          gameplayUI->insertDialogueText(" So, if I run into trouble... if I hide... they’ll disappear.");
+          gameplayUI->insertDialogueText("'If a member is seen, they must hide to sever the link.'");
+          gameplayUI->insertDialogueText("'Those who see invite their gaze. Those who flee invite their wrath.'");
+          gameplayUI->insertDialogueText("'To appease The Old Ones: one soul for every trespass. The link between seer and seen must remain unbroken.'");
+          gameplayUI->insertDialogueText("'Sacrifice Record'... What is this?");
+      }
+
+      else if (item->type == BEDROOM_KEY) {
         interaction_notification = "A Green Key.";
       } else if (item->type == DEN_KEY) {
         interaction_notification = "A Blue Key.";
