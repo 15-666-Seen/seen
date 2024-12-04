@@ -40,3 +40,8 @@ Load<Sound::Sample>
 chain_sample(LoadTagDefault, []() -> Sound::Sample const* {
 	return new Sound::Sample(data_path("sounds/chain.wav"));
 	});
+
+Load<Sound::Sample>
+cut_chain_sample(LoadTagDefault, []() -> Sound::Sample const* {
+	return new Sound::Sample(data_path("sounds/chain.wav"));
+	});

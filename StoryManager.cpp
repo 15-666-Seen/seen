@@ -22,6 +22,11 @@ void StoryManager::SetUpManager(GameplayUI *ui, InteractableManager *im) {
 
   interactableManager->setFurniturePhaseVisibility(SCULPTURE_EYE_R, false);
 
+  // hide some more things
+  if (isa_is_debugging) {
+      interactableManager->setFurniturePhaseVisibility(CORPSE, false);
+  }
+
   setUpPhase(); // set up phase 0
 }
 
@@ -60,18 +65,42 @@ bool StoryManager::advanceStory() {
     }
     break;
   case 4:
-    // if player move the shelf
+    // if player hides from first ghost
     if (interactableManager->isHiding) {
       current_phase++; // advance to the next phase
       set_up_next_phase = true;
     }
     break;
   case 5:
-    // TODO: break here
-    if (false) {
+    
+    if (interactableManager->interactStatusCheck(REDROOM_DOOR) == 1) {
       current_phase++; // advance to the next phase
+      // can enter redroom now, switch walk mesh
       set_up_next_phase = true;
     }
+    break;
+  case 6:
+      if (interactableManager->interactStatusCheck(BLUEPRINT) == 1) {
+          current_phase++; 
+          // basement now unlocked.
+          set_up_next_phase = true;
+      }
+      break;
+
+  case 7:
+      current_phase++;
+      set_up_next_phase = true;
+      break;
+
+  case 8:
+      current_phase++;
+      set_up_next_phase = true;
+      break;
+
+  case 9:
+      current_phase++;
+      set_up_next_phase = true;
+      break;
   case 10:
     // player uses the ladder
     if (interactableManager->interactStatusCheck(LADDER) == 1) {
@@ -123,6 +152,7 @@ void StoryManager::setUpPhase() {
   switch (current_phase) {
   case 0:
 
+
     if (!bgm_sound) {
       bgm_sound = Sound::loop_3D(*default_bgm_sample, 0.8f,
                                  glm::vec3(0.0f, 0.0f, 10.0f), 1.0f);
@@ -130,6 +160,7 @@ void StoryManager::setUpPhase() {
     interactableManager->setItemPhaseAvailability(DEN_KEY, true);
     interactableManager->setFurniturePhaseVisibility(DOORBLOCK, false);
     interactableManager->setFurniturePhaseAvailability(BEDROOM_DOOR, true);
+    interactableManager->setFurniturePhaseAvailability(REDROOM_DOOR, true);
     interactableManager->setFurniturePhaseAvailability(CLOSET2, true);
     interactableManager->setFurniturePhaseAvailability(DOOR1, true);
     interactableManager->setItemPhaseVisibility(REDROOM_KEY, false);
@@ -143,9 +174,7 @@ void StoryManager::setUpPhase() {
     gameplayUI->insertDialogueText("Is that..a corpse?");
     gameplayUI->insertDialogueText("...");
 
-    interactableManager->setFurniturePhaseVisibility(CHAIN_CUT2, true);
-    interactableManager->setFurniturePhaseVisibility(CHAIN_CUT1, true);
-    interactableManager->setFurniturePhaseVisibility(CHAIN, true);
+    
 
     // user get in blue room, tiny sculpture is available
     interactableManager->setFurniturePhaseAvailability(TINY_SCULPTURE, true);
@@ -178,15 +207,33 @@ void StoryManager::setUpPhase() {
     break;
 
   case 4:
-    enableGhost("ghost1", true);
+    if (!isa_is_debugging) enableGhost("ghost1", true);
     break;
 
   case 5:
-    enableGhost("ghost1", false);
+    if (!isa_is_debugging) enableGhost("ghost1", false);
     break;
 
+  case 6:
+      // enters red room, can pick up stuff
+      interactableManager->setItemPhaseVisibility(CLIP_M, true);
+      interactableManager->setItemPhaseAvailability(CLIP_M, true);
+
+      // can also interact w the blueprint
+      interactableManager->setFurniturePhaseAvailability(BLUEPRINT, true);
+      break;
+
+  case 7:
+      break;
+
+  case 8:
+      break;
+
+  case 9:
+      break;
+
   case 10:
-    // player is currently hiding, need to push sofa away
+    // player is currently hiding?, need to push sofa away
     // sofa can now be pushed away
     interactableManager->setFurniturePhaseAvailability(SOFA, true);
     // we set ladder to usable once we interact with the sofa

@@ -130,6 +130,32 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
         interaction_notification = "This door is locked from inside.";
       }
 
+      if (furniture->type == REDROOM_DOOR) {
+              if (current_phase >= 5 && inventory.hasItem(REDROOM_KEY)) {
+                  // TODO: DEBUG this crashes the game
+                 /* Door* door = dynamic_cast<Door*>(furniture);
+                  door->state = Door::DoorState::OPENING;*/
+                  furniture->interact_status = 1;
+                  furniture->phase_allow_interact = false;
+                  return true;
+              }
+              else if (current_phase == 4 && inventory.hasItem(REDROOM_KEY)) {
+                  interaction_notification = "NO TIME TO OPEN DOORS!!";
+                  return true;
+              }
+              interaction_notification = "Seems like I need a key to open this.";
+              return true;
+      }
+
+      if (furniture->type == BLUEPRINT) {
+          gameplayUI->insertDialogueText("Great. Because the one place I'd want to go in a creepy old house is a dark, hidden basement...");
+          gameplayUI->insertDialogueText("The arrow is pointing to...a basement under the sofa?");
+          gameplayUI->insertDialogueText("A blueprint of the house... maybe it'll help me find a way out.");
+          furniture->interact_status = 1;
+          furniture->phase_allow_interact = false;
+          return true;
+      }
+
       else if (furniture->type == DOOR1) {
         // TODO: currently directly open door1
         if (current_phase == 0) {
@@ -142,6 +168,23 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
           interaction_notification = "Seems like I need a key to open this.";
         }
       }
+
+      else if (furniture->type == FRONT_DOOR) {
+          // TODO: currently directly open door1
+          if (furniture->interact_status == 0) {
+              setFurniturePhaseVisibility(CHAIN_CUT1, false);
+              Door* door = dynamic_cast<Door*>(furniture);
+              door->state = Door::DoorState::OPENING;
+              furniture->interact_status = 1;
+              interaction_notification = "It Opened..";
+              return true;      
+          }
+          else if (furniture->interact_status == 1) {
+              furniture->interact_status = 2;
+              furniture->phase_allow_interact = false;
+          }
+      }
+
 
       else if (furniture->type == DOORBLOCK) {
           if (furniture->interact_status == 0) {
@@ -165,6 +208,24 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
               gameplayUI->insertDialogueText("I turned around for a second and this chain... vanished out of thin air?");
               gameplayUI->insertDialogueText("...");
               furniture->interact_status = 1;
+          }
+          else if (inventory.hasItem(CLIP_L) && inventory.hasItem(CLIP_R) && inventory.hasItem(CLIP_M)) {
+              Sound::play_3D(*cut_chain_sample, 2.0f,
+                  furniture->drawable->transform->position, 10.0f);
+
+              // display cut chain
+              setFurniturePhaseVisibility(CHAIN_CUT1, true);
+              setFurniturePhaseAvailability(CHAIN_CUT1, false);
+              setFurniturePhaseVisibility(CHAIN_CUT2, true);
+              setFurniturePhaseAvailability(CHAIN_CUT2, false);
+              setFurniturePhaseVisibility(CHAIN, false);
+              setFurniturePhaseAvailability(CHAIN, false);
+
+              setFurniturePhaseAvailability(FRONT_DOOR, true);
+
+          }
+          else if (inventory.hasItem(CLIP_L) || inventory.hasItem(CLIP_R) || inventory.hasItem(CLIP_M)) {
+              interaction_notification = "I have some parts of a chain cutter now..maybe if I find all three parts I can cut my way out!";
           }
           else {
               interaction_notification = "Still locked. I can't untangle it.";
@@ -257,6 +318,13 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
           // go up
           furniture->interact_status = 2;
           furniture->phase_allow_interact = false;
+
+          setFurniturePhaseAvailability(FRIDGE1, false);
+          setFurniturePhaseAvailability(FRIDGE2, false);
+          setFurniturePhaseAvailability(FRIDGE3, false);
+          setFurniturePhaseAvailability(FRIDGE4, false);
+          setFurniturePhaseAvailability(FRIDGE5, false);
+
           return true;
         }
 
@@ -329,17 +397,29 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
 bool InteractableManager::updateItem(Scene::Transform *player_transform,
                                      Scene::Camera *camera,
                                      bool interact_pressed, float elapsed) {
-  for (auto &[_, item] : itemsMap) {
+
+    int total_pt = inventory.hasItem(CLIP_L) + inventory.hasItem(CLIP_M) + inventory.hasItem(CLIP_R);
+    
+    for (auto &[_, item] : itemsMap) {
     if (!item->interactable(player_transform, camera)) {
       continue;
     }
     gameplayUI->setInteractionText(item->interactText());
     if (interact_pressed) {
       inventory.addItem(item->type);
-      if (item->type == CLIP_R) {
-        interaction_notification =
-            "Part of a clip. I should find the other half. (1/3)";
-      } else if (item->type == FILE1) {
+      if (item->type == CLIP_L) {
+          interaction_notification =
+              "Part of a chain cutter. (" + std::to_string((total_pt + 1)) + "/3)";
+      }
+      else if (item->type == CLIP_R) {
+          interaction_notification =
+              "Part of a chain cutter. (" + std::to_string((total_pt + 1)) + "/3)";
+      }
+      else if (item->type == CLIP_M) {
+          interaction_notification =
+              "Part of a chain cutter. (" + std::to_string((total_pt + 1)) + "/3)";
+      }
+      else if (item->type == FILE1) {
         interaction_notification = "\"(stained...) should never find "
                                    "(stained...) basement in this house.\"";
       } else if (item->type == BEDROOM_KEY) {

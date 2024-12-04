@@ -46,6 +46,11 @@ bool Item::interact(float elapsed) {
     visible = false;
     this->drawable->visible = false;
     return true;
+  }
+  else if (type == CLIP_M) {
+      visible = false;
+      this->drawable->visible = false;
+      return true;
   } else if (type == CLIP_R) {
     visible = false;
     this->drawable->visible = false;

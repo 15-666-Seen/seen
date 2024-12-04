@@ -224,7 +224,9 @@ bool PlayMode::handle_event(SDL_Event const &evt,
 
 bool ending = false; // if the game is ending, move to EndMode
 void PlayMode::update(float elapsed) {
-  if (ending) {
+
+
+  if (ending || interactableManager.interactStatusCheck(FRONT_DOOR) >= 2) {
     next = "EndMode";
     finished = true;
   }
@@ -478,7 +480,7 @@ void PlayMode::checkPhaseUpdates() {
     player.at = walkmesh->nearest_walk_point(player.transform->position);
   }
 
-  else if (storyManager->getCurrentPhase() == 8) { //
+  else if (storyManager->getCurrentPhase() == 6) {
     walkmesh = &phonebank_walkmeshes->lookup("phase5");
     player.at = walkmesh->nearest_walk_point(player.transform->position);
   }

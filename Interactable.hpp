@@ -75,12 +75,15 @@ enum FurnitureType {
   FRIDGE5,
   CLOSET0,
   CLOSET1,
-  CLOSET2
+  CLOSET2,
+  BLUEPRINT
 };
 static std::map<FurnitureType, std::vector<std::string>>
     FurnitureTypeToInteractText = {
         {BED, {"hide under bed", "exit hiding"}},
         {BEDROOM_DOOR, {"open door"}},
+        {REDROOM_DOOR, {"open door"}},
+        {FRONT_DOOR, {"open door", "leave?"}},
         {DOOR1, {"open door"}},
         {DOORBLOCK, {"examine", "remove"}},
         {TINY_SCULPTURE, {"interact"}},
@@ -96,6 +99,7 @@ static std::map<FurnitureType, std::vector<std::string>>
         {CLOSET0, {"hide", "exit hiding"}},
         {CLOSET1, {"hide", "exit hiding"}},
         {CLOSET2, {"hide", "exit hiding"}},
+        {BLUEPRINT, {"investigate"}}
 };
 
 static std::map<std::string, FurnitureType> MeshNameToFurnitureType = {
@@ -123,6 +127,7 @@ static std::map<std::string, FurnitureType> MeshNameToFurnitureType = {
     {"Closet0", CLOSET0},
     {"Closet1", CLOSET1},
     {"Closet2", CLOSET2},
+    {"Blueprint", BLUEPRINT}
 };
 
 /* A single furniture */
