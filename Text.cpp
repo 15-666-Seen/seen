@@ -217,6 +217,18 @@ void Text::set_font_size(FT_F26Dot6 new_font_size, FT_F26Dot6 new_font_scale,
 //    return;
 //}
 
+
+Character Text::get_character(unsigned int i, hb_glyph_info_t* glyph_info) {
+    hb_codepoint_t char_req = glyph_info[i].codepoint;
+    if (chars.find(char_req) == chars.end()) {
+        Character ch = Character::Load(char_req, typeface);
+        chars.insert(std::pair<hb_codepoint_t, Character>(char_req, ch));
+    }
+
+    const Character& ch = chars[char_req];
+	return ch;
+}
+
 void Text::draw(float dt, const glm::vec2 &drawable_size, const glm::vec2 &pos, float ss_scale, bool animate) {
   // drawable_size - window size
   // width - how wide the displayed string gets to be
@@ -271,15 +283,11 @@ void Text::draw(float dt, const glm::vec2 &drawable_size, const glm::vec2 &pos, 
               use_secondary ? color2.y : color.y,
               use_secondary ? color2.z : color.z);
 
-  for (unsigned int i = 0; i < static_cast<unsigned int>(amnt * num_chars);
+  for (unsigned int i = 1; i <= static_cast<unsigned int>(amnt * num_chars);
        i++) {
-    hb_codepoint_t char_req = glyph_info[i].codepoint;
-    if (chars.find(char_req) == chars.end()) {
-      Character ch = Character::Load(char_req, typeface);
-      chars.insert(std::pair<hb_codepoint_t, Character>(char_req, ch));
-    }
+    
+	  Character ch = get_character(i-1, glyph_info);
 
-    const Character &ch = chars[char_req];
     float xpos = char_x + ch.Bearing.x * ss_scale;
     float ypos = char_y - (ch.Size.y - ch.Bearing.y) * ss_scale;
     float w = ch.Size.x * ss_scale;
@@ -305,26 +313,19 @@ void Text::draw(float dt, const glm::vec2 &drawable_size, const glm::vec2 &pos, 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-    // glDepthMask(GL_TRUE);
-
-    //char_x += (ch.Advance >> 6) * ss_scale;
-
-    /*if (char_x >= right_bound || text_content[i] == '\n') {
-      char_x = pos.x;
-      char_y -= (y_size + 5.0f);
-    }
-    // newline by word
-    else */
     if (text_content[i] == ' ') { 
-      unsigned int j = i + 1;
-      for (; text_content[j] != ' ' && j < text_content.size(); j++);
-	  j--;
-	  j--;
 
-      if ((char_x + ((ch.Advance >> 6) * ss_scale * (j - i + 5))) >= right_bound) {
+      unsigned int j = i + 1;
+	  float next_word_width = (ch.Advance >> 6) * ss_scale;
+
+	  for (; text_content[j] != ' ' && j < text_content.size(); j++) {
+		  Character next_ch = get_character(j, glyph_info);
+		  next_word_width += (next_ch.Advance >> 6) * ss_scale;
+      }
+
+      if ((char_x + next_word_width) >= right_bound) {
         char_x = pos.x;
         char_y -= (y_size + 5.0f);
-		//i++;    // Skip the space
 	  }
 	  else
 		  char_x += (ch.Advance >> 6) * ss_scale;
