@@ -92,6 +92,7 @@ static std::map<FurnitureType, std::vector<std::string>>
         {FRIDGE3, {"open fridge"}},
         {FRIDGE4, {"open fridge"}},
         {FRIDGE5, {"open fridge"}},
+        {CHAIN, {"leave", "try to leave"}},
         {CLOSET0, {"hide", "exit hiding"}},
         {CLOSET1, {"hide", "exit hiding"}},
         {CLOSET2, {"hide", "exit hiding"}},
@@ -138,6 +139,7 @@ struct Furniture {
   int interact_status = 0;
   // TODO: TBD
   bool can_interact = false;
+  float anim_time = 0.0f;
 
   // when calling interact, pre-condition must be valid
   virtual bool interact(float elapsed);

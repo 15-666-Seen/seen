@@ -46,6 +46,8 @@ struct InteractableManager {
 
   void setFurniturePhaseAvailability(FurnitureType furniture_type, bool allow);
   void setItemPhaseAvailability(ItemType item_type, bool allow);
+
+
   void setFurniturePhaseVisibility(FurnitureType furniture_type, bool visible);
   void setItemPhaseVisibility(ItemType item_type, bool visible);
 
@@ -62,4 +64,6 @@ struct InteractableManager {
 
   void closeDoor(FurnitureType furniture_type);
   void moveFurniture(FurnitureType furniture_type, glm::vec3 move);
+
+  void scaleFurniture(FurnitureType furniture_type, float scale);
 };
