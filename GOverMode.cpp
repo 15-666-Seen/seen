@@ -41,7 +41,7 @@ GOverMode::GOverMode() : scene(*gbg_scene) {
     background->pipeline.start = mesh1.start;
     background->pipeline.count = mesh1.count;
 
-    background->tex_normal = 0;// background->pipeline.tex_name_to_glint["0_n"];
+    background->tex_normal = background->pipeline.tex_name_to_glint["0_n"];
 	background->transform->rotation = glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.f));
 	background->transform->rotation *= glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 0.f, 1.f));
 	background->transform->position = glm::vec3(0.0f, 0.0f, 0.5f);
