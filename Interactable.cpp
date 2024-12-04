@@ -81,9 +81,19 @@ Furniture::Furniture() {}
 bool Furniture::interact(float elapsed) {
   if (type == BED) {
     interact_status = 1;
-  } else if (type == CLOSET2) {
-    interact_status = 1;
+  } 
+  else if (type == CLOSET2) {
+      interact_status = 1;
   }
+  else if (type == TINY_SCULPTURE_TENTACLES) {
+      if (anim_time > 1.f) {
+          interact_status = 2;
+          return true;
+      }
+      anim_time += elapsed;
+      drawable->transform->scale = glm::vec3(anim_time);
+  }
+
 
   return true;
 }

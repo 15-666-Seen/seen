@@ -35,3 +35,8 @@ Load<Sound::Sample>
 breath_trigger_sample(LoadTagDefault, []() -> Sound::Sample const * {
   return new Sound::Sample(data_path("sounds/breath-trigger.wav"));
 });
+
+Load<Sound::Sample>
+chain_sample(LoadTagDefault, []() -> Sound::Sample const* {
+	return new Sound::Sample(data_path("sounds/chain.wav"));
+	});

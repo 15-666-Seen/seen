@@ -16,8 +16,11 @@ void StoryManager::SetUpManager(GameplayUI *ui, InteractableManager *im) {
   // hide some things
   interactableManager->setFurniturePhaseVisibility(CHAIN_CUT2, false);
   interactableManager->setFurniturePhaseVisibility(CHAIN_CUT1, false);
-  interactableManager->setFurniturePhaseVisibility(CHAIN, false);
+
+  interactableManager->setFurniturePhaseVisibility(TINY_SCULPTURE_TENTACLES, false);
   interactableManager->setFurniturePhaseVisibility(DOORBLOCK, false);
+
+  interactableManager->setFurniturePhaseVisibility(SCULPTURE_EYE_R, false);
 
   setUpPhase(); // set up phase 0
 }
@@ -38,7 +41,7 @@ bool StoryManager::advanceStory() {
     break;
   case 1:
     // forward if tiny sculpture is interacted, red key is shown
-    if (interactableManager->interactStatusCheck(TINY_SCULPTURE) == 1) {
+    if (interactableManager->interactStatusCheck(TINY_SCULPTURE_TENTACLES) == 2) {
       current_phase++; // advance to the next phase
       set_up_next_phase = true;
     }
@@ -131,6 +134,8 @@ void StoryManager::setUpPhase() {
     interactableManager->setFurniturePhaseAvailability(DOOR1, true);
     interactableManager->setItemPhaseVisibility(REDROOM_KEY, false);
 
+    interactableManager->setFurniturePhaseAvailability(CHAIN, true);
+
     break;
 
   case 1:
@@ -143,7 +148,6 @@ void StoryManager::setUpPhase() {
     interactableManager->setFurniturePhaseVisibility(CHAIN, true);
 
     // user get in blue room, tiny sculpture is available
-    interactableManager->setFurniturePhaseVisibility(SCULPTURE_EYE_R, false);
     interactableManager->setFurniturePhaseAvailability(TINY_SCULPTURE, true);
     interactableManager->setItemPhaseAvailability(EYEBALL, true);
 
@@ -156,7 +160,7 @@ void StoryManager::setUpPhase() {
     interactableManager->closeDoor(DOOR1);
     interactableManager->setItemPhaseVisibility(REDROOM_KEY, true);
     interactableManager->setItemPhaseAvailability(REDROOM_KEY, true);
-    interactableManager->setFurniturePhaseAvailability(TINY_SCULPTURE, false);
+
     //interactableManager->setFurniturePhaseAvailability(BOOKSHELF, true);
 
     interactableManager->setFurniturePhaseVisibility(DOORBLOCK, true);

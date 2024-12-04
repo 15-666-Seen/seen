@@ -157,14 +157,36 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
           return true;
       }
 
+      else if (furniture->type == CHAIN) {
+          if (furniture->interact_status == 0) {
+              Sound::play_3D(*chain_sample, 2.0f,
+                  furniture->drawable->transform->position, 10.0f);
+              gameplayUI->insertDialogueText("No. No way. I can't be seeing this right. What kind of place is this?");
+              gameplayUI->insertDialogueText("I turned around for a second and this chain... vanished out of thin air?");
+              gameplayUI->insertDialogueText("...");
+              furniture->interact_status = 1;
+          }
+          else {
+              interaction_notification = "Still locked. I can't untangle it.";
+          }
+          
+         return true;
+      }
+
+
       else if (furniture->type == TINY_SCULPTURE) {
+         
         if (!inventory.hasItem(EYEBALL)) {
           interaction_notification = "Hmm... Seems something is missing here.";
         } else {
-          // TODO@Isa: animation?
-          furniture->interact_status = 1;
-          // also change visablity of furniture eyeball
-          furnituresMap[SCULPTURE_EYE_R]->drawable->visible = true;
+            // can no longer interact w sculpture
+            setFurniturePhaseAvailability(TINY_SCULPTURE, false);
+
+            // animation
+            furnituresMap[TINY_SCULPTURE_TENTACLES]->interact_status = 1;
+            furnituresMap[SCULPTURE_EYE_R]->drawable->visible = true;
+            setFurniturePhaseVisibility(TINY_SCULPTURE_TENTACLES, true);
+            scaleFurniture(TINY_SCULPTURE_TENTACLES, 0.001f);
         }
       }
 
@@ -239,7 +261,7 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
         }
 
         interaction_notification =
-            "Not yet. I haven't found what I'm looking for.";
+            "Not yet. This place wouldn't be marked on the blueprint if this is all.";
         return true;
       } else if (furniture->type == FRIDGE1) {
         // Push sofa aside
@@ -370,4 +392,13 @@ void InteractableManager::closeDoor(FurnitureType furniture_type) {
   door->drawable->transform->rotation =
       glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
   door->animation_time = 0.0f;
+}
+
+void InteractableManager::scaleFurniture(FurnitureType furniture_type, float scale) {
+    for (auto& [_, furniture] : furnituresMap) {
+
+        if (furniture->type == furniture_type) {
+            furniture->drawable->transform->scale = glm::vec3(scale);
+        }
+    }
 }
