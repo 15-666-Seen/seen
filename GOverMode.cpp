@@ -56,6 +56,11 @@ GOverMode::GOverMode() : scene(*gbg_scene) {
     text.set_color(glm::vec3(0.8f, 0.8f, 0.8f));
 
     text.set_text(texts[current_section].text);
+
+	instructions.init();
+	//instructions.set_color(glm::vec3(0.8f, 0.8f, 0.8f));
+	instructions.set_text("Press [Q] to Exit    Press [E] to Restart");
+
     if (lit_color_texture_program->tex_file_to_glint.find(texts[0].text_file) == lit_color_texture_program->tex_file_to_glint.end()) {
         throw std::runtime_error("Texture not found");
     }
@@ -68,32 +73,53 @@ bool GOverMode::handle_event(SDL_Event const &evt,
                             glm::uvec2 const &window_size) {
 
   if (evt.type == SDL_KEYDOWN) {
-    if (evt.key.keysym.sym == SDLK_ESCAPE) {
-      SDL_SetRelativeMouseMode(SDL_FALSE);
-      gamePause = !gamePause;
-      return true;
-    } 
-  } else if (evt.type == SDL_KEYUP) {
-    if (evt.key.keysym.sym == SDLK_SPACE) {
-      space.pressed = true;
-      return true;
-    } 
-  } else if (evt.type == SDL_MOUSEBUTTONUP) {
-	click.pressed = true;
-	return true;
+        if (evt.key.keysym.sym == SDLK_ESCAPE) {
+          SDL_SetRelativeMouseMode(SDL_FALSE);
+          gamePause = !gamePause;
+          return true;
+        } 
+        else if (evt.key.keysym.sym == SDLK_q) {
+            q.pressed = true;
+            return true;
+        }
+        else if (evt.key.keysym.sym == SDLK_e) {
+            e.pressed = true;
+            return true;
+        }
+        else if (evt.key.keysym.sym == SDLK_SPACE) {
+            space.pressed = true;
+            return true;
+        }
+  } 
+  else if (evt.type == SDL_MOUSEBUTTONDOWN) {
+	    click.pressed = true;
+	    return true;
   }
 
   return false;
 }
 
-
+bool stop_animation = false;
 void GOverMode::update(float elapsed) {
   if (gStop || gamePause) {
     return;
   }
 
-  if (space.pressed || click.pressed) {
+  if (q.pressed) {
 	  finished = true;
+      next = "";
+	  //std::cout << "Q pressed" << std::endl;
+      return;
+  }
+  if (e.pressed) {
+	  finished = true;
+	  next = "PlayMode";
+	  //std::cout << "E pressed" << std::endl;
+	  return;
+  }
+
+  if (space.pressed || click.pressed) {
+	  stop_animation = true;
 
   }
     // reset button press counters:
@@ -101,6 +127,10 @@ void GOverMode::update(float elapsed) {
   space.pressed = false;
   click.downs = 0;
   click.pressed = false;
+  q.downs = 0;
+  q.pressed = false;
+  e.downs = 0;
+  e.pressed = false;
 
   //bool advanced = storyManager->advanceStory();
   GOverMode::text_elapsed = elapsed;
@@ -151,7 +181,12 @@ void GOverMode::draw(glm::uvec2 const &drawable_size) {
   float y = drawable_size.y * 0.22f;
   //float width = drawable_size.x * 0.8f;
   text.set_bound(drawable_size.x * 0.9f);
-  text.draw(GOverMode::text_elapsed, drawable_size, glm::vec2(x, y), 1.1f, true);
+  text.draw(GOverMode::text_elapsed, drawable_size, glm::vec2(x, y), 1.1f, !stop_animation);
+
+  x = drawable_size.x * 0.7f;
+  y = drawable_size.y * 0.5f;
+  instructions.set_bound(drawable_size.x * 0.98f);
+  instructions.draw(GOverMode::text_elapsed, drawable_size, glm::vec2(x, y), 1.f, false);
 
   GL_ERRORS();
 }

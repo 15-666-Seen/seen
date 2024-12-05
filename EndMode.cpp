@@ -30,85 +30,43 @@ Load< Scene > ebg_scene(LoadTagDefault, []() -> Scene const* {
 
 EndMode::EndMode() : scene(*ebg_scene) {
 
-    //Mesh mesh1 = bg_meshes->lookup("Plane");
+    if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
+    camera = &scene.cameras.front();
+    //camera->transform->position = glm::vec3(10.0f, 0.f, 0.0f);
 
-    //auto newTrans1 = new Scene::Transform();
-    //scene.drawables.emplace_back(newTrans1);
-    //background = &scene.drawables.back();
-
-    //background->pipeline = lit_color_texture_program_pipeline;
-    //background->pipeline.vao = bg_meshes_for_lit_color_texture_program;
-    //background->pipeline.type = mesh1.type;
-    //background->pipeline.start = mesh1.start;
-    //background->pipeline.count = mesh1.count;
-
-	/*if (lit_color_texture_program->tex_file_to_glint.find("IMG_3075.png") == lit_color_texture_program->tex_file_to_glint.end()) {
-		throw std::runtime_error("Texture not found");
-	}
-	background->tex = lit_color_texture_program->tex_file_to_glint.find("IMG_3075.png")->second;
-	std::cout << "Texture: " << background->tex << std::endl;*/
- //   background->tex_normal = 0;// background->pipeline.tex_name_to_glint["0_n"];
-	//background->transform->rotation = glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.f));
-	//background->transform->rotation *= glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 0.f, 1.f));
-	//background->transform->position = glm::vec3(0.0f, 0.0f, 0.5f);
-	//background->transform->scale = glm::vec3(0.7f, 0.3f, 0.5f);
-	//background->transform->scale = glm::vec3(0.1f, 0.1f, 0.1f);
-
- //   if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
- //   camera = &scene.cameras.front();
- //   camera->transform->position = glm::vec3(10.0f, 0.f, 0.0f);
-
-
-	//// add a background (black background behind the images)
- //   auto newTrans2 = new Scene::Transform();
- //   scene.drawables.emplace_back(newTrans2);
- //   Scene::Drawable& d = scene.drawables.back();
-
- //   d.pipeline = lit_color_texture_program_pipeline;
- //   d.pipeline.vao = bg_meshes_for_lit_color_texture_program;
- //   d.pipeline.type = mesh1.type;
- //   d.pipeline.start = mesh1.start;
- //   d.pipeline.count = mesh1.count;
- //   d.tex = lit_color_texture_program->tex_file_to_glint.find("pure_black.png")->second;
-	//d.tex_normal = 0;
-	//d.transform->position = glm::vec3(0.0f, 0.0f, 0.0f);
- //   d.transform->rotation = glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.f));
- //   d.transform->rotation *= glm::angleAxis(glm::radians(90.f), glm::vec3(0.0f, 0.f, 1.f));
-	//
-
- //   //d.transform->scale = glm::vec3(2.f, 1.f, 1.f);
-
- //   text.init();
- //   text.set_color(glm::vec3(0.8f, 0.8f, 0.8f));
- //   //text.set_text("interactionText");
-
- //   text.set_text(texts[current_section].text);
- //   if (lit_color_texture_program->tex_file_to_glint.find(texts[0].text_file) == lit_color_texture_program->tex_file_to_glint.end()) {
- //       throw std::runtime_error("Texture not found");
- //   }
- //   background->tex = lit_color_texture_program->tex_file_to_glint.find(texts[0].text_file)->second;
+	text.init();
+    text.set_color(glm::vec3(0.8f, 0.8f, 0.8f));
+    text.set_text(texts[current_section].text);
+	instructions.init();
+    instructions.set_text("Press [Q] to Exit    Press [E] to Restart");
 }
 
 EndMode::~EndMode() {}
 
 bool EndMode::handle_event(SDL_Event const &evt,
                             glm::uvec2 const &window_size) {
-
-  if (evt.type == SDL_KEYDOWN) {
-    if (evt.key.keysym.sym == SDLK_ESCAPE) {
-      SDL_SetRelativeMouseMode(SDL_FALSE);
-      gamePause = !gamePause;
-      return true;
+    if (evt.type == SDL_KEYDOWN) {
+        if (evt.key.keysym.sym == SDLK_ESCAPE) {
+            SDL_SetRelativeMouseMode(SDL_FALSE);
+            gamePause = !gamePause;
+            return true;
+        }
+        else if (evt.key.keysym.sym == SDLK_q) {
+            q.pressed = true;
+            return true;
+        }
+        else if (evt.key.keysym.sym == SDLK_e) {
+            e.pressed = true;
+            return true;
+        }
+        else if (evt.key.keysym.sym == SDLK_SPACE) {
+            space.pressed = true;
+            return true;
+        }
+    } else if (evt.type == SDL_MOUSEBUTTONDOWN) {
+            click.pressed = true;
+            return true;
     }
-  } else if (evt.type == SDL_KEYUP) {
-    if (evt.key.keysym.sym == SDLK_SPACE) {
-      space.pressed = true;
-      return true;
-    }
-  } else if (evt.type == SDL_MOUSEBUTTONUP) {
-    click.pressed = true;
-    return true;
-  }
 
   return false;
 }
@@ -119,17 +77,31 @@ void EndMode::update(float elapsed) {
     return;
   }
 
+  if (q.pressed) {
+      finished = true;
+      next = "";
+      //std::cout << "Q pressed" << std::endl;
+      return;
+  }
+  if (e.pressed) {
+      finished = true;
+      next = "PlayMode";
+      //std::cout << "E pressed" << std::endl;
+      return;
+  }
+
   if (space.pressed || click.pressed) {
 	  current_section++;
 	  if (current_section >= 4) {
-		  finished = true;
-		  return;
+          current_section = 3;
+		  /*finished = true;
+		  return;*/
 	  }
 	  text.set_text(texts[current_section].text);
 	  text.reset_time();
-      if (lit_color_texture_program->tex_file_to_glint.find(texts[current_section].text_file) == lit_color_texture_program->tex_file_to_glint.end()) {
+      /*if (lit_color_texture_program->tex_file_to_glint.find(texts[current_section].text_file) == lit_color_texture_program->tex_file_to_glint.end()) {
           throw std::runtime_error("Texture not found");
-      }
+      }*/
       //background->tex = lit_color_texture_program->tex_file_to_glint.find(texts[current_section].text_file)->second;
 
   }
@@ -189,6 +161,11 @@ void EndMode::draw(glm::uvec2 const &drawable_size) {
   //float width = drawable_size.x * 0.8f;
   text.set_bound(drawable_size.x * 0.9f);
   text.draw(EndMode::text_elapsed, drawable_size, glm::vec2(x, y), 1.1f, true);
+
+  x = drawable_size.x * 0.7f;
+  y = drawable_size.y * 0.5f;
+  instructions.set_bound(drawable_size.x * 0.98f);
+  instructions.draw(EndMode::text_elapsed, drawable_size, glm::vec2(x, y), 1.f, false);
 
   GL_ERRORS();
 }
