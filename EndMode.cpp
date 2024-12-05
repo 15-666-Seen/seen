@@ -39,14 +39,12 @@ EndMode::EndMode() : scene(*ebg_scene) {
     text.set_text(texts[current_section].text);
 	instructions.init();
     instructions.set_text("Press [Q] to Exit    Press [E] to Restart");
-	std::cout << "EndMode created" << std::endl;
 }
 
 EndMode::~EndMode() {}
 
 bool EndMode::handle_event(SDL_Event const &evt,
                             glm::uvec2 const &window_size) {
-	std::cout << "EndMode event handled" << std::endl;
     if (evt.type == SDL_KEYDOWN) {
         if (evt.key.keysym.sym == SDLK_ESCAPE) {
             SDL_SetRelativeMouseMode(SDL_FALSE);
@@ -82,13 +80,13 @@ void EndMode::update(float elapsed) {
   if (q.pressed) {
       finished = true;
       next = "";
-      std::cout << "Q pressed" << std::endl;
+      //std::cout << "Q pressed" << std::endl;
       return;
   }
   if (e.pressed) {
       finished = true;
       next = "PlayMode";
-      std::cout << "E pressed" << std::endl;
+      //std::cout << "E pressed" << std::endl;
       return;
   }
 
@@ -115,7 +113,6 @@ void EndMode::update(float elapsed) {
 
   //bool advanced = storyManager->advanceStory();
   EndMode::text_elapsed = elapsed;
-  std::cout << "EndMode updated" << std::endl;
 }
 
 void EndMode::draw(glm::uvec2 const &drawable_size) {
@@ -170,6 +167,5 @@ void EndMode::draw(glm::uvec2 const &drawable_size) {
   instructions.set_bound(drawable_size.x * 0.98f);
   instructions.draw(EndMode::text_elapsed, drawable_size, glm::vec2(x, y), 1.f, false);
 
-  std::cout << "EndMode drawn" << std::endl;
   GL_ERRORS();
 }
