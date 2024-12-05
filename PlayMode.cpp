@@ -225,10 +225,13 @@ bool PlayMode::handle_event(SDL_Event const &evt,
 bool ending = false; // if the game is ending, move to EndMode
 void PlayMode::update(float elapsed) {
 
-
+   
   if (ending || interactableManager.interactStatusCheck(FRONT_DOOR) >= 2) {
-    next = "EndMode";
-    finished = true;
+      waitBeforeEnd -= elapsed;
+      if (waitBeforeEnd <= 0.f) {
+          next = "EndMode";
+          finished = true;
+      }
     return;
   }
 
@@ -424,7 +427,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 
   glUseProgram(0);
 
-  glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+  glClearColor(0.065f, 0.01f, 0.01f, 0.4f);
   glClearDepth(1.0f); // 1.0 is actually the default value to clear the depth
                       // buffer to, but FYI you can change it.
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

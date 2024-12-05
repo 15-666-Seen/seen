@@ -60,4 +60,6 @@ struct PlayMode : Mode {
 
   // ghosts
   void setupGhosts();
+
+  float waitBeforeEnd = 2.f;
 };

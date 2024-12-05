@@ -133,6 +133,10 @@ bool Furniture::interactable(Scene::Transform *player_transform,
           iteractCheck(player_transform, getCenterPos() + glm::vec3(0.f, 0.f, -2.6f), camera,
                FURNITURE_INTERACT_DISTANCE);
   }
+  else if (type == FRONT_DOOR) {
+      return iteractCheck(player_transform, getCenterPos() + glm::vec3(-0.5f, 0.f, 0.f), camera,
+          FURNITURE_INTERACT_DISTANCE);
+  }
 
   return iteractCheck(player_transform, getCenterPos(), camera,
                       FURNITURE_INTERACT_DISTANCE);

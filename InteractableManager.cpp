@@ -40,7 +40,7 @@ void InteractableManager::load(const Scene &scene, GameplayUI *a_gameplayUI) {
     Furniture *furniture;
     // Special case to add offset for door
     if (furniture_type == BEDROOM_DOOR || furniture_type == DOOR1 
-        || furniture_type == REDROOM_DOOR ) {
+        || furniture_type == REDROOM_DOOR || furniture_type == FRONT_DOOR) {
       furniture = new Door();
     } else {
       furniture = new Furniture();

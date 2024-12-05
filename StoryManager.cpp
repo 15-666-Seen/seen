@@ -27,6 +27,8 @@ void StoryManager::SetUpManager(GameplayUI *ui, InteractableManager *im) {
       interactableManager->setFurniturePhaseVisibility(CORPSE, false);
   }
 
+  
+
   setUpPhase(); // set up phase 0
 }
 
@@ -168,6 +170,7 @@ void StoryManager::setUpPhase() {
 
     interactableManager->setFurniturePhaseAvailability(CHAIN, true);
 
+    //interactableManager->setFurniturePhaseAvailability(FRONT_DOOR, true);
     break;
 
   case 1:
