@@ -39,7 +39,7 @@ struct Character {
 struct Text {
   std::string text_file = "RubikDistressed-Regular.ttf";
   FT_F26Dot6 font_size = 2;
-  FT_F26Dot6 font_scale = 2; // number of units per pixel
+  FT_F26Dot6 font_scale = 3; // number of units per pixel
 
   float anim_time = 1.0f; // time (seconds) to complete animation
   float time = 0.f;       // current time for new text

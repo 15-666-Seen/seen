@@ -15,5 +15,6 @@ extern Load<Sound::Sample> eyeball_sample;
 
 extern Load<Sound::Sample> chain_sample;
 extern Load<Sound::Sample> cut_chain_sample;
+extern Load<Sound::Sample> fridge_sample;
 
 extern Load<Sound::Sample> breath_trigger_sample;

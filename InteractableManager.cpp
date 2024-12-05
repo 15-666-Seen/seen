@@ -101,6 +101,8 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
                                           Scene::Camera *camera,
                                           bool interact_pressed,
                                           float elapsed) {
+
+   
   for (auto &[_, furniture] : furnituresMap) {
 
     if (furniture->isInteracting()) {
@@ -335,8 +337,15 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
       } else if (furniture->type == FRIDGE1) {
         // Push sofa aside
         if (current_phase == 11) {
+          Sound::play_3D(*fridge_sample, 2.0f,
+                furniture->drawable->transform->position, 10.0f);
+
+          Sound::play_3D(*breath_trigger_sample, 2.0f,
+              furniture->drawable->transform->position, 10.0f);
           furniture->drawable->transform->rotation +=
               glm::angleAxis(glm::radians(80.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+          furniture->drawable->transform->scale = glm::vec3(1.f);
+
           furniture->phase_allow_interact = false;
           interaction_notification = "Woah!!";
           return true;
@@ -347,8 +356,12 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
       else if (furniture->type == FRIDGE2) {
         // Push sofa aside
         if (current_phase == 11) {
+            Sound::play_3D(*fridge_sample, 2.0f,
+                furniture->drawable->transform->position, 10.0f);
           furniture->drawable->transform->rotation +=
               glm::angleAxis(glm::radians(80.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+          furniture->drawable->transform->scale = glm::vec3(1.f);
+
           furniture->phase_allow_interact = false;
           return true;
         }
@@ -358,8 +371,12 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
       else if (furniture->type == FRIDGE3) {
         // Push sofa aside
         if (current_phase == 11) {
-          furniture->drawable->transform->rotation +=
+            Sound::play_3D(*fridge_sample, 2.0f,
+                furniture->drawable->transform->position, 10.0f);
+          furniture->drawable->transform->rotation =
               glm::angleAxis(glm::radians(80.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+          furniture->drawable->transform->scale = glm::vec3(1.f);
+
           furniture->phase_allow_interact = false;
           return true;
         }
@@ -367,10 +384,12 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
       }
 
       else if (furniture->type == FRIDGE4) {
-        // Push sofa aside
         if (current_phase == 11) {
-          furniture->drawable->transform->rotation +=
+            Sound::play_3D(*fridge_sample, 2.0f,
+                furniture->drawable->transform->position, 10.0f);
+          furniture->drawable->transform->rotation =
               glm::angleAxis(glm::radians(80.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+          furniture->drawable->transform->scale = glm::vec3(1.f);
           furniture->phase_allow_interact = false;
           setItemPhaseAvailability(CLIP_R, true);
           return true;
@@ -381,8 +400,13 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
       else if (furniture->type == FRIDGE5) {
         // Push sofa aside
         if (current_phase == 11) {
-          furniture->drawable->transform->rotation +=
+            Sound::play_3D(*fridge_sample, 2.0f,
+                furniture->drawable->transform->position, 10.0f);
+          furniture->drawable->transform->rotation =
               glm::angleAxis(glm::radians(80.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+          furniture->drawable->transform->scale = glm::vec3(1.f);
+         
+
           furniture->phase_allow_interact = false;
           return true;
         }
