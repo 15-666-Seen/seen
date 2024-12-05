@@ -31,21 +31,18 @@ struct GOverMode : Mode {
   struct Button {
     uint8_t downs = 0;
     uint8_t pressed = 0;
-  } space, click;
+  } space, click, q ,e;
 
   // local copy of the game scene (so code can change it during gameplay):
   Scene scene;
   Scene::Drawable* background = nullptr;
   Scene::Camera* camera = nullptr;
 
-  Text text;
+  Text text, instructions;
   uint8_t current_section = 0;
-  Section texts[4] = { 
+  Section texts[1] = { 
       {"Ah, there you are. I told you Ravenshade always leaves its mark. Don't worry-you'll belong here soon enough.", "pure_black.png"},
   };
-
-  // In game UI
-  //GameplayUI *gameplayUI;
 
   bool gStop = false;
   bool gamePause = false;
@@ -54,7 +51,4 @@ struct GOverMode : Mode {
 
   float text_elapsed = 0.0f;  // time for text animation
 
-  //std::string current_dialogue = "";
-
-  //bool finished = false;
 };

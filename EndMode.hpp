@@ -29,14 +29,14 @@ struct EndMode : Mode {
   struct Button {
     uint8_t downs = 0;
     uint8_t pressed = 0;
-  } space, click;
+  } space, click, q, e;
 
   // local copy of the game scene (so code can change it during gameplay):
   Scene scene;
   //Scene::Drawable* background = nullptr;
   Scene::Camera* camera = nullptr;
 
-  Text text;
+  Text text, instructions;
   uint8_t current_section = 0;
   Section texts[4] = { 
       {"So, what do you think? Ravenshade Manor,charming, isn't it? It's not every day you find a place with so much character.", "pure_black.png"},
@@ -46,16 +46,12 @@ struct EndMode : Mode {
   };
 
   // In game UI
-  GameplayUI *gameplayUI;
 
   bool gStop = false;
   bool gamePause = false;
 
-  std::shared_ptr<Sound::PlayingSample> walking_sound;
+  //std::shared_ptr<Sound::PlayingSample> walking_sound;
 
   float text_elapsed = 0.0f;  // time for text animation
 
-  //std::string current_dialogue = "";
-
-  //bool finished = false;
 };
