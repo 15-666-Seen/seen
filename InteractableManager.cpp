@@ -39,7 +39,8 @@ void InteractableManager::load(const Scene &scene, GameplayUI *a_gameplayUI) {
     }
     Furniture *furniture;
     // Special case to add offset for door
-    if (furniture_type == BEDROOM_DOOR || furniture_type == DOOR1) {
+    if (furniture_type == BEDROOM_DOOR || furniture_type == DOOR1 
+        || furniture_type == REDROOM_DOOR ) {
       furniture = new Door();
     } else {
       furniture = new Furniture();
@@ -133,8 +134,8 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
       if (furniture->type == REDROOM_DOOR) {
               if (current_phase >= 5 && inventory.hasItem(REDROOM_KEY)) {
                   // TODO: DEBUG this crashes the game
-                 /* Door* door = dynamic_cast<Door*>(furniture);
-                  door->state = Door::DoorState::OPENING;*/
+                  Door* door = dynamic_cast<Door*>(furniture);
+                  door->state = Door::DoorState::OPENING;
                   furniture->interact_status = 1;
                   furniture->phase_allow_interact = false;
                   return true;
