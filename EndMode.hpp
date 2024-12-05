@@ -38,11 +38,12 @@ struct EndMode : Mode {
 
   Text text, instructions;
   uint8_t current_section = 0;
-  Section texts[4] = { 
-      {"So, what do you think? Ravenshade Manor,charming, isn't it? It's not every day you find a place with so much character.", "pure_black.png"},
-	  {"You really should come back sometime. The fireplace will be crackling, the rooms full of stories, and there's always tea on the stove. It's everything a home should be,warm, cozy, alive.", "pure_black.png"},
+  Section texts[5] = { 
+      {"So, what do you think? Ravenshade Manor, charming, isn't it? It's not every day you find a place with so much character.", "pure_black.png"},
+	  {"You really should come back sometime. The fireplace will be crackling, the rooms full of stories, and there's always tea on the stove. ", "pure_black.png"},
+	  {"It's everything a home should be...warm...cozy...alive.", "pure_black.png"},
 	  {"Come on, I'll walk you back inside. Trust me, it's an experience you won't forget, and neither will I.", "pure_black.png"},
-	  {"The END", "pure_black.png"}
+	  {"When you leave, if you leave, don't forget Ravenshade Manor. It won't forget you.", "pure_black.png"}
   };
 
   // In game UI
@@ -53,5 +54,6 @@ struct EndMode : Mode {
   //std::shared_ptr<Sound::PlayingSample> walking_sound;
 
   float text_elapsed = 0.0f;  // time for text animation
+  bool showfull = false;
 
 };

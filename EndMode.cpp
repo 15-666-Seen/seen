@@ -38,7 +38,8 @@ EndMode::EndMode() : scene(*ebg_scene) {
     text.set_color(glm::vec3(0.8f, 0.8f, 0.8f));
     text.set_text(texts[current_section].text);
 	instructions.init();
-    instructions.set_text("Press [Q] to Exit    Press [E] to Restart");
+    instructions.set_text(" ");
+    
 }
 
 EndMode::~EndMode() {}
@@ -77,33 +78,34 @@ void EndMode::update(float elapsed) {
     return;
   }
 
-  if (q.pressed) {
+  if (q.pressed && current_section >= 4) {
       finished = true;
       next = "";
       //std::cout << "Q pressed" << std::endl;
       return;
   }
-  if (e.pressed) {
+  if (e.pressed && current_section >= 4) {
       finished = true;
       next = "PlayMode";
       //std::cout << "E pressed" << std::endl;
       return;
   }
 
-  if (space.pressed || click.pressed) {
-	  current_section++;
-	  if (current_section >= 4) {
-          current_section = 3;
-		  /*finished = true;
-		  return;*/
-	  }
-	  text.set_text(texts[current_section].text);
-	  text.reset_time();
-      /*if (lit_color_texture_program->tex_file_to_glint.find(texts[current_section].text_file) == lit_color_texture_program->tex_file_to_glint.end()) {
-          throw std::runtime_error("Texture not found");
-      }*/
-      //background->tex = lit_color_texture_program->tex_file_to_glint.find(texts[current_section].text_file)->second;
+  if ((space.pressed || click.pressed) && current_section < 4) {
+      if (!showfull) {
+          showfull = true;
+          text.show_full();
+      }
+      else {
+          showfull = false;
+          current_section++;
+         
+          if (current_section == 4) instructions.set_text("Press [Q] to Exit    Press [E] to Restart");
 
+          text.set_text(texts[current_section].text);
+          text.reset_time();
+
+      }
   }
     // reset button press counters:
   space.downs = 0;
@@ -132,7 +134,7 @@ void EndMode::draw(glm::uvec2 const &drawable_size) {
 
   glUseProgram(0);
 
-  glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+  glClearColor(0.f, 0.f, 0.f, 1.0f);
   glClearDepth(1.0f); // 1.0 is actually the default value to clear the depth
                       // buffer to, but FYI you can change it.
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -154,7 +156,6 @@ void EndMode::draw(glm::uvec2 const &drawable_size) {
           0.0f, 0.3f, 0.0f, 0.f, 0.0f, 0.0f, 1.0f,
           0.0f, 0.0f, -0.65f, 0.0f, 1.0f));
   }
-  //sprites.~UIShader(); // explicitly draws any sprite
 
   float x = drawable_size.x * 0.1f;
   float y = drawable_size.y * 0.22f;

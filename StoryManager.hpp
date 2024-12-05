@@ -15,7 +15,7 @@ struct StoryManager {
   StoryManager();
 
   const int total_phase = 15;
-  int current_phase = 10;
+  int current_phase = 0;
   int bgm_status = 0;
 
   bool isa_is_debugging = true; // when true, we don't show the scary stuff!
