@@ -35,7 +35,7 @@ static std::map<std::string, ItemType> MeshNameToItemType = {
     {"Folder_Police", FILE2},    {"DenKey", DEN_KEY},
     {"RedroomKey", REDROOM_KEY}, {"ClipL", CLIP_L},
     {"ClipR", CLIP_R},           {"ClipM", CLIP_M},
-	{"Eyeball", EYEBALL}, 	{"Rope.001", ROPE},
+	{"Eyeball", EYEBALL}, 	{"Rope", ROPE},
 };
 static std::map<ItemType, std::string> ItemTypeToInteractText = {
     {BEDROOM_KEY, "grab key"},
