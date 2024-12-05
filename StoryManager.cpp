@@ -4,10 +4,13 @@
 #include "Interactable.hpp"
 #include "sound_prep.hpp"
 #include "util.hpp"
+#include "Move.hpp"
 
 #include <iostream>
 
 StoryManager::StoryManager() {}
+
+Move move;
 
 void StoryManager::SetUpManager(GameplayUI *ui, InteractableManager *im) {
   gameplayUI = ui;
@@ -26,7 +29,7 @@ void StoryManager::SetUpManager(GameplayUI *ui, InteractableManager *im) {
 }
 
 // true for advancing to the next phase
-bool StoryManager::advanceStory() {
+bool StoryManager::advanceStory(float elapsed) {
   bool set_up_next_phase = false;
 
   bgmCheck();
@@ -72,6 +75,65 @@ bool StoryManager::advanceStory() {
       current_phase++; // advance to the next phase
       set_up_next_phase = true;
     }
+	break;
+  case 6:
+	  // player is in the attic
+	  if (true) {
+		  current_phase++; // advance to the next phase
+		  set_up_next_phase = true;
+	  }
+	  break;
+  case 7:
+	  // open the attic door
+	  if (interactableManager->interactStatusCheck(ROPE) == 1) {
+		  //current_phase++; // advance to the next phase
+		  //set_up_next_phase = true;
+		  move.update(elapsed);
+		  static bool next = false;
+          uint8_t step = next;
+          if (step == 0) {
+              glm::vec3& old_pos = interactableManager->furnituresMap[ROPE]->drawable->transform->position;
+		      glm::vec3 new_pos = glm::vec3(old_pos.x, old_pos.y + 0.5f, old_pos.z - 0.5f);
+              move.AddTransition(old_pos, new_pos, 0.5f, &next);
+		      glm::quat& old_rotate = interactableManager->furnituresMap[ATTIC_DOOR]->drawable->transform->rotation;
+		      glm::quat new_rotate = old_rotate *= glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 1.f, 0.f));
+		      move.AddTransition(old_pos, new_pos, 0.5f, &next);
+              step = step + next;
+          }      
+          else if (step == 1) {
+              glm::vec3& old_pos = interactableManager->furnituresMap[ATTIC_LADDER]->drawable->transform->position;
+              glm::vec3 new_pos = glm::vec3(old_pos.x, old_pos.y + 0.5f, old_pos.z);
+              move.AddTransition(old_pos, new_pos, 0.5f, &next);
+              
+              step = step + next;
+          }
+          else if (step == 2) {
+			  glm::vec3& old_pos = interactableManager->furnituresMap[ATTIC_LADDER1]->drawable->transform->position;
+			  glm::vec3 new_pos = glm::vec3(old_pos.x, old_pos.y + 0.5f, old_pos.z);
+			  move.AddTransition(old_pos, new_pos, 0.5f, &next);
+			  step = step + next;
+		  }
+          else if (step == 3) {
+              glm::vec3& old_pos = interactableManager->furnituresMap[ATTIC_LADDER2]->drawable->transform->position;
+              glm::vec3 new_pos = glm::vec3(old_pos.x, old_pos.y + 0.5f, old_pos.z);
+              move.AddTransition(old_pos, new_pos, 0.5f, &next);
+              step = step + next;
+		  }
+          else if (step == 4) {
+              current_phase++; // advance to the next phase
+              set_up_next_phase = true;
+          }
+	  }
+	  break;
+  case 8:
+      // ghost chase
+
+      break;
+
+  case 9:
+      // ghost chase completed
+
+      break;
   case 10:
     // player uses the ladder
     if (interactableManager->interactStatusCheck(LADDER) == 1) {
@@ -184,6 +246,18 @@ void StoryManager::setUpPhase() {
   case 5:
     enableGhost("ghost1", false);
     break;
+  case 6:
+
+  case 7:
+	  interactableManager->setFurniturePhaseAvailability(ROPE, true);
+      interactableManager->furnituresMap[ATTIC_LADDER]->drawable->transform->parent = interactableManager->furnituresMap[ATTIC_DOOR]->drawable->transform;
+      interactableManager->furnituresMap[ATTIC_LADDER1]->drawable->transform->parent = interactableManager->furnituresMap[ATTIC_LADDER]->drawable->transform;
+      interactableManager->furnituresMap[ATTIC_LADDER2]->drawable->transform->parent = interactableManager->furnituresMap[ATTIC_LADDER1]->drawable->transform;
+  case 8:
+
+
+  case 9:
+
 
   case 10:
     // player is currently hiding, need to push sofa away

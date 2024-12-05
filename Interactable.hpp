@@ -27,15 +27,14 @@ enum ItemType {
   CLIP_L,
   CLIP_R,
   CLIP_M,
-  EYEBALL,
-  ROPE
+  EYEBALL
 };
 static std::map<std::string, ItemType> MeshNameToItemType = {
     {"BedroomKey", BEDROOM_KEY}, {"Folder", FILE1},
     {"Folder_Police", FILE2},    {"DenKey", DEN_KEY},
     {"RedroomKey", REDROOM_KEY}, {"ClipL", CLIP_L},
     {"ClipR", CLIP_R},           {"ClipM", CLIP_M},
-	{"Eyeball", EYEBALL}, 	{"Rope.001", ROPE},
+	{"Eyeball", EYEBALL},
 };
 static std::map<ItemType, std::string> ItemTypeToInteractText = {
     {BEDROOM_KEY, "grab key"},
@@ -47,7 +46,6 @@ static std::map<ItemType, std::string> ItemTypeToInteractText = {
     {CLIP_R, "grab chain cutter (right)"},
     {CLIP_M, "grab chain cutter (center)"},
     {EYEBALL, "grab eyeball"},
-	{ROPE, "pull the rope"},
 };
 
 /* Type of interactable object that cannot be picked up */
@@ -77,7 +75,12 @@ enum FurnitureType {
   FRIDGE5,
   CLOSET0,
   CLOSET1,
-  CLOSET2
+  CLOSET2,
+  ROPE,
+  ATTIC_DOOR,
+  ATTIC_LADDER,
+  ATTIC_LADDER1,
+  ATTIC_LADDER2
 };
 static std::map<FurnitureType, std::vector<std::string>>
     FurnitureTypeToInteractText = {
@@ -98,6 +101,7 @@ static std::map<FurnitureType, std::vector<std::string>>
         {CLOSET0, {"hide", "exit hiding"}},
         {CLOSET1, {"hide", "exit hiding"}},
         {CLOSET2, {"hide", "exit hiding"}},
+        {ROPE, {"pull the rope"}},
 };
 
 static std::map<std::string, FurnitureType> MeshNameToFurnitureType = {
@@ -124,7 +128,12 @@ static std::map<std::string, FurnitureType> MeshNameToFurnitureType = {
     {"FridgeDoor5", FRIDGE5},
     {"Closet0", CLOSET0},
     {"Closet1", CLOSET1},
-    {"Closet2", CLOSET2},
+	{"Closet2", CLOSET2},
+    {"Rope.001", ROPE},
+	{"LadderCover", ATTIC_DOOR},
+	{"AtticLadder.003", ATTIC_LADDER},
+	{"AtticLadder.001", ATTIC_LADDER1},
+	{"AtticLadder.002", ATTIC_LADDER2},
 };
 
 /* A single furniture */

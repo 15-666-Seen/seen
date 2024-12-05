@@ -384,7 +384,7 @@ void PlayMode::update(float elapsed) {
   if (gameplayUI->dialogueText.size() > 0) {
     gStop = true;
   }
-  bool advanced = storyManager->advanceStory();
+  bool advanced = storyManager->advanceStory(elapsed);
 
   for (auto &[name, ghost] : storyManager->GhostMap) {
     if (!ghost->active)

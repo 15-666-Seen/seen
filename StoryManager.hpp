@@ -27,7 +27,7 @@ struct StoryManager {
   void SetUpManager(GameplayUI *ui, InteractableManager *im);
 
   /* called per frame to test if we need to go to the next stage */
-  bool advanceStory();
+  bool advanceStory(float elapsed);
 
   /* set up phase[current_phase] */
   void setUpPhase();
