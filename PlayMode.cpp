@@ -229,6 +229,7 @@ void PlayMode::update(float elapsed) {
   if (ending || interactableManager.interactStatusCheck(FRONT_DOOR) >= 2) {
     next = "EndMode";
     finished = true;
+    return;
   }
 
   if (gStop || gamePause) {
@@ -396,6 +397,7 @@ void PlayMode::update(float elapsed) {
     if (ghost->got_player) {
       next = "GOverMode";
       finished = true;
+      return;
     }
   }
 

@@ -13,9 +13,9 @@ bool iteractCheck(Scene::Transform *player_transform, glm::vec3 object_pos,
       player_transform->position + glm::vec3(0.0f, 0.0f, PLAYER_HEIGHT);
 
   // check if player is close enough to interact with item
-  float distance_xy =
-      glm::distance(glm::vec2(player_eye_pos.x, player_eye_pos.y),
-                    glm::vec2(object_pos.x, object_pos.y));
+  float distance_xy = glm::distance(player_eye_pos, object_pos);
+      /*glm::distance(player_eye_pos.x, player_eye_pos.y),
+                    glm::vec2(object_pos.x, object_pos.y));*/
 
   // player's looking at the furniture
   glm::vec3 player_look_dir = camera->transform->make_local_to_world()[2];

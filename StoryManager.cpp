@@ -164,6 +164,7 @@ void StoryManager::setUpPhase() {
     interactableManager->setFurniturePhaseAvailability(CLOSET2, true);
     interactableManager->setFurniturePhaseAvailability(DOOR1, true);
     interactableManager->setItemPhaseVisibility(REDROOM_KEY, false);
+    interactableManager->setItemPhaseAvailability(FILE2, true);
 
     interactableManager->setFurniturePhaseAvailability(CHAIN, true);
 
