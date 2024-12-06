@@ -143,6 +143,23 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
                 }
             }
 
+            else if (furniture->type == REDROOM_DOOR) {
+                // TODO: currently directly open door1
+                if (current_phase == 6) {
+                    if (inventory.hasItem(REDROOM_KEY)) {
+                        std::cout << "OPENING REDROOM DOOR" << std::endl;
+                        Door* door = dynamic_cast<Door*>(furniture);
+                        door->state = Door::DoorState::OPENING;
+                        std::cout << "OPENING REDROOM DOOR1" << std::endl;
+                        furniture->interact_status = 1;
+                        furniture->phase_allow_interact = false;
+                        std::cout << "OPENING REDROOM DOOR2" << std::endl;
+                        return true;
+                    }
+                    interaction_notification = "Seems like I need a key to open this.";
+                }
+            }
+
             else if (furniture->type == DOORBLOCK) {
                 if (furniture->interact_status == 0) {
                     interaction_notification = "Tentacles?? Am I losing my mind?";
@@ -325,11 +342,12 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
                 }
                 return true;
             }
-            else if (furniture->type == ROPE) {
+            else if (furniture->type == MAP) {
                 if (current_phase == 7) {
                     furniture->interact_status = 1;
                     return true;
                 }
+                interaction_notification = "Blueprint... something was hidden?";
                 return true;
             }
         }
@@ -352,6 +370,12 @@ bool InteractableManager::updateItem(Scene::Transform *player_transform,
       if (item->type == CLIP_R) {
         interaction_notification =
             "Part of a clip. I should find the other half. (1/3)";
+      } else if (item->type == CLIP_M) {
+		  interaction_notification =
+			  "Part of a clip. I should find the other half. (2/3)";
+	  } else if (item->type == CLIP_L) {
+		  interaction_notification =
+			  "Part of a clip. I got to assemble them. (3/3)";
       } else if (item->type == FILE1) {
         interaction_notification = "\"(stained...) should never find "
                                    "(stained...) basement in this house.\"";

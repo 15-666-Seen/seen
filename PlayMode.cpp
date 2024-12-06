@@ -478,6 +478,11 @@ void PlayMode::checkPhaseUpdates() {
     player.at = walkmesh->nearest_walk_point(player.transform->position);
   }
 
+  else if (storyManager->getCurrentPhase() == 7) {
+      walkmesh = &phonebank_walkmeshes->lookup("phase8");
+      player.at = walkmesh->nearest_walk_point(player.transform->position);
+  }
+
   else if (storyManager->getCurrentPhase() == 8) { //
     walkmesh = &phonebank_walkmeshes->lookup("phase5");
     player.at = walkmesh->nearest_walk_point(player.transform->position);

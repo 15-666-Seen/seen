@@ -76,17 +76,14 @@ enum FurnitureType {
   CLOSET0,
   CLOSET1,
   CLOSET2,
-  ROPE,
-  ATTIC_DOOR,
-  ATTIC_LADDER,
-  ATTIC_LADDER1,
-  ATTIC_LADDER2
+  MAP
 };
 static std::map<FurnitureType, std::vector<std::string>>
     FurnitureTypeToInteractText = {
         {BED, {"hide under bed", "exit hiding"}},
         {BEDROOM_DOOR, {"open door"}},
         {DOOR1, {"open door"}},
+		{REDROOM_DOOR, {"open door"}},
         {DOORBLOCK, {"examine", "remove"}},
         {TINY_SCULPTURE, {"interact"}},
         {BOOKSHELF, {"move shelf"}},
@@ -101,7 +98,7 @@ static std::map<FurnitureType, std::vector<std::string>>
         {CLOSET0, {"hide", "exit hiding"}},
         {CLOSET1, {"hide", "exit hiding"}},
         {CLOSET2, {"hide", "exit hiding"}},
-        {ROPE, {"pull the rope"}},
+        {MAP, {"Inspect the blueprint"}},
 };
 
 static std::map<std::string, FurnitureType> MeshNameToFurnitureType = {
@@ -129,11 +126,7 @@ static std::map<std::string, FurnitureType> MeshNameToFurnitureType = {
     {"Closet0", CLOSET0},
     {"Closet1", CLOSET1},
 	{"Closet2", CLOSET2},
-    {"Rope.001", ROPE},
-	{"LadderCover", ATTIC_DOOR},
-	{"AtticLadder.003", ATTIC_LADDER},
-	{"AtticLadder.001", ATTIC_LADDER1},
-	{"AtticLadder.002", ATTIC_LADDER2},
+    {"Blueprint", MAP},
 };
 
 /* A single furniture */
