@@ -398,6 +398,7 @@ void PlayMode::update(float elapsed) {
     ghost->path_points.push_back(player.transform->position);
     ghost->update(elapsed);
     if (ghost->got_player) {
+      Sound::stop_all_samples();
       next = "GOverMode";
       finished = true;
       return;
