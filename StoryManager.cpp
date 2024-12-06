@@ -238,7 +238,7 @@ void StoryManager::setUpPhase() {
   case 9:
 	  
 	  // ghost chase
-      if (!isa_is_debugging) enableGhost("ghost2", true);
+      if (!isa_is_debugging) enableGhost("ghost2", false);
 	  break;
 
 
