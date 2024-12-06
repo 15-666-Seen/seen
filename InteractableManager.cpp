@@ -543,7 +543,7 @@ int InteractableManager::interactStatusCheck(ItemType item_type) {
 void InteractableManager::closeDoor(FurnitureType furniture_type) {
   Door *door = dynamic_cast<Door *>(furnituresMap[furniture_type]);
   door->interact_sound = Sound::play_3D(
-      *door_close_sample, 2.0f, door->drawable->transform->position, 10.0f);
+      *door_close_sample, 1.5f, door->drawable->transform->position, 10.0f);
   door->state = Door::DoorState::CLOSED;
   door->interact_status = 0; // set interaction text
   door->drawable->transform->rotation =

@@ -289,7 +289,7 @@ void StoryManager::bgmCheck() {
         bgm_sound->stop(1.0f / 60.0f);
         bgm_sound.reset();
         bgm_sound =
-            Sound::loop_3D(*chase_bgm_sample, 8.0f,
+            Sound::loop_3D(*chase_bgm_sample, 2.0f,
                            ghost.second->drawable->transform->position, 6.0f);
         bgm_status = 1;
       }
