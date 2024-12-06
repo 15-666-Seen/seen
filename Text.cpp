@@ -1,4 +1,4 @@
-#pragma once
+
 #include "Text.hpp"
 
 #include <glm/glm.hpp>
@@ -31,7 +31,7 @@
 Character Character::Load(hb_codepoint_t request, FT_Face typeface) {
   // taken almost verbatim from
   // https://learnopengl.com/In-Practice/Text-Rendering
-  if (FT_Load_Glyph(typeface, request, FT_LOAD_RENDER))
+  if (FT_Load_Glyph(typeface, static_cast<FT_UInt>(request), FT_LOAD_RENDER))
     throw std::runtime_error("Failed to load glyph: " +
                              std::to_string(request));
   GLuint tex;
@@ -126,8 +126,8 @@ void Text::init(std::string ttf_file) {
   // initialize openGL for rendering
   {
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glBindVertexArray(VAO);
@@ -137,7 +137,7 @@ void Text::init(std::string ttf_file) {
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    glDisable(GL_BLEND);
+    //glDisable(GL_BLEND);
     GL_ERRORS();
   }
 
@@ -168,9 +168,9 @@ void Text::set_text(const std::string &new_text) {
   update_buffer(text_content);
   anim_time = text_content.size() / 40.f; // reset animation time
 
-  // for (int i = 0; i < 64; i++) {
-  //	color2_bit_array[i] = false;
-  //}
+   for (int i = 0; i < 64; i++) {
+  	color2_bit_array[i] = false;
+  }
 }
 
 void Text::set_bound(float new_bound) { right_bound = new_bound; }
@@ -185,6 +185,7 @@ void Text::set_color2_index(uint8_t index) {
 }
 
 void Text::reset_time() { time = 0.f; }
+void Text::show_full() { time = 100.f; }
 
 void Text::highlight() {
   // show some effect for highlighting
@@ -212,8 +213,24 @@ void Text::set_font_size(FT_F26Dot6 new_font_size, FT_F26Dot6 new_font_scale,
   }
 }
 
-void Text::draw(float dt, const glm::vec2 &drawable_size, float width,
-                const glm::vec2 &pos, float ss_scale, bool animate) {
+//void Text::draw(float dt, const glm::vec2& drawable_size, float width,
+//    const glm::vec2& pos, float ss_scale, bool animate) {
+//    return;
+//}
+
+
+Character Text::get_character(unsigned int i, hb_glyph_info_t* glyph_info) {
+    hb_codepoint_t char_req = glyph_info[i].codepoint;
+    if (chars.find(char_req) == chars.end()) {
+        Character ch = Character::Load(char_req, typeface);
+        chars.insert(std::pair<hb_codepoint_t, Character>(char_req, ch));
+    }
+
+    const Character& ch = chars[char_req];
+	return ch;
+}
+
+void Text::draw(float dt, const glm::vec2 &drawable_size, const glm::vec2 &pos, float ss_scale, bool animate) {
   // drawable_size - window size
   // width - how wide the displayed string gets to be
   // pos - position in screenspace where the text gets rendered
@@ -241,7 +258,7 @@ void Text::draw(float dt, const glm::vec2 &drawable_size, float width,
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   // Use member variable color2 for the secondary color
   glUniformMatrix4fv(glGetUniformLocation(draw_text_program, "projection"), 1,
-                     GL_FALSE, &projection[0][0]);
+                     GL_FALSE, glm::value_ptr(projection) );    //&projection[0][0]
   glActiveTexture(GL_TEXTURE0);
   glBindVertexArray(VAO);
 
@@ -267,15 +284,11 @@ void Text::draw(float dt, const glm::vec2 &drawable_size, float width,
               use_secondary ? color2.y : color.y,
               use_secondary ? color2.z : color.z);
 
-  for (unsigned int i = 0; i < static_cast<unsigned int>(amnt * num_chars);
+  for (unsigned int i = 1; i <= static_cast<unsigned int>(amnt * num_chars);
        i++) {
-    hb_codepoint_t char_req = glyph_info[i].codepoint;
-    if (chars.find(char_req) == chars.end()) {
-      Character ch = Character::Load(char_req, typeface);
-      chars.insert(std::pair<hb_codepoint_t, Character>(char_req, ch));
-    }
+    
+	  Character ch = get_character(i-1, glyph_info);
 
-    const Character &ch = chars[char_req];
     float xpos = char_x + ch.Bearing.x * ss_scale;
     float ypos = char_y - (ch.Size.y - ch.Bearing.y) * ss_scale;
     float w = ch.Size.x * ss_scale;
@@ -301,26 +314,24 @@ void Text::draw(float dt, const glm::vec2 &drawable_size, float width,
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-    // glDepthMask(GL_TRUE);
+    if (text_content[i] == ' ') { 
 
-    char_x += (ch.Advance >> 6) * ss_scale;
-
-    if (char_x >= right_bound || text_content[i] == '\n') {
-      char_x = pos.x;
-      char_y -= (y_size + 5.0f);
-    }
-    // newline by word
-    else if (text_content[i] == ' ') {
       unsigned int j = i + 1;
-      for (; text_content[j] != ' ' && j < text_content.size(); j++)
-        ;
+	  float next_word_width = (ch.Advance >> 6) * ss_scale;
 
-      if ((char_x + ((ch.Advance >> 6) * ss_scale * (j - i + 10))) >=
-          right_bound) {
+	  for (; text_content[j] != ' ' && j < text_content.size(); j++) {
+		  Character next_ch = get_character(j, glyph_info);
+		  next_word_width += (next_ch.Advance >> 6) * ss_scale;
+      }
+
+      if ((char_x + next_word_width) >= right_bound) {
         char_x = pos.x;
         char_y -= (y_size + 5.0f);
-      }
+	  }
+	  else
+		  char_x += (ch.Advance >> 6) * ss_scale;
     }
+    else char_x += (ch.Advance >> 6) * ss_scale;
 
     if (text_content[i] == ' ') {
       // Move to the next word

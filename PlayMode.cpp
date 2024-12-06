@@ -6,6 +6,7 @@
 #include "Load.hpp"
 #include "Mesh.hpp"
 #include "Scene.hpp"
+#include "glm/ext/vector_float3.hpp"
 #include "sound_prep.hpp"
 #include "util.hpp"
 
@@ -24,17 +25,18 @@ Load<MeshBuffer> phonebank_meshes(LoadTagDefault, []() -> MeshBuffer const * {
 });
 
 // used to get normal map texture name
-// following the stupid code idealogy of defining this close to where its used :)
-std::string getNormalMapName(const std::string& filename) {
-    std::string new_filename = filename;
-    size_t pos = new_filename.rfind('.');
-    if (pos != std::string::npos) {
-        new_filename.insert(pos, "_n");
-    }
-    return new_filename;
+// following the stupid code idealogy of defining this close to where its used
+// :)
+std::string getNormalMapName(const std::string &filename) {
+  std::string new_filename = filename;
+  size_t pos = new_filename.rfind('.');
+  if (pos != std::string::npos) {
+    new_filename.insert(pos, "_n");
+  }
+  return new_filename;
 }
 
-Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
+Load<Scene> house_scene(LoadTagDefault, []() -> Scene const * {
   return new Scene(data_path("house.scene"), [&](Scene &scene,
                                                  Scene::Transform *transform,
                                                  std::string const &mesh_name) {
@@ -50,9 +52,9 @@ Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
     drawable.pipeline.start = mesh.start;
     drawable.pipeline.count = mesh.count;
 
-
     drawable.tex = drawable.pipeline.tex_name_to_glint[mesh.tex];
-    drawable.tex_normal = drawable.pipeline.tex_name_to_glint[getNormalMapName(mesh.tex)];
+    drawable.tex_normal =
+        drawable.pipeline.tex_name_to_glint[getNormalMapName(mesh.tex)];
 
     /* some asserts to ensure the shader is loaded correctly */
     auto s = drawable.pipeline.tex_name_to_glint.find("0");
@@ -68,10 +70,10 @@ Load<Scene> phonebank_scene(LoadTagDefault, []() -> Scene const * {
     }
 
     if (drawable.tex_normal == 0) {
-        printf("No normal map for mesh %s named %s\n", mesh_name.c_str(), getNormalMapName(mesh.tex).c_str());
-        drawable.tex_normal = drawable.pipeline.tex_name_to_glint["0_n"];
+      printf("No normal map for mesh %s named %s\n", mesh_name.c_str(),
+             getNormalMapName(mesh.tex).c_str());
+      drawable.tex_normal = drawable.pipeline.tex_name_to_glint["0_n"];
     }
-
   });
 });
 
@@ -83,7 +85,7 @@ phonebank_walkmeshes(LoadTagDefault, []() -> WalkMeshes const * {
   return ret;
 });
 
-PlayMode::PlayMode() : scene(*phonebank_scene) {
+PlayMode::PlayMode() : scene(*house_scene) {
   // create a player transform:
   scene.transforms.emplace_back();
   player.transform = &scene.transforms.back();
@@ -96,6 +98,8 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
   player.camera->fovy = glm::radians(60.0f);
   player.camera->near = 0.01f;
   player.camera->transform->parent = nullptr;
+
+  player.transform->position = glm::vec3(0.0f, -11.0f, 0.0f);
 
   // rotate camera facing direction (-z) to player facing direction (+y):
   player.camera->transform->rotation =
@@ -218,7 +222,19 @@ bool PlayMode::handle_event(SDL_Event const &evt,
   return false;
 }
 
+bool ending = false; // if the game is ending, move to EndMode
 void PlayMode::update(float elapsed) {
+
+   
+  if (ending || interactableManager.interactStatusCheck(FRONT_DOOR) >= 2) {
+      waitBeforeEnd -= elapsed;
+      if (waitBeforeEnd <= 0.f) {
+          next = "EndMode";
+          finished = true;
+      }
+    return;
+  }
+
   if (gStop || gamePause) {
     return;
   }
@@ -374,7 +390,20 @@ void PlayMode::update(float elapsed) {
   if (gameplayUI->dialogueText.size() > 0) {
     gStop = true;
   }
-  bool advanced = storyManager->advanceStory();
+  bool advanced = storyManager->advanceStory(elapsed);
+
+  for (auto &[name, ghost] : storyManager->GhostMap) {
+    if (!ghost->active)
+      continue;
+    ghost->path_points.push_back(player.transform->position);
+    ghost->update(elapsed);
+    if (ghost->got_player) {
+      Sound::stop_all_samples();
+      next = "GOverMode";
+      finished = true;
+      return;
+    }
+  }
 
   // TODO: check phase updates -> update walkmesh?
   if (advanced) {
@@ -391,7 +420,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
   // set up light type and position for lit_color_texture_program:
   // TODO: consider using the Light(s) in the scene to do this
   glUseProgram(lit_color_texture_program->program);
-  glUniform1i(lit_color_texture_program->LIGHT_TYPE_int, 4);
+  glUniform1i(lit_color_texture_program->LIGHT_TYPE_int, 4); // 4
   glUniform3fv(lit_color_texture_program->LIGHT_DIRECTION_vec3, 1,
                glm::value_ptr(glm::vec3(0.0f, 0.0f, -1.0f)));
   glUniform3fv(lit_color_texture_program->LIGHT_ENERGY_vec3, 1,
@@ -399,7 +428,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 
   glUseProgram(0);
 
-  glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+  glClearColor(0.065f, 0.01f, 0.01f, 0.4f);
   glClearDepth(1.0f); // 1.0 is actually the default value to clear the depth
                       // buffer to, but FYI you can change it.
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -448,7 +477,27 @@ void PlayMode::checkPhaseUpdates() {
   }
 
   else if (storyManager->getCurrentPhase() == 3) {
-    walkmesh = &phonebank_walkmeshes->lookup("phase1");
+    walkmesh = &phonebank_walkmeshes->lookup("phase3");
+    player.at = walkmesh->nearest_walk_point(player.transform->position);
+  }
+
+  else if (storyManager->getCurrentPhase() == 4) {
+    walkmesh = &phonebank_walkmeshes->lookup("phase4");
+    player.at = walkmesh->nearest_walk_point(player.transform->position);
+  }
+
+  else if (storyManager->getCurrentPhase() == 6) {
+    walkmesh = &phonebank_walkmeshes->lookup("phase5");
+    player.at = walkmesh->nearest_walk_point(player.transform->position);
+  }
+
+  else if (storyManager->getCurrentPhase() == 11) { // basement
+    walkmesh = &phonebank_walkmeshes->lookup("phase6");
+    player.at = walkmesh->nearest_walk_point(player.transform->position);
+  }
+
+  else if (storyManager->getCurrentPhase() == 12) {
+    walkmesh = &phonebank_walkmeshes->lookup("phase7");
     player.at = walkmesh->nearest_walk_point(player.transform->position);
   }
 }
@@ -476,7 +525,8 @@ glm::vec3 PlayMode::cameraShake(float elapsed) {
 void PlayMode::setupGhosts() {
   for (auto &drawable : scene.drawables) {
     if (drawable.mesh_name.find("ghost") != std::string::npos) {
-      Ghost *ghost = new Ghost(drawable.mesh_name, &drawable);
+      Ghost *ghost = new Ghost(drawable.mesh_name, &drawable, player.transform,
+                               player.camera->transform);
       storyManager->GhostMap[drawable.mesh_name] = ghost;
       drawable.visible = false; // initially invisible
     }

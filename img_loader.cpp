@@ -1,4 +1,4 @@
-#pragma once
+
 
 #include "GL.hpp"
 #include "img_loader.hpp"

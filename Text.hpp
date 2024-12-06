@@ -39,7 +39,7 @@ struct Character {
 struct Text {
   std::string text_file = "RubikDistressed-Regular.ttf";
   FT_F26Dot6 font_size = 2;
-  FT_F26Dot6 font_scale = 2; // number of units per pixel
+  FT_F26Dot6 font_scale = 3; // number of units per pixel
 
   float anim_time = 1.0f; // time (seconds) to complete animation
   float time = 0.f;       // current time for new text
@@ -90,11 +90,14 @@ struct Text {
 
   void reset_time();
 
+  void show_full();
+
   void highlight();
 
   void set_font_size(FT_F26Dot6 new_font_size, FT_F26Dot6 new_font_scale,
                      bool override = false);
 
-  void draw(float dt, const glm::vec2 &drawable_size, float width,
-            const glm::vec2 &pos, float ss_scale, bool animate = false);
+  Character get_character(unsigned int i, hb_glyph_info_t* glyph_info);
+
+  void draw(float dt, const glm::vec2& drawable_size, const glm::vec2& pos, float ss_scale, bool animate = false);
 };

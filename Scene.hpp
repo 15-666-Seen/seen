@@ -22,7 +22,7 @@
 #include <unordered_map>
 #include <vector>
 
-static constexpr float PLAYER_HEIGHT = 1.2f;
+static constexpr float PLAYER_HEIGHT = 1.7f;
 
 struct Scene {
 

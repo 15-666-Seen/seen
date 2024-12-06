@@ -13,9 +13,9 @@ bool iteractCheck(Scene::Transform *player_transform, glm::vec3 object_pos,
       player_transform->position + glm::vec3(0.0f, 0.0f, PLAYER_HEIGHT);
 
   // check if player is close enough to interact with item
-  float distance_xy =
-      glm::distance(glm::vec2(player_eye_pos.x, player_eye_pos.y),
-                    glm::vec2(object_pos.x, object_pos.y));
+  float distance_xy = glm::distance(player_eye_pos, object_pos);
+      /*glm::distance(player_eye_pos.x, player_eye_pos.y),
+                    glm::vec2(object_pos.x, object_pos.y));*/
 
   // player's looking at the furniture
   glm::vec3 player_look_dir = camera->transform->make_local_to_world()[2];
@@ -36,10 +36,35 @@ bool Item::interact(float elapsed) {
   if (type == BEDROOM_KEY) {
     visible = false;
     this->drawable->visible = false;
-    return true;
+  } else if (type == DEN_KEY) {
+    visible = false;
+    this->drawable->visible = false;
   } else if (type == FILE1) {
-    interact_status = 1;
+    // interact_status = 1;
     return true;
+  } else if (type == CLIP_L) {
+    visible = false;
+    this->drawable->visible = false;
+    return true;
+  }
+  else if (type == CLIP_M) {
+      visible = false;
+      this->drawable->visible = false;
+      return true;
+  } else if (type == CLIP_R) {
+    visible = false;
+    this->drawable->visible = false;
+    return true;
+  } else if (type == EYEBALL) {
+    visible = false;
+    this->drawable->visible = false;
+    interact_sound = Sound::play_3D(*eyeball_sample, 2.0f,
+                                    drawable->transform->position, 10.0f);
+  } else if (type == REDROOM_KEY) {
+    visible = false;
+    this->drawable->visible = false;
+    interact_sound = Sound::play_3D(*breath_trigger_sample, 2.0f,
+                                    drawable->transform->position, 10.0f);
   }
   return true;
 }
@@ -61,7 +86,19 @@ Furniture::Furniture() {}
 bool Furniture::interact(float elapsed) {
   if (type == BED) {
     interact_status = 1;
+  } 
+  else if (type == CLOSET2) {
+      interact_status = 1;
   }
+  else if (type == TINY_SCULPTURE_TENTACLES) {
+      if (anim_time > 1.f) {
+          interact_status = 2;
+          return true;
+      }
+      anim_time += elapsed;
+      drawable->transform->scale = glm::vec3(anim_time);
+  }
+
 
   return true;
 }
@@ -82,6 +119,46 @@ bool Furniture::interactable(Scene::Transform *player_transform,
     }
   }
 
+  else if (type == CLOSET2) {
+    if (interact_status == 0) {
+      return iteractCheck(player_transform, getCenterPos(), camera,
+                          FURNITURE_INTERACT_DISTANCE);
+    } else {
+      return true;
+    }
+  }
+
+  else if (type == CLOSET0) {
+      if (interact_status == 0) {
+          return iteractCheck(player_transform, getCenterPos(), camera,
+              FURNITURE_INTERACT_DISTANCE);
+      }
+      else {
+          return true;
+      }
+  }
+
+  else if (type == CLOSET1) {
+      if (interact_status == 0) {
+          return iteractCheck(player_transform, getCenterPos(), camera,
+              FURNITURE_INTERACT_DISTANCE);
+      }
+      else {
+          return true;
+      }
+  }
+
+  else if (type == LADDER) {
+      return iteractCheck(player_transform, getCenterPos() + glm::vec3(0.f, 0.f, 1.5f), camera,
+           FURNITURE_INTERACT_DISTANCE) || 
+          iteractCheck(player_transform, getCenterPos() + glm::vec3(0.f, 0.f, -2.6f), camera,
+               FURNITURE_INTERACT_DISTANCE);
+  }
+  else if (type == FRONT_DOOR) {
+      return iteractCheck(player_transform, getCenterPos() + glm::vec3(-0.5f, 0.f, 0.f), camera,
+          FURNITURE_INTERACT_DISTANCE);
+  }
+
   return iteractCheck(player_transform, getCenterPos(), camera,
                       FURNITURE_INTERACT_DISTANCE);
 }
@@ -93,14 +170,14 @@ bool Door::interact(float elapsed) {
                                     drawable->transform->position, 10.0f);
   }
   animation_time += elapsed;
-  if (animation_time > 0.5f) {
+  if (animation_time > 0.6f) {
     state = Door::DoorState::OPEN;
     interact_status = 1;
     return false;
   }
   // rotate the door along z axis
   drawable->transform->rotation =
-      glm::angleAxis(glm::radians(-90.0f) * (animation_time / 0.5f),
+      glm::angleAxis(glm::radians(-90.0f) * (animation_time / 0.6f),
                      glm::vec3(0.0f, 0.0f, 1.0f));
   return true;
 }

@@ -2,6 +2,7 @@
 
 #include "InteractableManager.hpp"
 #include "Scene.hpp"
+#include "Sound.hpp"
 #include "StoryManager.hpp"
 #include "UI.hpp"
 #include "WalkMesh.hpp"
@@ -59,4 +60,6 @@ struct PlayMode : Mode {
 
   // ghosts
   void setupGhosts();
+
+  float waitBeforeEnd = 0.5f;
 };
