@@ -1,8 +1,8 @@
 Seen
 
-Author: (TODO: your name)
+Author: Isa L, Shao W, Michael C
 
-Design: (TODO: In two sentences or fewer, describe what is new and interesting about your game.)
+Design: Trapped in a dark, mysterious mansion, you must scavenge for parts of a wire cutter to break the chains barring the main door.
 
 Screen Shot:
 
@@ -10,9 +10,15 @@ Screen Shot:
 
 How To Play:
 
-(TODO: describe the controls and (if needed) goals/strategy.)
+WASD - move
 
-Sources: (TODO: list a source URL for any assets you did not create yourself. Make sure you have a license for the asset.)
+F - interact and hide
+
+Sources: 
+
+All textures: https://ambientcg.com/
+
+All sounds: https://pixabay.com/sound-effects
 
 This game was built with [NEST](NEST.md).
 
