@@ -33,7 +33,7 @@ void StoryManager::SetUpManager(GameplayUI *ui, InteractableManager *im) {
 }
 
 // true for advancing to the next phase
-bool StoryManager::advanceStory() {
+bool StoryManager::advanceStory(float elapsed) {
   bool set_up_next_phase = false;
 
   bgmCheck();
@@ -80,27 +80,31 @@ bool StoryManager::advanceStory() {
       // can enter redroom now, switch walk mesh
       set_up_next_phase = true;
     }
-    break;
+	break;
   case 6:
-      if (interactableManager->interactStatusCheck(BLUEPRINT) == 1) {
-          current_phase++; 
-          // basement now unlocked.
+	  // player is in the attic
+      if (interactableManager->interactStatusCheck(REDROOM_DOOR) == 1) {
+          current_phase++; // advance to the next phase
           set_up_next_phase = true;
       }
-      break;
-
+	  break;
   case 7:
-      current_phase++;
-      set_up_next_phase = true;
-      break;
-
+      if (interactableManager->interactStatusCheck(MAP) == 1) {
+          current_phase++; // advance to the next phase
+          set_up_next_phase = true;
+      }
+	  break;
   case 8:
-      current_phase++;
-      set_up_next_phase = true;
+      // ghost chase
+       if (interactableManager->isHiding) {
+		  current_phase++; // advance to the next phase
+		  set_up_next_phase = true;
+	   }
       break;
 
   case 9:
-      current_phase++;
+      // ghost chase completed
+      current_phase++; // advance to the next phase
       set_up_next_phase = true;
       break;
   case 10:
@@ -215,26 +219,26 @@ void StoryManager::setUpPhase() {
     break;
 
   case 5:
-    if (!isa_is_debugging) enableGhost("ghost1", false);
+    enableGhost("ghost1", false);
     break;
-
-  case 6:
-      // enters red room, can pick up stuff
-      interactableManager->setItemPhaseVisibility(CLIP_M, true);
+  case 6:   // can read the blueprint and grab key
+      interactableManager->setFurniturePhaseAvailability(REDROOM_DOOR, true);
+      
+  case 7:   
+	  interactableManager->setFurniturePhaseAvailability(MAP, true);
       interactableManager->setItemPhaseAvailability(CLIP_M, true);
-
-      // can also interact w the blueprint
-      interactableManager->setFurniturePhaseAvailability(BLUEPRINT, true);
-      break;
-
-  case 7:
-      break;
-
-  case 8:
-      break;
+	  break;
+  case 8:   
+          // ghost chase
+	      enableGhost("ghost2", true);
+	      break;
 
   case 9:
-      break;
+	  
+	  // ghost chase
+	  enableGhost("ghost2", true);
+	  break;
+
 
   case 10:
     // player is currently hiding?, need to push sofa away
@@ -287,6 +291,9 @@ void StoryManager::bgmCheck() {
                            ghost.second->drawable->transform->position, 6.0f);
         bgm_status = 1;
       }
+	  /*if (ghost.second->got_player) {
+		  one_active = false;
+	  }*/
       return;
     }
   }

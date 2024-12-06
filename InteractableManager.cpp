@@ -105,33 +105,33 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
    
   for (auto &[_, furniture] : furnituresMap) {
 
-    if (furniture->isInteracting()) {
-      furniture->interact(elapsed);
-    }
-
-    if (!furniture->interactable(player_transform, camera)) {
-      continue;
-    }
-    // as long as its interactable, set the interaction text
-    gameplayUI->setInteractionText(furniture->interactText());
-
-    if (interact_pressed) {
-      cur_furniture = furniture->type;
-
-      // TODO: set different notification
-      if (furniture->type == BEDROOM_DOOR) {
-        if (current_phase == 3) {
-          if (inventory.hasItem(BEDROOM_KEY)) {
-            Door *door = dynamic_cast<Door *>(furniture);
-            door->state = Door::DoorState::OPENING;
-            furniture->phase_allow_interact = false;
-            return true;
-          }
-          interaction_notification = "Seems like I need a key to open this.";
-          return true;
+        if (furniture->isInteracting()) {
+            furniture->interact(elapsed);
         }
-        interaction_notification = "This door is locked from inside.";
-      }
+
+        if (!furniture->interactable(player_transform, camera)) {
+            continue;
+        }
+        // as long as its interactable, set the interaction text
+        gameplayUI->setInteractionText(furniture->interactText());
+
+        if (interact_pressed) {
+            cur_furniture = furniture->type;
+
+            // TODO: set different notification
+            if (furniture->type == BEDROOM_DOOR) {
+                if (current_phase == 3) {
+                    if (inventory.hasItem(BEDROOM_KEY)) {
+                        Door* door = dynamic_cast<Door*>(furniture);
+                        door->state = Door::DoorState::OPENING;
+                        furniture->phase_allow_interact = false;
+                        return true;
+                    }
+                    interaction_notification = "Seems like I need a key to open this.";
+                    return true;
+                }
+                interaction_notification = "This door is locked from inside.";
+            }
 
       if (furniture->type == REDROOM_DOOR) {
               if (current_phase >= 5 && inventory.hasItem(REDROOM_KEY)) {
@@ -238,65 +238,68 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
       }
 
 
-      else if (furniture->type == TINY_SCULPTURE) {
-         
-        if (!inventory.hasItem(EYEBALL)) {
-          interaction_notification = "Hmm... Seems something is missing here.";
-        } else {
-            // can no longer interact w sculpture
-            setFurniturePhaseAvailability(TINY_SCULPTURE, false);
+            else if (furniture->type == TINY_SCULPTURE) {
 
-            // animation
-            furnituresMap[TINY_SCULPTURE_TENTACLES]->interact_status = 1;
-            furnituresMap[SCULPTURE_EYE_R]->drawable->visible = true;
-            setFurniturePhaseVisibility(TINY_SCULPTURE_TENTACLES, true);
-            scaleFurniture(TINY_SCULPTURE_TENTACLES, 0.001f);
-        }
-      }
+                if (!inventory.hasItem(EYEBALL)) {
+                    interaction_notification = "Hmm... Seems something is missing here.";
+                }
+                else {
+                    // can no longer interact w sculpture
+                    setFurniturePhaseAvailability(TINY_SCULPTURE, false);
 
-      else if (furniture->type == BOOKSHELF) {
-        furniture->drawable->transform->position.x -= 2.0f;
-        furniture->interact_status = 1;
-      }
+                    // animation
+                    furnituresMap[TINY_SCULPTURE_TENTACLES]->interact_status = 1;
+                    furnituresMap[SCULPTURE_EYE_R]->drawable->visible = true;
+                    setFurniturePhaseVisibility(TINY_SCULPTURE_TENTACLES, true);
+                    scaleFurniture(TINY_SCULPTURE_TENTACLES, 0.001f);
+                }
+            }
 
-      else if (furniture->type == BED) {
-        if (furniture->interact_status == 0) {
-          furniture->interact_status = 1;
-          // modify player's view
-          camera->transform->position =
-              glm::vec3(-8.9071f, -4.72332f, 3.21787f);
-          camera->yaw = -1.54317f;
-          camera->pitch = 0.327246f;
-          isHiding = true;
-        } else {
-          furniture->interact_status = 0;
-          // here we modify player pos
-          camera->transform->position = player_transform->position;
-          camera->transform->position.z += PLAYER_HEIGHT;
-          camera->yaw = -1.54317f;
-          camera->pitch = 0.327246f;
-          isHiding = false;
-        }
-      }
+            else if (furniture->type == BOOKSHELF) {
+                furniture->drawable->transform->position.x -= 2.0f;
+                furniture->interact_status = 1;
+            }
 
-      else if (furniture->type == CLOSET2) {
-        if (furniture->interact_status == 0) {
-          furniture->interact_status = 1;
-          // modify player's view
-          camera->transform->position = glm::vec3(
-              6.85f, 4.65f, player_transform->position.z + PLAYER_HEIGHT);
-          camera->yaw = 0.0f;
-          camera->pitch = 0.0f;
-          isHiding = true;
-        } else {
-          furniture->interact_status = 0;
-          camera->transform->position = player_transform->position;
-          camera->transform->position.z += PLAYER_HEIGHT;
-          camera->yaw = -3.14159f;
-          camera->pitch = 0.327246f;
-          isHiding = false;
-        }
-      }
+            else if (furniture->type == BED) {
+                if (furniture->interact_status == 0) {
+                    furniture->interact_status = 1;
+                    // modify player's view
+                    camera->transform->position =
+                        glm::vec3(-8.9071f, -4.72332f, 3.21787f);
+                    camera->yaw = -1.54317f;
+                    camera->pitch = 0.327246f;
+                    isHiding = true;
+                }
+                else {
+                    furniture->interact_status = 0;
+                    // here we modify player pos
+                    camera->transform->position = player_transform->position;
+                    camera->transform->position.z += PLAYER_HEIGHT;
+                    camera->yaw = -1.54317f;
+                    camera->pitch = 0.327246f;
+                    isHiding = false;
+                }
+            }
+
+            else if (furniture->type == CLOSET2) {
+                if (furniture->interact_status == 0) {
+                    furniture->interact_status = 1;
+                    // modify player's view
+                    camera->transform->position = glm::vec3(
+                        6.85f, 4.65f, player_transform->position.z + PLAYER_HEIGHT);
+                    camera->yaw = 0.0f;
+                    camera->pitch = 0.0f;
+                    isHiding = true;
+                }
+                else {
+                    furniture->interact_status = 0;
+                    camera->transform->position = player_transform->position;
+                    camera->transform->position.z += PLAYER_HEIGHT;
+                    camera->yaw = -3.14159f;
+                    camera->pitch = 0.327246f;
+                    isHiding = false;
+                }
+            }
 
       else if (furniture->type == SOFA) {
         // Push sofa aside
@@ -414,9 +417,9 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
       }
     }
 
-    return true;
-  }
-  return false;
+    }
+    
+    return false;
 }
 
 bool InteractableManager::updateItem(Scene::Transform *player_transform,

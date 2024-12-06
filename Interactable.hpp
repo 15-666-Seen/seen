@@ -27,8 +27,7 @@ enum ItemType {
   CLIP_L,
   CLIP_R,
   CLIP_M,
-  EYEBALL,
-  ROPE
+  EYEBALL
 };
 static std::map<std::string, ItemType> MeshNameToItemType = {
     {"BedroomKey", BEDROOM_KEY}, {"Folder", FILE1},
@@ -47,7 +46,6 @@ static std::map<ItemType, std::string> ItemTypeToInteractText = {
     {CLIP_R, "grab chain cutter (right)"},
     {CLIP_M, "grab chain cutter (center)"},
     {EYEBALL, "grab eyeball"},
-	{ROPE, "pull the rope"},
 };
 
 /* Type of interactable object that cannot be picked up */
