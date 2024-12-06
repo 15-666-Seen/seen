@@ -29,25 +29,6 @@ Load< Scene > gbg_scene(LoadTagDefault, []() -> Scene const* {
 
 GOverMode::GOverMode() : scene(*gbg_scene) {
 
-    Mesh mesh1 = gbg_meshes->lookup("Plane");
-
-    auto newTrans1 = new Scene::Transform();
-    scene.drawables.emplace_back(newTrans1);
-    background = &scene.drawables.back();
-
-    background->pipeline = lit_color_texture_program_pipeline;
-    background->pipeline.vao = gbg_meshes_for_lit_color_texture_program;
-    background->pipeline.type = mesh1.type;
-    background->pipeline.start = mesh1.start;
-    background->pipeline.count = mesh1.count;
-
-    background->tex_normal = background->pipeline.tex_name_to_glint["0_n"];
-	background->transform->rotation = glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.f));
-	background->transform->rotation *= glm::angleAxis(glm::radians(-90.f), glm::vec3(0.0f, 0.f, 1.f));
-	background->transform->position = glm::vec3(0.0f, 0.0f, 0.5f);
-	background->transform->scale = glm::vec3(0.7f, 0.3f, 0.5f);
-	background->transform->scale = glm::vec3(0.1f, 0.1f, 0.1f);
-
     if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
     camera = &scene.cameras.front();
     camera->transform->position = glm::vec3(10.0f, 0.f, 0.0f);
@@ -61,10 +42,6 @@ GOverMode::GOverMode() : scene(*gbg_scene) {
 	//instructions.set_color(glm::vec3(0.8f, 0.8f, 0.8f));
 	instructions.set_text("Press [Q] to Exit    Press [E] to Restart");
 
-    if (lit_color_texture_program->tex_file_to_glint.find(texts[0].text_file) == lit_color_texture_program->tex_file_to_glint.end()) {
-        throw std::runtime_error("Texture not found");
-    }
-    background->tex = lit_color_texture_program->tex_file_to_glint.find(texts[0].text_file)->second;
 }
 
 GOverMode::~GOverMode() {}

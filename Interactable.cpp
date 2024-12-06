@@ -127,6 +127,27 @@ bool Furniture::interactable(Scene::Transform *player_transform,
       return true;
     }
   }
+
+  else if (type == CLOSET0) {
+      if (interact_status == 0) {
+          return iteractCheck(player_transform, getCenterPos(), camera,
+              FURNITURE_INTERACT_DISTANCE);
+      }
+      else {
+          return true;
+      }
+  }
+
+  else if (type == CLOSET1) {
+      if (interact_status == 0) {
+          return iteractCheck(player_transform, getCenterPos(), camera,
+              FURNITURE_INTERACT_DISTANCE);
+      }
+      else {
+          return true;
+      }
+  }
+
   else if (type == LADDER) {
       return iteractCheck(player_transform, getCenterPos() + glm::vec3(0.f, 0.f, 1.5f), camera,
            FURNITURE_INTERACT_DISTANCE) || 

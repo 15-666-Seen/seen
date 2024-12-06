@@ -138,7 +138,6 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
                   // TODO: DEBUG this crashes the game
                   Door* door = dynamic_cast<Door*>(furniture);
                   door->state = Door::DoorState::OPENING;
-                  furniture->interact_status = 1;
                   furniture->phase_allow_interact = false;
                   return true;
               }
@@ -178,7 +177,7 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
               setFurniturePhaseVisibility(CHAIN_CUT1, false);
               Door* door = dynamic_cast<Door*>(furniture);
               door->state = Door::DoorState::OPENING;
-              furniture->interact_status = 1;
+              //furniture->interact_status = 1;
               interaction_notification = "It Opened..";
               return true;      
           }
@@ -297,6 +296,46 @@ bool InteractableManager::updateFurniture(Scene::Transform *player_transform,
                     camera->transform->position.z += PLAYER_HEIGHT;
                     camera->yaw = -3.14159f;
                     camera->pitch = 0.327246f;
+                    isHiding = false;
+                }
+            }
+
+            else if (furniture->type == CLOSET0) {
+                if (furniture->interact_status == 0) {
+                    furniture->interact_status = 1;
+                    // modify player's view
+                    camera->transform->position = glm::vec3(
+                        9.38f, -4.55f, player_transform->position.z + PLAYER_HEIGHT);
+                    camera->yaw = 1.55f;
+                    camera->pitch = 0.f;
+                    isHiding = true;
+                }
+                else {
+                    furniture->interact_status = 0;
+                    camera->transform->position = player_transform->position;
+                    camera->transform->position.z += PLAYER_HEIGHT;
+                    //camera->yaw = -3.14159f;
+                    //camera->pitch = 0.327246f;
+                    isHiding = false;
+                }
+            }
+
+            else if (furniture->type == CLOSET1) {
+                if (furniture->interact_status == 0) {
+                    furniture->interact_status = 1;
+                    // modify player's view
+                    camera->transform->position = glm::vec3(
+                        9.38f, -5.55f, player_transform->position.z + PLAYER_HEIGHT);
+                    camera->yaw = 1.55f;
+                    camera->pitch = 0.f;
+                    isHiding = true;
+                }
+                else {
+                    furniture->interact_status = 0;
+                    camera->transform->position = player_transform->position;
+                    camera->transform->position.z += PLAYER_HEIGHT;
+                    //camera->yaw = -3.14159f;
+                    //camera->pitch = 0.327246f;
                     isHiding = false;
                 }
             }

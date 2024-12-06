@@ -89,7 +89,7 @@ bool StoryManager::advanceStory(float elapsed) {
       }
 	  break;
   case 7:
-      if (interactableManager->interactStatusCheck(MAP) == 1) {
+      if (interactableManager->interactStatusCheck(BLUEPRINT) == 1) {
           current_phase++; // advance to the next phase
           set_up_next_phase = true;
       }
@@ -168,6 +168,8 @@ void StoryManager::setUpPhase() {
     interactableManager->setFurniturePhaseAvailability(BEDROOM_DOOR, true);
     interactableManager->setFurniturePhaseAvailability(REDROOM_DOOR, true);
     interactableManager->setFurniturePhaseAvailability(CLOSET2, true);
+    interactableManager->setFurniturePhaseAvailability(CLOSET0, true);
+    interactableManager->setFurniturePhaseAvailability(CLOSET1, true);
     interactableManager->setFurniturePhaseAvailability(DOOR1, true);
     interactableManager->setItemPhaseVisibility(REDROOM_KEY, false);
     interactableManager->setItemPhaseAvailability(FILE2, true);
@@ -219,24 +221,24 @@ void StoryManager::setUpPhase() {
     break;
 
   case 5:
-    enableGhost("ghost1", false);
+      if (!isa_is_debugging) enableGhost("ghost1", false);
     break;
   case 6:   // can read the blueprint and grab key
-      interactableManager->setFurniturePhaseAvailability(REDROOM_DOOR, true);
+      //interactableManager->setFurniturePhaseAvailability(REDROOM_DOOR, true);
       
   case 7:   
-	  interactableManager->setFurniturePhaseAvailability(MAP, true);
+	  interactableManager->setFurniturePhaseAvailability(BLUEPRINT, true);
       interactableManager->setItemPhaseAvailability(CLIP_M, true);
 	  break;
   case 8:   
           // ghost chase
-	      enableGhost("ghost2", true);
+      if (!isa_is_debugging) enableGhost("ghost2", true);
 	      break;
 
   case 9:
 	  
 	  // ghost chase
-	  enableGhost("ghost2", true);
+      if (!isa_is_debugging) enableGhost("ghost2", true);
 	  break;
 
 
